@@ -5,7 +5,14 @@
     {
         static void Main(string[] args)
         {
-
+            Player my = new Player("나");
+            Enemy enemy = new Enemy("적");
+            while (!my.Died || !enemy.Died) 
+            {
+                my.Attack(enemy);
+                if (enemy.Died) break;
+                enemy.Attack(my);
+            }
         }
         static void InputName() 
         {
@@ -171,40 +178,44 @@
             {
                 int dice = rand.Next(5) + 1;
 
-                Console.Write("주사위 눈 크기를 예측해 보십시오(0:High,1:Low) : ");
+                Console.Write("주사위 눈 크기를 예측해 보십시오(1:High,2:Low) : ");
 
                 int.TryParse(Console.ReadLine(), out int pradict);
+                bool high = false;
+                switch (pradict) 
+                {
+                    case 1 :
+                        high = true;
+                        break;
+                    case 2 :
+                        high = false;
+                        break;
+                    default: 
+                        Console.WriteLine("잘못된 입력입니다.");
+                        continue;
+                }
+                bool diceHigh = false;
                 if (dice > 3)
                 {
                     Console.WriteLine("High");
-                    if (pradict == 0)
-                    {
-                        Console.WriteLine("성공");
-                        count++;
-                    }
-                    else
-                    {
-                        Console.WriteLine("실패");
-                        Console.WriteLine($"점수 : {count}");
-                        count = 0;
-                        stop = true;
-                    }
+                    diceHigh = true;
                 }
                 else
                 {
                     Console.WriteLine("Low");
-                    if (pradict == 1)
-                    {
-                        Console.WriteLine("성공");
-                        count++;
-                    }
-                    else
-                    {
-                        Console.WriteLine("실패");
-                        Console.WriteLine($"점수 : {count}");
-                        count = 0;
-                        stop = true;
-                    }
+                    diceHigh= false;
+                }
+                if (high == diceHigh)
+                {
+                    Console.WriteLine("성공");
+                    count++;
+                }
+                else 
+                {
+                    Console.WriteLine("실패");
+                    Console.WriteLine($"점수 : {count}");
+                    count = 0;
+                    stop = true;
                 }
             }
         }
@@ -218,13 +229,18 @@
             {
                 int dice = rand.Next(5) + 1;
 
-                Console.Write("홀짝을 선택해 주십시오 (0:홀, 1:짝) : ");
+                Console.Write("홀짝을 선택해 주십시오 (1:홀, 2:짝) : ");
 
                 int.TryParse(Console.ReadLine(), out int pradict);
+                if (pradict !=1 && pradict !=2) 
+                {
+                    Console.WriteLine("잘못된 입력입니다.");
+                    continue;
+                }
                 if (dice % 2 == 0)//짝
                 {
                     Console.WriteLine("짝");
-                    if (pradict == 1)
+                    if (pradict == 2)
                     {
                         Console.WriteLine("성공");
                         count++;
@@ -240,7 +256,7 @@
                 else
                 {
                     Console.WriteLine("홀");
-                    if (pradict == 0)
+                    if (pradict == 1)
                     {
                         Console.WriteLine("성공");
                         count++;
