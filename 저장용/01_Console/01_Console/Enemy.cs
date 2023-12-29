@@ -9,10 +9,10 @@ namespace _01_Console
     internal class Enemy : Character
     {
         public Enemy (string _name) : base(_name) { }
-        public override void Skill()
+        protected override float OnSkill()
         {
-            base.Skill();
             Console.WriteLine("적은 도끼를 던진다.");
+            return attackPower * 3.0f;
         }
     }
 }

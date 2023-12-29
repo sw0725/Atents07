@@ -9,10 +9,10 @@ namespace _01_Console
     internal class Player : Character
     {
         public Player (string _name) : base (_name) { }
-        public override void Skill()
+        protected override float OnSkill()
         {
-            base.Skill();
             Console.WriteLine("플레이어의 파이어볼");
+            return attackPower * 5.0f;
         }
     }
 }
