@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour
 {
     PlayerInputAction inputAction;
+    Animator animator;
     public GameObject Bullet;
+    Transform firePlace;
 
     Vector3 inputDir = Vector3.zero;
     float moveSpeed = 5f;
@@ -15,7 +18,7 @@ public class Player : MonoBehaviour
     {
         if (context.performed)
         {
-            Bullet.SetActive(true);
+            Instantiate(Bullet, firePlace.position, Quaternion.identity);
         }
     }
     private void OnBoost(InputAction.CallbackContext context)
@@ -28,11 +31,14 @@ public class Player : MonoBehaviour
     private void OnMove(InputAction.CallbackContext context)
     {
         inputDir = context.ReadValue<Vector2>();
+        animator.SetFloat("InputY", inputDir.y);
     }
 
     private void Awake()
     {
         inputAction = new PlayerInputAction();
+        animator = GetComponent<Animator>();
+        firePlace =transform.GetChild(0);
     }
 
     private void OnEnable()
