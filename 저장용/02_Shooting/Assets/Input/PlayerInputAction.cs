@@ -25,21 +25,21 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     ""maps"": [
         {
             ""name"": ""Player"",
-            ""id"": ""cb43bb1b-72ad-481d-aab4-27926ac54299"",
+            ""id"": ""78682a61-e9ee-494c-9106-f277151aaefc"",
             ""actions"": [
                 {
                     ""name"": ""Move"",
-                    ""type"": ""Button"",
-                    ""id"": ""9c006804-e607-4878-8a80-580c43222eda"",
-                    ""expectedControlType"": ""Button"",
+                    ""type"": ""Value"",
+                    ""id"": ""9b500565-cfae-4042-97b2-ccb7e5381df2"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Boost"",
                     ""type"": ""Button"",
-                    ""id"": ""33fed568-b4ef-493a-aace-888cfc3491bc"",
+                    ""id"": ""fdb74ac2-3fb5-4a0b-99bc-e5bb0c66e23a"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -48,7 +48,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""Fire"",
                     ""type"": ""Button"",
-                    ""id"": ""c61279e1-59bc-4326-958b-d1d1092a2f69"",
+                    ""id"": ""ef02ba58-8504-4939-b35e-ef48dc5efe15"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -57,34 +57,78 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             ],
             ""bindings"": [
                 {
-                    ""name"": """",
-                    ""id"": ""7b4c96fb-b720-4ccc-8ba8-5e0c906541fd"",
-                    ""path"": """",
+                    ""name"": ""WASD"",
+                    ""id"": ""ba4b72cc-987d-4b0c-af44-cfdcb8117a31"",
+                    ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""New control scheme"",
+                    ""groups"": """",
                     ""action"": ""Move"",
-                    ""isComposite"": false,
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""21f9bc5a-79ad-4237-a5e1-ac21faf0886a"",
-                    ""path"": ""<Keyboard>/q"",
+                    ""name"": ""up"",
+                    ""id"": ""c2073b14-070f-4223-ba6d-5b765b6bb4c6"",
+                    ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""New control scheme"",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""4509230e-835d-4b76-a426-3d9bfcf8d4dc"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""6f868ff1-1675-406a-90fb-d32416cc898b"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""0cae44f0-ca48-4ab5-8908-bf6194c2ac5b"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""599c2eff-e310-4e38-abb7-acf84b4c90ba"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Player"",
                     ""action"": ""Boost"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""f50a5ba0-ccea-4204-b4a3-cd83c673b1d1"",
+                    ""id"": ""22fa1269-d2cd-4a9c-9495-51e3c75bd616"",
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""New control scheme"",
+                    ""groups"": ""Player"",
                     ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -94,8 +138,8 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     ],
     ""controlSchemes"": [
         {
-            ""name"": ""New control scheme"",
-            ""bindingGroup"": ""New control scheme"",
+            ""name"": ""Player"",
+            ""bindingGroup"": ""Player"",
             ""devices"": [
                 {
                     ""devicePath"": ""<Keyboard>"",
@@ -235,13 +279,13 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
-    private int m_NewcontrolschemeSchemeIndex = -1;
-    public InputControlScheme NewcontrolschemeScheme
+    private int m_PlayerSchemeIndex = -1;
+    public InputControlScheme PlayerScheme
     {
         get
         {
-            if (m_NewcontrolschemeSchemeIndex == -1) m_NewcontrolschemeSchemeIndex = asset.FindControlSchemeIndex("New control scheme");
-            return asset.controlSchemes[m_NewcontrolschemeSchemeIndex];
+            if (m_PlayerSchemeIndex == -1) m_PlayerSchemeIndex = asset.FindControlSchemeIndex("Player");
+            return asset.controlSchemes[m_PlayerSchemeIndex];
         }
     }
     public interface IPlayerActions
