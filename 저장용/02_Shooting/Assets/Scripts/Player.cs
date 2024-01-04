@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     PlayerInputAction inputAction;
     Animator animator;
     public GameObject Bullet;
+    public GameObject flash;
     Transform firePlace;
 
     Vector3 inputDir = Vector3.zero;
@@ -19,6 +20,7 @@ public class Player : MonoBehaviour
         if (context.performed)
         {
             Instantiate(Bullet, firePlace.position, Quaternion.identity);
+            Instantiate(flash, firePlace.position, Quaternion.identity);
         }
     }
     private void OnBoost(InputAction.CallbackContext context)
@@ -63,15 +65,8 @@ public class Player : MonoBehaviour
         inputAction.Player.Disable();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void FixedUpdate()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        transform.Translate(Time.deltaTime*moveSpeed*inputDir);
+        transform.Translate(Time.fixedDeltaTime * moveSpeed * inputDir);
     }
 }

@@ -4,18 +4,24 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    Vector3 dir = Vector3.right;
     float moveSpeed = 7f;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float AttackPower = 1.0f;
+    public GameObject hitEffect;
 
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Time.deltaTime * moveSpeed * dir);
+        transform.Translate(Time.deltaTime * moveSpeed * Vector2.right);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            enemy.Damage(AttackPower);
+        }
+        Instantiate(hitEffect, collision.transform.position, Quaternion.identity);
+        Destroy(this.gameObject);
     }
 }

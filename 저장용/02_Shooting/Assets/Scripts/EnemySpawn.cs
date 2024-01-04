@@ -5,8 +5,7 @@ using UnityEngine;
 public class EnemySpawn : MonoBehaviour
 {
     public GameObject enemy;
-    public float timeLaps = 0.5f;
-    float timer = 0.0f;
+    public float timeLaps = 2.0f;
     float min = -4.0f;
     float max = 4.0f;
     int counter = 0;
@@ -15,16 +14,15 @@ public class EnemySpawn : MonoBehaviour
     void Start()
     {
         counter = 0;
-        timer = 0.0f;
+
+        StartCoroutine(SpawnCoroutine());
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator SpawnCoroutine() 
     {
-        timer += Time.deltaTime;
-        if (timer > timeLaps) 
+        while (true) 
         {
-            timer = 0.0f;
+            yield return new WaitForSeconds(timeLaps);
             Spawn();
         }
     }
@@ -42,5 +40,26 @@ public class EnemySpawn : MonoBehaviour
         Vector3 pos = transform.position;
         pos.y += Random.Range(min, max);
         return pos;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;                             
+        Vector3 p0 = transform.position + Vector3.up * max;    
+        Vector3 p1 = transform.position + Vector3.up * min;    
+        Gizmos.DrawLine(p0, p1);                                
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Vector3 p0 = transform.position + Vector3.up * max - Vector3.right * 0.5f;
+        Vector3 p1 = transform.position + Vector3.up * min - Vector3.right * 0.5f;
+        Vector3 p3 = transform.position + Vector3.up * max + Vector3.right * 0.5f;
+        Vector3 p4 = transform.position + Vector3.up * min + Vector3.right * 0.5f;
+        Gizmos.DrawLine(p0, p1);
+        Gizmos.DrawLine(p0, p3);
+        Gizmos.DrawLine(p3, p4);
+        Gizmos.DrawLine(p1, p4);
     }
 }
