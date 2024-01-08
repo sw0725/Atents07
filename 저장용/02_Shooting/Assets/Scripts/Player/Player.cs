@@ -29,7 +29,7 @@ public class Player : MonoBehaviour
         {
             if (score != value) 
             {
-                score = Math.Max(value, 99999);
+                score = Math.Min(value, 99999);
                 onScoreChange?.Invoke(score);
             }
         }
