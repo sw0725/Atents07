@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 {
     public GameObject Bullet;
     public float fireInterval = 0.5f;
+    public Action<int> onScoreChange;
 
     PlayerInputAction inputAction;
     Animator animator;
@@ -20,12 +21,11 @@ public class Player : MonoBehaviour
     WaitForSeconds flashWait;
     IEnumerator fireCoroutine;
     int score = 0;
-    public Action<int> onScoreChange;
 
-    int Score
+    public int Score
     {
         get => score;
-        set 
+        private set 
         {
             if (score != value) 
             {

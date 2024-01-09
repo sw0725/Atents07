@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5575125436961903481}
   - component: {fileID: 6764327430413470226}
   - component: {fileID: 4126590100059081631}
+  - component: {fileID: 2141223588013025661}
   m_Layer: 0
   m_Name: BulletKill
   m_TagString: Untagged
@@ -335,3 +336,15 @@ CompositeCollider2D:
   m_OffsetDistance: 0.00005
   m_UseDelaunayMesh: 0
   m_CompositeGameObject: {fileID: 5876100878884961507}
+--- !u!114 &2141223588013025661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5876100878884961507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8a267851332b76459f9d7f3713080e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -6,6 +7,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public GameObject Effect;
+    public Action giveScore;
 
     public float moveSpeed = 1.0f;
     public float amplitude = 3.0f;
@@ -13,7 +15,7 @@ public class Enemy : MonoBehaviour
     public int hp = 3;
     public int score = 10;
 
-
+    Player player;
     float spawnY = 0.0f;
     float totalTime = 0.0f;
     private int HP 
@@ -25,6 +27,7 @@ public class Enemy : MonoBehaviour
             if (hp < 0.1)
             {
                 hp = 0;
+                giveScore();
                 OnDie();
             }
         }
@@ -33,6 +36,8 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        player = FindAnyObjectByType<Player>();
+        giveScore += () => player.AddScore(score);
         spawnY = transform.position.y;
         totalTime = 0.0f;
     }
@@ -56,8 +61,6 @@ public class Enemy : MonoBehaviour
     private void OnDie() 
     {
         Instantiate(Effect, transform.position, Quaternion.identity);
-        Player player = FindAnyObjectByType<Player>();
-        player.AddScore(score);
         Destroy(this.gameObject);
     }
 
