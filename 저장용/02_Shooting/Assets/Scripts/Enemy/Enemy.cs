@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : RecycleObject
 {
     public GameObject Effect;
     public Action giveScore;
@@ -36,10 +36,23 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = FindAnyObjectByType<Player>();
-        giveScore += () => player.AddScore(score);
+        
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        OnInitialized();
         spawnY = transform.position.y;
         totalTime = 0.0f;
+    }
+
+    protected override void OnDisable()
+    {
+        if (player != null) 
+        {
+        
+        }
     }
 
     // Update is called once per frame
@@ -64,4 +77,17 @@ public class Enemy : MonoBehaviour
         Destroy(this.gameObject);
     }
 
+    private void OnInitialized()
+    {
+        if(player == null)
+        {
+            player = FindAnyObjectByType<Player>();
+        }
+        if (player != null) 
+        {
+            giveScore += () => player.AddScore(score);
+        }
+    }
+    
+    
 }

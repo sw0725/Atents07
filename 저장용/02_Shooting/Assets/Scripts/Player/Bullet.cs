@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : RecycleObject
 {
     float moveSpeed = 7f;
-    public int AttackPower = 1;
     public GameObject hitEffect;
     public float lifeTime = 10.0f;
 
-    private void Start()
+    protected override void OnEnable()
     {
-        Destroy(gameObject, lifeTime);
+        base.OnEnable();
+        StartCoroutine(LifeOver(lifeTime));
     }
 
     // Update is called once per frame
@@ -23,6 +23,6 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Instantiate(hitEffect, this.transform.position, Quaternion.identity);
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
     }
 }

@@ -55,7 +55,8 @@ public class Player : MonoBehaviour
     void Fire(Vector3 positon, float angle = 0.0f) //총알 하나 발사
     {
         FlashEffect();
-        Instantiate(Bullet, firePlace.position, Quaternion.identity);
+        Debug.Log("fire실행");
+        Instantiate(Bullet, positon, Quaternion.identity);
     }
     IEnumerator FlashEffect() 
     {
@@ -118,5 +119,13 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         transform.Translate(Time.fixedDeltaTime * moveSpeed * inputDir);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy")) 
+        {
+            Destroy(collision.gameObject);
+        }
     }
 }

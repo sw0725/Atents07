@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Expiosion : MonoBehaviour
+public class Expiosion : RecycleObject
 {
     Animator animator;
     float animeLenth = 0.0f;
@@ -13,9 +13,11 @@ public class Expiosion : MonoBehaviour
         animeLenth = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
     }
     // Start is called before the first frame update
-    void Start()
+
+    protected override void OnEnable()
     {
-        Destroy(this.gameObject, animeLenth);
+        base.OnEnable();
+        StartCoroutine(LifeOver(animeLenth));
     }
 
 }
