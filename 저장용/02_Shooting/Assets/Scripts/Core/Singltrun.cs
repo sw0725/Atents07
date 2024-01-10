@@ -1,33 +1,35 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Singltrun : MonoBehaviour//ÇØ´ç Å¬·¡½º´Â new»ý¼º ºÒ°¡´É->»ý¼ºÀÚ ½Å°æ¾²Áö ¾Ê¾Æµµ µÊ
+public class Singltrun<T> : MonoBehaviour where T : Component
 {
     bool isinitialize;
     static bool isShutdown = false;
-    private static Singltrun instance = null;
-    public static Singltrun Instance
+    private static T instance = null;
+    public static T Instance
     {
         get
         {
             if (isShutdown) 
             {
+                Debug.LogWarning("½Ì±ÛÅæÀº ÀÌ¹Ì »èÁ¦ÁßÀÌ´Ù.");
                 return null;
             }
             if (instance == null)
             {
-                Singltrun s = FindAnyObjectByType<Singltrun>();
-                if (s == null)
+                T singleton = FindAnyObjectByType<T>();
+                if (singleton == null)
                 {
-                    GameObject dbj = new GameObject();
-                    dbj.name = "Sington";
-                    instance = dbj.AddComponent<Singltrun>();//¸ð³ë¿¡ ´º´Â ºÒ°¡ÇÏ´Ï±î ÀÌ·±½ÄÀ¸·Î ´ë½ÅÇÔ
+                    GameObject obj = new GameObject();
+                    obj.name = "Sington";
+                    singleton = obj.AddComponent<T>();
                 }
-                instance = s;
+                instance = singleton;
                 DontDestroyOnLoad(instance.gameObject);//¾ÀÀÌ »ç¶óÁ®µµ ¿ÀºêÁ§Æ® »èÁ¦ ¾ÈµÊ
             }
             return instance;
@@ -38,12 +40,15 @@ public class Singltrun : MonoBehaviour//ÇØ´ç Å¬·¡½º´Â new»ý¼º ºÒ°¡´É->»ý¼ºÀÚ ½Å°
     {
         if (instance == null) 
         {
-            instance = this;
+            instance = this as T;
             DontDestroyOnLoad(instance.gameObject);
         }
         else
         {
-            if (instance != this) { Destroy(this); }
+            if (instance != this) 
+            {
+                Destroy(this.gameObject); 
+            }
         }
     }
     private void OnApplicationQuit()
@@ -62,8 +67,14 @@ public class Singltrun : MonoBehaviour//ÇØ´ç Å¬·¡½º´Â new»ý¼º ºÒ°¡´É->»ý¼ºÀÚ ½Å°
 
     private void OnSceneLoded(Scene scene, LoadSceneMode mode)
     {
-        if (!isinitialize) { OnpreInitialize(); }
-        if (mode != LoadSceneMode.Additive) { OnInitialize(); }
+        if (!isinitialize) 
+        {
+            OnpreInitialize();
+        }
+        if (mode != LoadSceneMode.Additive) 
+        {
+            OnInitialize(); 
+        }
     }
 
     protected virtual void OnpreInitialize() 
@@ -72,7 +83,7 @@ public class Singltrun : MonoBehaviour//ÇØ´ç Å¬·¡½º´Â new»ý¼º ºÒ°¡´É->»ý¼ºÀÚ ½Å°
     }
     protected virtual void OnInitialize()
     {
-
+        isinitialize = true;
     }
 }
 //¹Ýµå½Ã ÇÑ°³ÀÇ °´Ã¼

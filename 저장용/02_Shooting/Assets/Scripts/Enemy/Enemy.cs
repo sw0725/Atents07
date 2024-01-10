@@ -27,16 +27,9 @@ public class Enemy : RecycleObject
             if (hp < 0.1)
             {
                 hp = 0;
-                giveScore();
                 OnDie();
             }
         }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
     }
 
     protected override void OnEnable()
@@ -51,8 +44,16 @@ public class Enemy : RecycleObject
     {
         if (player != null) 
         {
-        
+            giveScore -= PlayerAddScore;
+            giveScore = null;
+            player = null;
         }
+        base.OnDisable();
+    }
+
+    void PlayerAddScore() 
+    {
+        player.AddScore(score);
     }
 
     // Update is called once per frame
@@ -74,6 +75,7 @@ public class Enemy : RecycleObject
     private void OnDie() 
     {
         Instantiate(Effect, transform.position, Quaternion.identity);
+        giveScore?.Invoke();
         Destroy(this.gameObject);
     }
 
@@ -81,11 +83,11 @@ public class Enemy : RecycleObject
     {
         if(player == null)
         {
-            player = FindAnyObjectByType<Player>();
+            player = GameManager.Instance.Player;
         }
         if (player != null) 
         {
-            giveScore += () => player.AddScore(score);
+            giveScore += PlayerAddScore;
         }
     }
     

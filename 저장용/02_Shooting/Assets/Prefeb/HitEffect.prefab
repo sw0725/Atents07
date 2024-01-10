@@ -94,8 +94,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1079081788797146984}
   - component: {fileID: 835586811579527797}
+  - component: {fileID: 4519641159947726255}
   - component: {fileID: 7516970446429113662}
-  - component: {fileID: 1273181574042562784}
   m_Layer: 0
   m_Name: HitEffect
   m_TagString: Untagged
@@ -171,6 +171,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4519641159947726255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8620315540844443825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 609f110619a21bc428f5f837f04bc319, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &7516970446429113662
 Animator:
   serializedVersion: 5
@@ -192,15 +204,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1273181574042562784
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8620315540844443825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ba32970b95e9034ead9e1417b11dcc6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
