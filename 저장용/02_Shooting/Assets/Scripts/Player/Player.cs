@@ -54,9 +54,8 @@ public class Player : MonoBehaviour
 
     void Fire(Vector3 positon, float angle = 0.0f) //총알 하나 발사
     {
-        FlashEffect();
-        Debug.Log("fire실행");
-        Instantiate(Bullet, positon, Quaternion.identity);
+        StartCoroutine(FlashEffect());
+        Factory.Instance.GetBullet(positon);
     }
     IEnumerator FlashEffect() 
     {

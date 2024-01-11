@@ -90,6 +90,10 @@ public class Enemy : RecycleObject
             giveScore += PlayerAddScore;
         }
     }
-    
-    
+
+    public void SetStartPotition(Vector3 posotopn) 
+    {
+        transform.position = posotopn;
+        spawnY = posotopn.y;
+    }
 }

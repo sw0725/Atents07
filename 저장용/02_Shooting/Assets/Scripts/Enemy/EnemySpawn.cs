@@ -8,13 +8,10 @@ public class EnemySpawn : MonoBehaviour
     public float timeLaps = 2.0f;
     float min = -4.0f;
     float max = 4.0f;
-    int counter = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        counter = 0;
-
         StartCoroutine(SpawnCoroutine());
     }
 
@@ -29,10 +26,8 @@ public class EnemySpawn : MonoBehaviour
 
     void Spawn() 
     {
-        GameObject gameObject = Instantiate(enemy, EPotition(), Quaternion.identity);
-        gameObject.transform.SetParent(transform);
-        gameObject.name = $"Enemy_{counter}";
-        counter++;
+        Enemy enemy = Factory.Instance.GetEnemy(EPotition());
+        enemy.transform.SetParent(transform);
     }
 
     Vector3 EPotition() 

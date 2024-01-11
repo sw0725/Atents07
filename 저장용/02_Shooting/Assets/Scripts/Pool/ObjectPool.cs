@@ -12,11 +12,6 @@ public class ObjectPool<T> : MonoBehaviour where T : RecycleObject
 
     Queue<T> Queue;
 
-    private void Awake()
-    {
-        Initialized();
-    }
-
     public void Initialized()
     {
         if (Pool == null)

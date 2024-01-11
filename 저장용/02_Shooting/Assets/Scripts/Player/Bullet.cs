@@ -22,7 +22,7 @@ public class Bullet : RecycleObject
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Instantiate(hitEffect, this.transform.position, Quaternion.identity);
+        Factory.Instance.GetHitEffect(transform.position);
         gameObject.SetActive(false);
     }
 }
