@@ -56,6 +56,7 @@ public class Player : MonoBehaviour
     {
         StartCoroutine(FlashEffect());
         Factory.Instance.GetBullet(positon);
+        Debug.Log(1);
     }
     IEnumerator FlashEffect() 
     {
@@ -122,9 +123,6 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy")) 
-        {
-            Destroy(collision.gameObject);
-        }
+
     }
 }

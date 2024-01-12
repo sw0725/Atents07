@@ -6,6 +6,14 @@ public class KillZone : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Destroy(other.gameObject);
+        RecycleObject obj = other.GetComponent<RecycleObject>();
+        if (obj != null)
+        {
+            other.gameObject.SetActive(false);
+        }
+        else 
+        {
+            Destroy(other.gameObject);
+        }
     }
 }

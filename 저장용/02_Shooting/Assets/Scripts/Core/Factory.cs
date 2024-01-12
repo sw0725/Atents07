@@ -7,7 +7,8 @@ public enum PoolObjectType
     PlayerBullet = 0,
     HitEffect,
     Expolsive,
-    Enemy
+    EnemyWave,
+    EnemyAstroid
 }
 
 public class Factory : Singltrun<Factory>
@@ -16,6 +17,7 @@ public class Factory : Singltrun<Factory>
     HitPool Hit;
     Expolsion expolsion;
     EnemyPool enemy;
+    AsteroidPool asteroid;
 
     protected override void OnInitialize()
     {
@@ -33,6 +35,9 @@ public class Factory : Singltrun<Factory>
         enemy = GetComponentInChildren<EnemyPool>();
         if (enemy != null)
             enemy.Initialized();
+        asteroid = GetComponentInChildren<AsteroidPool>();
+        if (asteroid != null)
+            asteroid.Initialized();
     }
 
     public GameObject GetObject(PoolObjectType type) 
@@ -49,8 +54,11 @@ public class Factory : Singltrun<Factory>
             case PoolObjectType.Expolsive:
                 result = expolsion.GetObject().gameObject;
                 break;
-            case PoolObjectType.Enemy:
+            case PoolObjectType.EnemyWave:
                 result = enemy.GetObject().gameObject;
+                break;
+            case PoolObjectType.EnemyAstroid:
+                result = asteroid.GetObject().gameObject;
                 break;
         }
         return result;
@@ -63,8 +71,8 @@ public class Factory : Singltrun<Factory>
 
         switch (type)
         {
-            case PoolObjectType.Enemy:
-                Enemy enemy = obj.GetComponent<Enemy>();
+            case PoolObjectType.EnemyWave:
+                Wave enemy = obj.GetComponent<Wave>();
                 enemy.SetStartPotition(position);
                 break;
         }
@@ -105,15 +113,27 @@ public class Factory : Singltrun<Factory>
         expcomp.transform.position = position;
         return expcomp;
     }
-    public Enemy GetEnemy()
+    public Wave GetEnemyWave()
     {
         return enemy.GetObject();
     }
 
-    public Enemy GetEnemy(Vector3 position)
+    public Wave GetEnemyWave(Vector3 position)
     {
-        Enemy enemycomp = enemy.GetObject();
+        Wave enemycomp = enemy.GetObject();
         enemycomp.SetStartPotition(position);
         return enemycomp;
+    }
+
+    public Asteroid GetAstroid()
+    {
+        return asteroid.GetObject();
+    }
+
+    public Asteroid GetAstorid(Vector3 position)
+    {
+        Asteroid asteroidcomp = asteroid.GetObject();
+        asteroidcomp.transform.position = position;
+        return asteroidcomp;
     }
 }

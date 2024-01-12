@@ -4,29 +4,20 @@ using UnityEngine;
 
 public class BackgroundStar : BackGround
 {
+    SpriteRenderer[] spriteRenderer;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        spriteRenderer = GetComponentsInChildren<SpriteRenderer>();
+    }
+
     protected override void MoveRight(int index)
     {
         base.MoveRight(index);
-        SpriteRenderer spriteRenderer = bgSloats[index].gameObject.GetComponent<SpriteRenderer>();
-        int ran = Random.Range(0, 3);
-        switch (ran) 
-        {
-            case 0:
-                spriteRenderer.flipX = true;
-                spriteRenderer.flipY = true;
-                break;
-            case 1:
-                spriteRenderer.flipX = true;
-                spriteRenderer.flipY = false;
-                break;
-            case 2:
-                spriteRenderer.flipX = false;
-                spriteRenderer.flipY = true;
-                break;
-            case 3:
-                spriteRenderer.flipX = false;
-                spriteRenderer.flipY = false;
-                break;
-        }
+        int rand = Random.Range(0, 4);
+
+        spriteRenderer[index].flipX = ((rand & 0b_01) != 0);
+        spriteRenderer[index].flipX = ((rand & 0b_10) != 0);
     }
 }

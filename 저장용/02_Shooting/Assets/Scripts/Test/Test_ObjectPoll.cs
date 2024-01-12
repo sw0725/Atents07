@@ -24,7 +24,7 @@ public class Test_ObjectPoll : TestBase
     }
     protected override void OnTest3(InputAction.CallbackContext context)
     {
-       Enemy enemy = enemyPool.GetObject();
+       Wave enemy = enemyPool.GetObject();
     }
     protected override void OnTest4(InputAction.CallbackContext context)
     {

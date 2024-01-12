@@ -39,7 +39,6 @@ public class ObjectPool<T> : MonoBehaviour where T : RecycleObject
 
             T comp = obj.GetComponent<T>();
             comp.onDisable += () => Queue.Enqueue(comp);
-            Queue.Enqueue(comp);
 
             result[i] = comp;
             obj.SetActive(false);

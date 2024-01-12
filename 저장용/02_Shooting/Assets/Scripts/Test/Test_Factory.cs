@@ -26,8 +26,8 @@ public class Test_Factory : TestBase
             case PoolObjectType.Expolsive:
                 Factory.Instance.Getexpolsion(Position);
                 break;
-            case PoolObjectType.Enemy:
-                Factory.Instance.GetEnemy(Position);
+            case PoolObjectType.EnemyWave:
+                Factory.Instance.GetEnemyWave(Position);
                 break;
         }
     }
