@@ -7,7 +7,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour
 {
-    public GameObject Bullet;
     public float fireInterval = 0.5f;
     public Action<int> onScoreChange;
 
@@ -15,11 +14,12 @@ public class Player : MonoBehaviour
     Animator animator;
     Transform firePlace;
     GameObject flash;
+    WaitForSeconds flashWait;
 
     Vector3 inputDir = Vector3.zero;
     float moveSpeed = 5f;
-    WaitForSeconds flashWait;
     IEnumerator fireCoroutine;
+    public int PowerScale = 1;
     int score = 0;
 
     public int Score
@@ -55,8 +55,21 @@ public class Player : MonoBehaviour
     void Fire(Vector3 positon, float angle = 0.0f) //총알 하나 발사
     {
         StartCoroutine(FlashEffect());
-        Factory.Instance.GetBullet(positon);
-        Debug.Log(1);
+        switch (PowerScale) 
+        {
+            case 1:
+                Factory.Instance.GetBullet(positon, angle);
+                break;
+            case 2:
+                Factory.Instance.GetBullet(positon, 15.0f);
+                Factory.Instance.GetBullet(positon, -15.0f);
+                break;
+            case 3:
+                Factory.Instance.GetBullet(positon, 30.0f);
+                Factory.Instance.GetBullet(positon, angle);
+                Factory.Instance.GetBullet(positon, -30.0f);
+                break;
+        }
     }
     IEnumerator FlashEffect() 
     {
@@ -82,6 +95,11 @@ public class Player : MonoBehaviour
     public void AddScore(int getScore) 
     {
         Score += getScore;
+    }
+
+    public void AddPower()
+    {
+        if (PowerScale < 4) { PowerScale++; }
     }
 
     private void Awake()
@@ -119,10 +137,5 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         transform.Translate(Time.fixedDeltaTime * moveSpeed * inputDir);
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-
     }
 }

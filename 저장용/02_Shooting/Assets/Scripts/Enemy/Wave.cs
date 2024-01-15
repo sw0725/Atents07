@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Wave : EnemyBase
 {
-    public Action giveScore;
+    [Header("Wave data")]
 
     public float amplitude = 3.0f;
     public float frequency = 2.0f;
@@ -23,7 +23,6 @@ public class Wave : EnemyBase
 
     public void SetStartPotition(Vector3 posotopn) 
     {
-        transform.position = posotopn;
         spawnY = posotopn.y;
     }
 

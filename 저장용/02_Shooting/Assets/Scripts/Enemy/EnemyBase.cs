@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class EnemyBase : RecycleObject
 {
+    [Header("Enemy data")]
+
     public float moveSpeed = 1.0f;
     public int maxHp = 1;
     public int score = 10;
@@ -14,7 +16,7 @@ public class EnemyBase : RecycleObject
     Player player;
 
     int hp = 1;
-    private int HP 
+    protected int HP 
     {
         get => hp;
         set 
@@ -56,7 +58,7 @@ public class EnemyBase : RecycleObject
         OnMoveUpdate(Time.deltaTime);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Bullet") || collision.gameObject.CompareTag("Player")) 
         {
@@ -66,12 +68,12 @@ public class EnemyBase : RecycleObject
 
     protected virtual void OnDie() 
     {
-        Factory.Instance.Getexpolsion(transform.position);
+        Factory.Instance.Getexpolsion(this.transform.position);
         giveScore?.Invoke();
         gameObject.SetActive(false);
     }
 
-    private void OnInitialized()
+    protected virtual void OnInitialized()
     {
         if(player == null)
         {

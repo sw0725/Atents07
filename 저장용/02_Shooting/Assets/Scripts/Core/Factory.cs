@@ -8,7 +8,8 @@ public enum PoolObjectType
     HitEffect,
     Expolsive,
     EnemyWave,
-    EnemyAstroid
+    EnemyAstroid,
+    EnemyAstroidMini
 }
 
 public class Factory : Singltrun<Factory>
@@ -16,8 +17,9 @@ public class Factory : Singltrun<Factory>
     BulletPool bullet;
     HitPool Hit;
     Expolsion expolsion;
-    EnemyPool enemy;
+    WavePool enemy;
     AsteroidPool asteroid;
+    AsteroidMiniPool asteroidMini;
 
     protected override void OnInitialize()
     {
@@ -32,52 +34,42 @@ public class Factory : Singltrun<Factory>
         expolsion = GetComponentInChildren<Expolsion>();
         if (expolsion != null)
             expolsion.Initialized();
-        enemy = GetComponentInChildren<EnemyPool>();
+        enemy = GetComponentInChildren<WavePool>();
         if (enemy != null)
             enemy.Initialized();
         asteroid = GetComponentInChildren<AsteroidPool>();
         if (asteroid != null)
             asteroid.Initialized();
+        asteroidMini = GetComponentInChildren<AsteroidMiniPool>();
+        if (asteroidMini != null)
+            asteroidMini.Initialized();
     }
 
-    public GameObject GetObject(PoolObjectType type) 
+    public GameObject GetObject(PoolObjectType type, Vector3? position = null, Vector3? euler = null) 
     {
         GameObject result = null;
         switch (type) 
         {
             case PoolObjectType.PlayerBullet:
-                result = bullet.GetObject().gameObject;
+                result = bullet.GetObject(position, euler).gameObject;
                 break;
             case PoolObjectType.HitEffect:
-                result = Hit.GetObject().gameObject;
+                result = Hit.GetObject(position, euler).gameObject;
                 break; 
             case PoolObjectType.Expolsive:
-                result = expolsion.GetObject().gameObject;
+                result = expolsion.GetObject(position, euler).gameObject;
                 break;
             case PoolObjectType.EnemyWave:
-                result = enemy.GetObject().gameObject;
+                result = enemy.GetObject(position, euler).gameObject;
                 break;
             case PoolObjectType.EnemyAstroid:
-                result = asteroid.GetObject().gameObject;
+                result = asteroid.GetObject(position, euler).gameObject;
+                break;
+            case PoolObjectType.EnemyAstroidMini:
+                result = asteroidMini.GetObject(position, euler).gameObject;
                 break;
         }
         return result;
-    }
-
-    public GameObject GetObject(PoolObjectType type, Vector3 position) 
-    {
-        GameObject obj = GetObject(type);
-        obj.transform.position = position;
-
-        switch (type)
-        {
-            case PoolObjectType.EnemyWave:
-                Wave enemy = obj.GetComponent<Wave>();
-                enemy.SetStartPotition(position);
-                break;
-        }
-
-        return obj;
     }
     
     public Bullet GetBullet()
@@ -85,44 +77,36 @@ public class Factory : Singltrun<Factory>
         return bullet.GetObject();
     }
 
-    public Bullet GetBullet(Vector3 position) 
+    public Bullet GetBullet(Vector3 position, float angle = 0.0f) 
     {
-        Bullet bulletcomp = bullet.GetObject();
-        bulletcomp.transform.position = position;
-        return bulletcomp;
+        return bullet.GetObject(position, angle * Vector3.forward);
     }
     public Expiosion GetHitEffect()
     {
         return Hit.GetObject();
     }
 
-    public Expiosion GetHitEffect(Vector3 position)
+    public Expiosion GetHitEffect(Vector3 position, float angle = 0.0f)
     {
-        Expiosion Hitcomp = Hit.GetObject();
-        Hitcomp.transform.position = position;
-        return Hitcomp;
+        return Hit.GetObject(position, angle * Vector3.forward);
     }
     public Expiosion Getexpolsion()
     {
         return expolsion.GetObject();
     }
 
-    public Expiosion Getexpolsion(Vector3 position)
+    public Expiosion Getexpolsion(Vector3 position, float angle = 0.0f)
     {
-        Expiosion expcomp = expolsion.GetObject();
-        expcomp.transform.position = position;
-        return expcomp;
+        return expolsion.GetObject(position, angle * Vector3.forward);
     }
     public Wave GetEnemyWave()
     {
         return enemy.GetObject();
     }
 
-    public Wave GetEnemyWave(Vector3 position)
+    public Wave GetEnemyWave(Vector3 position, float angle = 0.0f)
     {
-        Wave enemycomp = enemy.GetObject();
-        enemycomp.SetStartPotition(position);
-        return enemycomp;
+        return enemy.GetObject(position, angle*Vector3.forward);
     }
 
     public Asteroid GetAstroid()
@@ -130,10 +114,17 @@ public class Factory : Singltrun<Factory>
         return asteroid.GetObject();
     }
 
-    public Asteroid GetAstorid(Vector3 position)
+    public Asteroid GetAstorid(Vector3 position, float angle = 0.0f)
     {
-        Asteroid asteroidcomp = asteroid.GetObject();
-        asteroidcomp.transform.position = position;
-        return asteroidcomp;
+        return asteroid.GetObject(position, angle * Vector3.forward);
+    }
+    public AstroidMini GetAstroidMini()
+    {
+        return asteroidMini.GetObject();
+    }
+
+    public AstroidMini GetAstoridMini(Vector3 position, float angle = 0.0f)
+    {
+        return asteroidMini.GetObject(position, angle*Vector3.forward);
     }
 }

@@ -45,20 +45,25 @@ public class ObjectPool<T> : MonoBehaviour where T : RecycleObject
         }
     }
 
-    public T GetObject() 
+    public T GetObject(Vector3? position = null, Vector3? eulerAngle = null)
     {
         if (Queue.Count > 0)
         {
             T comp = Queue.Dequeue();
             comp.gameObject.SetActive(true);
+            comp.transform.position = position.GetValueOrDefault();
+            comp.transform.Rotate(eulerAngle.GetValueOrDefault());
+            OnGetObject(comp);
             return comp;
         }
-        else 
+        else
         {
             ExpendPool();
-            return GetObject();
+            return GetObject(position, eulerAngle);
         }
     }
+
+    protected virtual void OnGetObject(T component) { }
 
     void ExpendPool() 
     {

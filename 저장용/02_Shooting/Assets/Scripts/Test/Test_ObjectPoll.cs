@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class Test_ObjectPoll : TestBase
 {
     public BulletPool pool;
-    public EnemyPool enemyPool;
+    public WavePool enemyPool;
     public Expolsion HitPool;
     public Expolsion ExPool;
 
