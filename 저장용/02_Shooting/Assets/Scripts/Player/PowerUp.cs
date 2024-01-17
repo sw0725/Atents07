@@ -1,62 +1,80 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class PowerUp : EnemyBase
+public class PowerUp : RecycleObject
 {
+    public float moveSpeed = 2.0f;
+    public float dirChangeinterval = 1.0f;
+    public int dirChangeCountMax = 5;
+    
+    Vector3 dir;
+    Transform player;
+    Animator animator;
+    int dirChangeCount = 5;
 
-    Player player;
-
-    Action gotIt;
-
-    protected override void OnDisable()
+    int DirChageCount 
     {
-        if (player != null)
+        get { return dirChangeCount; }
+        set 
         {
-            gotIt -= PlayerAddPower;
-            gotIt = null;
-            player = null;
-        }
-        base.OnDisable();
-    }
+            dirChangeCount = value;
+            animator.SetInteger("Count", dirChangeCount);
+            StopAllCoroutines();
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        if (player != null)
-        {
-            gotIt += PlayerAddPower;
-        }
-
-        HP = maxHp;
-    }
-
-    private void PlayerAddPower()
-    {
-        player.AddPower();
-    }
-
-    protected override void OnDie()
-    {
-        gotIt?.Invoke();
-        gameObject.SetActive(false);
-    }
-
-    protected override void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            HP--;
+            if (dirChangeCount > 0 && gameObject.activeSelf) 
+            {
+                StartCoroutine(DirectionChange()); ;
+            }
         }
     }
 
-    protected override void OnMoveUpdate(float deltaTime)
+    private void Awake()
     {
-        base.OnMoveUpdate(deltaTime);
+        animator = GetComponent<Animator>();
     }
-    ///하나 두줄
-    ///두개 세줄
-    ///새개 점수1000
-    ///랜덤방향으로 움직임 일정시간마다 이동방향 바뀜 높은확률로 플레이어의 반대쪽으로 움직인다
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        StopAllCoroutines();
+
+        DirChageCount = dirChangeCountMax;
+        player = GameManager.Instance.Player.transform;
+        dir = Vector3.zero;
+    }
+
+    IEnumerator DirectionChange() 
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(dirChangeinterval);
+            if (Random.value < 0.4f)
+            {
+                Vector2 playerToPowerup = transform.position - player.position;
+                dir = Quaternion.Euler(0, 0, Random.Range(-90.0f, 90.0f)) * playerToPowerup;
+            }
+            else 
+            {
+                dir = Random.insideUnitCircle;
+            }
+            dir.Normalize();
+            DirChageCount--;
+        }
+    }
+
+    private void Update()
+    {
+        transform.Translate(Time.deltaTime * moveSpeed * dir);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (DirChageCount>0 && collision.gameObject.CompareTag("Border")) 
+        {
+            dir = Vector3.Reflect(dir, collision.contacts[0].normal);
+            DirChageCount--;
+        }
+    }
 }

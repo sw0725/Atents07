@@ -7,6 +7,7 @@ public enum PoolObjectType
     PlayerBullet = 0,
     HitEffect,
     Expolsive,
+    PowerUp,
     EnemyWave,
     EnemyAstroid,
     EnemyAstroidMini
@@ -17,6 +18,7 @@ public class Factory : Singltrun<Factory>
     BulletPool bullet;
     HitPool Hit;
     Expolsion expolsion;
+    PowerUpPool powerUp;
     WavePool enemy;
     AsteroidPool asteroid;
     AsteroidMiniPool asteroidMini;
@@ -34,6 +36,9 @@ public class Factory : Singltrun<Factory>
         expolsion = GetComponentInChildren<Expolsion>();
         if (expolsion != null)
             expolsion.Initialized();
+        powerUp = GetComponentInChildren<PowerUpPool>();
+        if (powerUp != null)
+            powerUp.Initialized();
         enemy = GetComponentInChildren<WavePool>();
         if (enemy != null)
             enemy.Initialized();
@@ -58,6 +63,9 @@ public class Factory : Singltrun<Factory>
                 break; 
             case PoolObjectType.Expolsive:
                 result = expolsion.GetObject(position, euler).gameObject;
+                break;
+            case PoolObjectType.PowerUp:
+                result = powerUp.GetObject(position, euler).gameObject;
                 break;
             case PoolObjectType.EnemyWave:
                 result = enemy.GetObject(position, euler).gameObject;
@@ -95,10 +103,20 @@ public class Factory : Singltrun<Factory>
         return expolsion.GetObject();
     }
 
+    public PowerUp GetPowerUp(Vector3 position, float angle = 0.0f)
+    {
+        return powerUp.GetObject(position, angle * Vector3.forward);
+    }
+    public PowerUp GetPowerUp()
+    {
+        return powerUp.GetObject();
+    }
+
     public Expiosion Getexpolsion(Vector3 position, float angle = 0.0f)
     {
         return expolsion.GetObject(position, angle * Vector3.forward);
     }
+
     public Wave GetEnemyWave()
     {
         return enemy.GetObject();
