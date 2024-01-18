@@ -10,7 +10,11 @@ public enum PoolObjectType
     PowerUp,
     EnemyWave,
     EnemyAstroid,
-    EnemyAstroidMini
+    EnemyAstroidMini,
+    EnemyBouns,
+    EnemyCurve,
+    EnemyBossBullet,
+    EnemyBossMissle,
 }
 
 public class Factory : Singltrun<Factory>
@@ -22,6 +26,10 @@ public class Factory : Singltrun<Factory>
     WavePool enemy;
     AsteroidPool asteroid;
     AsteroidMiniPool asteroidMini;
+    BounsPool bouns;
+    CurvePool curve;
+    BossBulletPool bossBullet;
+    BossMisslePool bossMissle;
 
     protected override void OnInitialize()
     {
@@ -48,6 +56,18 @@ public class Factory : Singltrun<Factory>
         asteroidMini = GetComponentInChildren<AsteroidMiniPool>();
         if (asteroidMini != null)
             asteroidMini.Initialized();
+        bouns = GetComponentInChildren<BounsPool>();
+        if (bouns != null)
+            bouns.Initialized();
+        curve = GetComponentInChildren<CurvePool>();
+        if (curve != null)
+            curve.Initialized();
+        bossBullet = GetComponentInChildren<BossBulletPool>();
+        if (bossBullet != null)
+            bossBullet.Initialized();
+        bossMissle = GetComponentInChildren<BossMisslePool>();
+        if (bossMissle != null)
+            bossMissle.Initialized();
     }
 
     public GameObject GetObject(PoolObjectType type, Vector3? position = null, Vector3? euler = null) 
@@ -76,6 +96,18 @@ public class Factory : Singltrun<Factory>
             case PoolObjectType.EnemyAstroidMini:
                 result = asteroidMini.GetObject(position, euler).gameObject;
                 break;
+            case PoolObjectType.EnemyBouns:
+                result = bouns.GetObject(position, euler).gameObject;
+                break;
+            case PoolObjectType.EnemyCurve:
+                result = curve.GetObject(position, euler).gameObject;
+                break;
+            case PoolObjectType.EnemyBossBullet:
+                result = bossBullet.GetObject(position, euler).gameObject;
+                break;
+            case PoolObjectType.EnemyBossMissle:
+                result = bossMissle.GetObject(position, euler).gameObject;
+                break;
         }
         return result;
     }
@@ -89,6 +121,25 @@ public class Factory : Singltrun<Factory>
     {
         return bullet.GetObject(position, angle * Vector3.forward);
     }
+    public BossBullet GetBossBullet()
+    {
+        return bossBullet.GetObject();
+    }
+    public BossBullet GetBossBullet(Vector3 position, float angle = 0.0f)
+    {
+        return bossBullet.GetObject(position, angle * Vector3.forward);
+    }
+
+    public BossMissle GetBossMissle(Vector3 position, float angle = 0.0f)
+    {
+        return bossMissle.GetObject(position, angle * Vector3.forward);
+    }
+    public BossMissle GetBossMissle()
+    {
+        return bossMissle.GetObject();
+    }
+
+
     public Expiosion GetHitEffect()
     {
         return Hit.GetObject();
@@ -103,6 +154,12 @@ public class Factory : Singltrun<Factory>
         return expolsion.GetObject();
     }
 
+    public Expiosion Getexpolsion(Vector3 position, float angle = 0.0f)
+    {
+        return expolsion.GetObject(position, angle * Vector3.forward);
+    }
+
+
     public PowerUp GetPowerUp(Vector3 position, float angle = 0.0f)
     {
         return powerUp.GetObject(position, angle * Vector3.forward);
@@ -111,12 +168,6 @@ public class Factory : Singltrun<Factory>
     {
         return powerUp.GetObject();
     }
-
-    public Expiosion Getexpolsion(Vector3 position, float angle = 0.0f)
-    {
-        return expolsion.GetObject(position, angle * Vector3.forward);
-    }
-
     public Wave GetEnemyWave()
     {
         return enemy.GetObject();
@@ -144,5 +195,23 @@ public class Factory : Singltrun<Factory>
     public AstroidMini GetAstoridMini(Vector3 position, float angle = 0.0f)
     {
         return asteroidMini.GetObject(position, angle*Vector3.forward);
+    }
+    public Bouns GetBouns()
+    {
+        return bouns.GetObject();
+    }
+
+    public Bouns GetBouns(Vector3 position, float angle = 0.0f)
+    {
+        return bouns.GetObject(position, angle * Vector3.forward);
+    }
+    public Curve GetCurve()
+    {
+        return curve.GetObject();
+    }
+
+    public Curve GetCurve(Vector3 position, float angle = 0.0f)
+    {
+        return curve.GetObject(position, angle * Vector3.forward);
     }
 }

@@ -5,7 +5,6 @@ using UnityEngine;
 public class Bullet : RecycleObject
 {
     float moveSpeed = 7f;
-    public GameObject hitEffect;
     public float lifeTime = 10.0f;
 
     protected override void OnEnable()
