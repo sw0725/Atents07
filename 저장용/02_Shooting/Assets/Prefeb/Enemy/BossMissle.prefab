@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 8974381129705453810}
   - component: {fileID: 5550878746206002178}
   - component: {fileID: 8445310982226930603}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BossMissle
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -148,6 +148,7 @@ MonoBehaviour:
   moveSpeed: 5
   maxHp: 1
   score: 0
+  guidePerformance: 1.5
 --- !u!1 &5882220739917128034
 GameObject:
   m_ObjectHideFlags: 0

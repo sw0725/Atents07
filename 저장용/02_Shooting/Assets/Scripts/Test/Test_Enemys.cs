@@ -33,6 +33,6 @@ public class Test_Enemys : TestBase
 
     protected override void OnTest5(InputAction.CallbackContext context)
     {
-        //boss
+        Factory.Instance.GetBoss(spawnPoint.position);
     }
 }

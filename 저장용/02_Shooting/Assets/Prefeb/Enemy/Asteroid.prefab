@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
-  maxHp: 1
+  maxHp: 5
   score: 10
   rotateSpeed: 360
   minRotateSpeed: 30

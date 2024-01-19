@@ -13,6 +13,7 @@ public enum PoolObjectType
     EnemyAstroidMini,
     EnemyBouns,
     EnemyCurve,
+    EnemyBoss,
     EnemyBossBullet,
     EnemyBossMissle,
 }
@@ -28,6 +29,7 @@ public class Factory : Singltrun<Factory>
     AsteroidMiniPool asteroidMini;
     BounsPool bouns;
     CurvePool curve;
+    BossPool boss;
     BossBulletPool bossBullet;
     BossMisslePool bossMissle;
 
@@ -62,6 +64,9 @@ public class Factory : Singltrun<Factory>
         curve = GetComponentInChildren<CurvePool>();
         if (curve != null)
             curve.Initialized();
+        boss = GetComponentInChildren<BossPool>();
+        if (boss != null)
+            boss.Initialized();
         bossBullet = GetComponentInChildren<BossBulletPool>();
         if (bossBullet != null)
             bossBullet.Initialized();
@@ -101,6 +106,9 @@ public class Factory : Singltrun<Factory>
                 break;
             case PoolObjectType.EnemyCurve:
                 result = curve.GetObject(position, euler).gameObject;
+                break;
+            case PoolObjectType.EnemyBoss:
+                result = boss.GetObject(position, euler).gameObject;
                 break;
             case PoolObjectType.EnemyBossBullet:
                 result = bossBullet.GetObject(position, euler).gameObject;
@@ -213,5 +221,14 @@ public class Factory : Singltrun<Factory>
     public Curve GetCurve(Vector3 position, float angle = 0.0f)
     {
         return curve.GetObject(position, angle * Vector3.forward);
+    }
+    public Boss GetBoss()
+    {
+        return boss.GetObject();
+    }
+
+    public Boss GetBoss(Vector3 position, float angle = 0.0f)
+    {
+        return boss.GetObject(position, angle * Vector3.forward);
     }
 }
