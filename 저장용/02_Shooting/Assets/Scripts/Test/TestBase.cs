@@ -7,10 +7,17 @@ using UnityEngine.InputSystem;
 public class TestBase : MonoBehaviour
 {
     TestInputAction action;
+    public int seed = -1;
+    const int allRandom = -1;
 
     private void Awake()
     {
         action = new TestInputAction();
+
+        if (seed != allRandom) 
+        {
+            UnityEngine.Random.InitState(seed);
+        }
     }
 
     private void OnEnable()

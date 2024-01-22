@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,13 +11,18 @@ public class Player : MonoBehaviour
 {
     public float fireInterval = 0.5f;
     public Action<int> onScoreChange;
+    public Action<int> onLifeChange;
+    public Action<int> onDead;
     public int powerBonus = 1000;
+    public float invincibleTime = 2.0f;
 
     PlayerInputAction inputAction;
+    Rigidbody2D rigid2d;
     Animator animator;
     Transform[] firePlace;
     GameObject flash;
     WaitForSeconds flashWait;
+    SpriteRenderer spriteRenderer;
 
     Vector3 inputDir = Vector3.zero;
     float moveSpeed = 5f;
@@ -24,6 +31,7 @@ public class Player : MonoBehaviour
     private int power = 1;
     private const int maxPower = 3;
     private const int minPower = 1;
+    private bool IsAlive => life >0;
 
     private int Power
     {
@@ -57,6 +65,34 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+    private int life = 3;
+    private const int startLife = 3;
+
+    int Life 
+    {
+        get => life;
+        set 
+        {
+            if (life != value) 
+            {
+                life = value;
+                if (IsAlive)
+                {
+                    OnHit();
+                }
+                else
+                {
+                    OnDie();
+                }
+
+                life = Mathf.Clamp(life, 0, startLife);
+                onLifeChange?.Invoke(life);
+            }
+        }
+    }
+
+
     private void OnFireStart(InputAction.CallbackContext _)
     {
         StartCoroutine(fireCoroutine);
@@ -131,6 +167,45 @@ public class Player : MonoBehaviour
         }    
     }
 
+    private void OnHit()
+    {
+        Power--;
+        Power = math.max(1, Power);
+        StartCoroutine(Invincible());
+    }
+
+    void OnDie() 
+    {
+        Collider2D body = GetComponent<Collider2D>();
+        body.enabled = false;       //해당컴포넌트만 끄기
+
+        Factory.Instance.Getexpolsion(transform.position);
+
+        inputAction.Player.Disable();
+
+        rigid2d.gravityScale = 1.0f;
+        rigid2d.freezeRotation = false;
+        rigid2d.AddTorque(1000);
+        rigid2d.AddForce(Vector2.left * 10.0f, ForceMode2D.Impulse); //기본 force:이동 Impulse:가속
+
+        onDead?.Invoke(Score);
+    }
+
+    IEnumerator Invincible() 
+    {
+        gameObject.layer = LayerMask.NameToLayer("Invincible");
+        float timer = 0.0f;
+        while (timer < invincibleTime) 
+        {
+            timer += Time.deltaTime;
+            float alpha = (Mathf.Cos(timer * 30.0f) + 1.0f) * 0.5f;       //cos = -1~1
+            spriteRenderer.color = new Color(1, 1, 1, alpha);
+            yield return null;
+        }
+        gameObject.layer = LayerMask.NameToLayer("Player");
+        spriteRenderer.color = Color.white;
+    }
+
 #if UNITY_EDITOR    //유니티 에디터에서 실행할때만 실행
     public void Test_PowerUP() 
     {
@@ -141,12 +216,19 @@ public class Player : MonoBehaviour
     {
         Power--;
     }
+
+    public void Test_Die()
+    {
+        Life = 0;
+    }
+
 #endif
 
     private void Awake()
     {
         inputAction = new PlayerInputAction();
         animator = GetComponent<Animator>();
+        rigid2d = GetComponent<Rigidbody2D>();
         Transform fireRoot =transform.GetChild(0);
         firePlace = new Transform[fireRoot.childCount];
         for (int i = 0; i < firePlace.Length; i++)
@@ -156,6 +238,7 @@ public class Player : MonoBehaviour
         flash = transform.GetChild(1).gameObject;
         flashWait = new WaitForSeconds(0.1f);
         fireCoroutine = FireCoroutine();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void OnEnable()
@@ -167,6 +250,12 @@ public class Player : MonoBehaviour
         inputAction.Player.Boost.canceled += OnBoost;
         inputAction.Player.Move.performed += OnMove;
         inputAction.Player.Move.canceled += OnMove;
+    }
+
+    private void Start()
+    {
+        Power = 1;
+        Life = startLife;
     }
 
     private void OnDisable()
@@ -182,12 +271,19 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.Translate(Time.fixedDeltaTime * moveSpeed * inputDir);
+        if (IsAlive)
+        {
+            rigid2d.MovePosition(rigid2d.position + (Vector2)(Time.fixedDeltaTime * moveSpeed * inputDir));
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("PowerUp")) 
+        if (collision.gameObject.CompareTag("Enemy")) 
+        {
+            Life--;
+        }
+        else if (collision.gameObject.CompareTag("PowerUp")) 
         {
             Power++;
             collision.gameObject.SetActive(false);

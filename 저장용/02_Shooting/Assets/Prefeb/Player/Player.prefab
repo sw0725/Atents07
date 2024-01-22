@@ -104,6 +104,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fireInterval: 0.5
   powerBonus: 1000
+  startLife: 3
+  invincibleTime: 2
 --- !u!95 &8762565034222893412
 Animator:
   serializedVersion: 5
