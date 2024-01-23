@@ -185,7 +185,7 @@ public class Player : MonoBehaviour
 
         rigid2d.gravityScale = 1.0f;
         rigid2d.freezeRotation = false;
-        rigid2d.AddTorque(1000);
+        rigid2d.AddTorque(10000);
         rigid2d.AddForce(Vector2.left * 10.0f, ForceMode2D.Impulse); //기본 force:이동 Impulse:가속
 
         onDead?.Invoke(Score);
@@ -220,6 +220,10 @@ public class Player : MonoBehaviour
     public void Test_Die()
     {
         Life = 0;
+    }
+    public void Test_SetScore(int score)
+    {
+        Score = score;
     }
 
 #endif

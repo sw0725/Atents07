@@ -38,7 +38,7 @@ public class LifePanal : MonoBehaviour
         }
     }
 
-    private void OnLifeChange(int obj) //n->n-1->n-2..3->2->1->0
+    private void OnLifeChange(int obj) 
     {
         for (int i = 0; i < obj; i++) 
         {
