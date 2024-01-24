@@ -3,32 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Test_ObjectPoll : TestBase
+public class Test_SaveLoad : TestBase
 {
-    public BulletPool pool;
-    public WavePool enemyPool;
-    public Expolsion HitPool;
-    public Expolsion ExPool;
-#if UNITY_EDITOR
+    public int Score;
+    public RankPanel rankPanel;
+
+    Player player;
+# if UNITY_EDITOR
     private void Start()
     {
+        player = GameManager.Instance.Player;
     }
 
     protected override void OnTest1(InputAction.CallbackContext context)
     {
-        Bullet bullet = pool.GetObject();
+        rankPanel.Test_SaveRankPanel();
     }
+
     protected override void OnTest2(InputAction.CallbackContext context)
     {
-        Expiosion Hit = HitPool.GetObject();
+
     }
+
     protected override void OnTest3(InputAction.CallbackContext context)
     {
-       Wave enemy = enemyPool.GetObject();
+        player.Test_Die();
     }
+
     protected override void OnTest4(InputAction.CallbackContext context)
     {
-        Expiosion expiosion = ExPool.GetObject();
+        player.Test_SetScore(Score);
     }
-#endif
+
+    protected override void OnTest5(InputAction.CallbackContext context)
+    {
+    }
+# endif
 }

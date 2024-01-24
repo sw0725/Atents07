@@ -7,7 +7,7 @@ public class Test_Delegate : TestBase
     public delegate void TestDelegate();
 
     TestDelegate aaa;
-
+#if UNITY_EDITOR
     void TestRun() 
     {
         Debug.Log("D1");
@@ -32,4 +32,5 @@ public class Test_Delegate : TestBase
     {
         aaa();
     }
+#endif
 }

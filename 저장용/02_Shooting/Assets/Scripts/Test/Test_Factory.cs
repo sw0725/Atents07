@@ -8,7 +8,7 @@ public class Test_Factory : TestBase
 {
     public PoolObjectType PoolObjectType;
     public Vector3 Position = Vector3.zero;
-
+#if UNITY_EDITOR
     protected override void OnTest1(InputAction.CallbackContext context)
     {
         Factory.Instance.GetObject(PoolObjectType, Position);
@@ -31,4 +31,5 @@ public class Test_Factory : TestBase
                 break;
         }
     }
+#endif
 }

@@ -7,7 +7,7 @@ public class Test_Asteroid : TestBase
 {
     public Asteroid Asteroid;
     public Transform target;
-
+#if UNITY_EDITOR
     private void Start()
     {
         target = transform.GetChild(0);
@@ -17,6 +17,5 @@ public class Test_Asteroid : TestBase
     {
         Factory.Instance.GetAstorid(target.position);
     }
-
-    
+#endif
 }

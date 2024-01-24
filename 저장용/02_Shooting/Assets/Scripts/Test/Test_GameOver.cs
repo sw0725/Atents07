@@ -11,7 +11,7 @@ public class Test_GameOver : TestBase
     public RankPanel rankPanel;
 
     Player player;
-
+# if UNITY_EDITOR
     private void Start()
     {
         player = GameManager.Instance.Player;
@@ -29,7 +29,7 @@ public class Test_GameOver : TestBase
 
     protected override void OnTest3(InputAction.CallbackContext context)
     {
-        RankLine.SetData("°¡°¡°¡", 10000);
+        rankPanel.Test_LoadRankPanel();
     }
 
     protected override void OnTest4(InputAction.CallbackContext context)
@@ -41,4 +41,5 @@ public class Test_GameOver : TestBase
     {
         rankPanel.Test_SaveRankPanel();
     }
+# endif
 }

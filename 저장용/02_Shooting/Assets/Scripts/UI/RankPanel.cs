@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Windows;
 
@@ -10,12 +11,24 @@ public class RankPanel : MonoBehaviour
     string[] rankerName;
 
     const int rankCount = 5;
+    TMP_InputField inputField;
+    int updatedIndex = -1;
 
     private void Awake()
     {
-        rankLines = GetComponentsInChildren<RankLine>();
+        rankLines = GetComponentsInChildren<RankLine>(true);
         highScore = new int[rankCount];
         rankerName = new string[rankCount];
+
+        inputField = GetComponentInChildren<TMP_InputField>(true);  //true = 비활성화도 찾기
+        inputField.onEndEdit.AddListener(OnNameInputEnd);          //UI용 델리게이트 = on~시리즈
+    }
+
+    private void Start()
+    {
+        Player player = GameManager.Instance.Player;
+        player.onDead += UpdateRankData;
+        LoadRankData();
     }
 
     void SetDefaultData() 
@@ -39,9 +52,9 @@ public class RankPanel : MonoBehaviour
 
                                   //~아래의 세이브폴더 아래에저장       //Application.dataPath = 에셋폴더가 있는위치 ==실행파일있는위치
         string path = $"{Application.dataPath}/Save/";               //@"\Save" = 폴더명으로 직접지목 @=폴더표시
-        if (!Directory.Exists(path))                                 //폴더있->t 폴더없->f
+        if (!System.IO.Directory.Exists(path))                                 //폴더있->t 폴더없->f
         {
-            Directory.CreateDirectory(path);                        //거따가 만들기 단 중간 경로 명시해야함
+            System.IO.Directory.CreateDirectory(path);                        //거따가 만들기 단 중간 경로 명시해야함
         }
                 //구식방법 - 데이터를 스필릿으로 일일이 분해해줘야함
         //string fullPath = $"{path}Save.txt";                         // 세이브파일 변형이싫으면 Text말고 바이너리로 저장한다
@@ -51,14 +64,64 @@ public class RankPanel : MonoBehaviour
         System.IO.File.WriteAllText(fullPath, jsonText);
     }
 
-    bool LoadRankData() 
+    bool LoadRankData()
     {
         bool result = false;    //성공여부
+        string path = $"{Application.dataPath}/Save/";
+        if (System.IO.Directory.Exists(path))
+        {
+            string fullPath = $"{path}Save.json";
+            if (System.IO.File.Exists(fullPath))
+            {
+                string json = System.IO.File.ReadAllText(fullPath);
+
+                SaveData data = JsonUtility.FromJson<SaveData>(json);
+                highScore = data.highScore;
+                rankerName = data.rankerName;
+
+                result = true;
+            }
+        }
+
+        if (!result) 
+        {
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+            SetDefaultData();
+        }
+        
+        RefreshRankLine();
         return result;
     }
 
     void UpdateRankData(int Score)
     {
+        for (int i = 0;i<rankCount;i++) 
+        {
+            if (highScore[i] < Score) 
+            {
+                for (int j = rankCount - 1; j > i; j--) 
+                {
+                    highScore[j] = highScore[j - 1];
+                    rankerName[j] = rankerName[j - 1];
+                    rankLines[j].SetData(rankerName[j], highScore[j]);
+                }
+                highScore[i] = Score;
+
+                rankLines[i].SetData("newRanker", Score);
+                updatedIndex = i;
+
+                Vector3 pos = inputField.transform.position;
+                pos.y = rankLines[i].transform.position.y;
+                inputField.transform.position = pos;
+
+                inputField.gameObject.SetActive(true);
+
+                break;
+            }
+        }
         
     }
 
@@ -70,6 +133,13 @@ public class RankPanel : MonoBehaviour
         }
     }
 
+    void OnNameInputEnd(string text)
+    {
+        rankerName[updatedIndex] = text;
+        RefreshRankLine();
+        SaveRankData();
+    }
+#if UNITY_EDITOR
     public void Test_RankPanel() 
     {
         SetDefaultData();
@@ -78,8 +148,17 @@ public class RankPanel : MonoBehaviour
 
     public void Test_SaveRankPanel()
     {
-        SetDefaultData();
         RefreshRankLine();
         SaveRankData();
     }
+    public void Test_LoadRankPanel()
+    {
+        LoadRankData();
+    }
+
+    public void Test_UpdateRankPanel(int Score)
+    {
+        UpdateRankData(Score);
+    }
+# endif
 }

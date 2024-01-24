@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class Test_AsteroidMini : TestBase
 {
     public Transform Target;
-
+#if UNITY_EDITOR
     private void Start()
     {
         Target = transform.GetChild(0);
@@ -16,4 +16,5 @@ public class Test_AsteroidMini : TestBase
     {
         Factory.Instance.GetAstoridMini(Target.position);
     }
+#endif
 }
