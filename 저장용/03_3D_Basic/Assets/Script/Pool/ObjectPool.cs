@@ -50,9 +50,9 @@ public class ObjectPool<T> : MonoBehaviour where T : RecycleObject
         if (Queue.Count > 0)
         {
             T comp = Queue.Dequeue();
-            comp.gameObject.SetActive(true);
             comp.transform.position = position.GetValueOrDefault();
-            comp.transform.Rotate(eulerAngle.GetValueOrDefault());
+            comp.transform.rotation = Quaternion.Euler(eulerAngle.GetValueOrDefault());
+            comp.gameObject.SetActive(true);
             OnGetObject(comp);
             return comp;
         }

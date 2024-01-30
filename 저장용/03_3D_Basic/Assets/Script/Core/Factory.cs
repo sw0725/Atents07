@@ -16,8 +16,7 @@ public class Factory : Singltrun<Factory>
         base.OnInitialize();
 
         bullet = GetComponentInChildren<BulletPool>();
-        if (bullet != null)
-            bullet.Initialized();
+        if (bullet != null) bullet.Initialized();
     }
 
     public GameObject GetObject(PoolObjectType type, Vector3? position = null, Vector3? euler = null)

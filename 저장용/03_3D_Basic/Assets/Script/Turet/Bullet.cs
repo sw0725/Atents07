@@ -18,7 +18,14 @@ public class Bullet : RecycleObject
     {
         base.OnEnable();
         StartCoroutine(LifeOver(lifeTime));
+        rb.angularVelocity = Vector3.zero;              //재사용시 기존 회전력 초기화
         rb.velocity = initialSpeed * transform.forward;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        StopAllCoroutines();
+        StartCoroutine(LifeOver(2.0f));
     }
 }
 

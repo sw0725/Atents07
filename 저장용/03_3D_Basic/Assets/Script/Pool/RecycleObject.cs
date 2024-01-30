@@ -9,8 +9,6 @@ public class RecycleObject : MonoBehaviour
     public Action onDisable;
     protected virtual void OnEnable()
     {
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
         StopAllCoroutines();
     }
 
