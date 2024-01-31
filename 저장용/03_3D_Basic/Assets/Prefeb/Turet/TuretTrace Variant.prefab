@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6876477179148577905, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.43
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 6876477179148577905, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
       propertyPath: m_LocalPosition.y
@@ -63,6 +63,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3832672482981557325, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6091554101421221061}
+    - targetCorrespondingSourceObject: {fileID: 3832672482981557325, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5658469665622091659}
   m_SourcePrefab: {fileID: 100100000, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
 --- !u!1 &3869758144959792915 stripped
 GameObject:
@@ -81,3 +84,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 820fa8834ddc9d040be90199816ed08c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bullet: 0
+  fireInterval: 1
+  sightRange: 10
+  turnSpeed: 2
+  fireAngle: 10
+--- !u!135 &5658469665622091659
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3869758144959792915}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 10
+  m_Center: {x: 0, y: 0, z: 0}

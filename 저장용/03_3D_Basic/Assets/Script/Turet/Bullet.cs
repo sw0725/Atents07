@@ -27,6 +27,11 @@ public class Bullet : RecycleObject
         StopAllCoroutines();
         StartCoroutine(LifeOver(2.0f));
     }
+    private void FixedUpdate()
+    {                       //벡터의 길이 = 벡터가 0이 아닐때
+        if(rb.velocity.sqrMagnitude>0.1f)
+        transform.forward = rb.velocity;    //운동량은 중력의 영향으로 자동으로 아래를 향함 -> 을 총알의 벡터에 반영 -> 자연스러운 회전
+    }
 }
 
 //public float initialSpeed = 20.0f;

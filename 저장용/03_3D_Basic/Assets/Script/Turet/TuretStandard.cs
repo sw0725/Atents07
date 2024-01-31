@@ -7,7 +7,7 @@ public class TuretStandard : TuretBase
 
     private void Start()
     {
-        StartFire();
+        StartCoroutine(FireCoroutine);
     }
 
 }

@@ -78,9 +78,10 @@ public class Player : MonoBehaviour
 
     void Rotate()
     {   //쿼터니언의Euler-xyz값만큼 회전 생성 |AngleAxis-특정축 기준 몇도만큼 회전 |FromToRatation-시작방향에서 도착방향이 될 수 있는 회전 생성
-        //Lerp-시작회전에서 목표회전으로 보간(직선) |Slerp-러프와 동일(곡선) |LookRotation-특정방향을 바라보는 회전 생성
-        Quaternion rotate = Quaternion.AngleAxis(Time.fixedDeltaTime*rotateSpeed*RotateDirection, transform.up);    //y축기준 회전
-        rigid.MoveRotation(rigid.rotation * rotate);                                                        //기존회전값*회전값=포지션과 동일효과
+        //Lerp-시작회전에서 목표회전으로 보간(직선) |Slerp-러프와 동일(곡선) |LookRotation-특정방향을 바라보는 회전 생성 |identity-회전없음
+        //Inverse-반전 |RotateTowards-시작값부터 목표값까지 -속도만큼 | 트랜스폼의 RotateAround-특정 위치에서 특정축 기준으로 회전 
+        Quaternion rotate = Quaternion.AngleAxis(Time.fixedDeltaTime*rotateSpeed*RotateDirection, transform.up);
+        rigid.MoveRotation(rigid.rotation * rotate);                                                      //기존회전값*회전값=포지션과 동일효과
     }   //리그바디의 무브로테이션은 포지션과 다르게 -만큼더가 아니라 -로설정한다. 부적합
 
     void Jump()

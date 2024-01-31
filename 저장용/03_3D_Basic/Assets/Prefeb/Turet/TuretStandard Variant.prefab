@@ -12,9 +12,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: TuretStandard Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3832672482981557325, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6876477179148577905, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 6876477179148577905, guid: e369bd8ccf4da8b45bebb34504688766, type: 3}
       propertyPath: m_LocalPosition.y
@@ -77,3 +81,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d98e833072f446549b478044528c48d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bullet: 0
+  fireInterval: 1
