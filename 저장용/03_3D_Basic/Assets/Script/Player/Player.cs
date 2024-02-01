@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
     float MoveDirection = 0.0f;                //1:전진 -1:후진 0:정지
     float RotateDirection = 0.0f;              //1:우회전 -1:좌회전 0:정지
     readonly int isMovehash = Animator.StringToHash("IsMove");
+    readonly int isUsehash = Animator.StringToHash("Use");
     bool isjumping = false;
     float jumpTime = -1.0f;
     bool IsJumpAvailable => !isjumping && (jumpTime < 0.0f);
@@ -27,6 +28,9 @@ public class Player : MonoBehaviour
         inputActions = new PlayerInputAction();
         anim = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody>();
+
+        ItemUseChecker checker = GetComponentInChildren<ItemUseChecker>();
+        checker.onItemUse += (inter) => inter.Use();
     }
 
     private void OnEnable()
@@ -61,6 +65,7 @@ public class Player : MonoBehaviour
 
     private void OnUse(InputAction.CallbackContext context)
     {
+        anim.SetTrigger(isUsehash);
     }
 
     void SetInput(Vector2 input, bool isMove) 
