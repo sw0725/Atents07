@@ -6,14 +6,9 @@ class DoorManualAutoClose : DoorManual
 {
     public float closetimer = 3.0f;
 
-    protected override void Awake()
+    public new void Use()       //부모 함수 무시 = new
     {
-        base.Awake();
-    }
-
-    public override void Use()
-    {
-        base.Use();
+        Open();
         StopAllCoroutines();
         StartCoroutine(CloseTimer());
     }
@@ -25,5 +20,3 @@ class DoorManualAutoClose : DoorManual
     }
 }
 
-//일정시간 이후 자동 닫힘
-//트리거 안에 입성시 튜도리얼 - UI에서 추가말고 3D오브제로 추가

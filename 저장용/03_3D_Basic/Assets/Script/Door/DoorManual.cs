@@ -2,8 +2,12 @@
 using TMPro;
 using UnityEngine;
 
-class DoorManual : DoorBase, IInteracable
+public class DoorManual : DoorBase, IInteracable
 {
+    public float coolTime = 0.5f;
+    float coolTimer = 0;
+    public bool CanUse => coolTimer < 0.0f;
+
     TextMeshPro guid;
     bool doorOpen = false;
 
@@ -13,21 +17,31 @@ class DoorManual : DoorBase, IInteracable
         guid = GetComponentInChildren<TextMeshPro>(true);
     }
 
-    public virtual void Use()
+    private void Update()
     {
-        if (!doorOpen)
-        {
-            Open();
-            doorOpen = true;
-        }
-        else 
-        {
-            Close();
-            doorOpen = false;
-        }
+        coolTimer -= Time.deltaTime;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public virtual void Use()
+    {
+        if (CanUse) 
+        {
+            if (doorOpen)
+            {
+                Close();
+                doorOpen = false;
+            }
+            else
+            {
+                Open();
+                doorOpen = true;
+            }
+            coolTimer = coolTime;
+        }
+        
+    }
+
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
@@ -47,7 +61,7 @@ class DoorManual : DoorBase, IInteracable
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {

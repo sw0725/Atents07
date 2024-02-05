@@ -1,23 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IAive
 {
     public float moveSpeed = 0.01f;
     public float rotateSpeed = 180.0f;
     public float jumpPower = 6.0f;
     public float jumpCoolTime = 1.0f;
+    public Action OnDie;
 
     float MoveDirection = 0.0f;                //1:전진 -1:후진 0:정지
     float RotateDirection = 0.0f;              //1:우회전 -1:좌회전 0:정지
     readonly int isMovehash = Animator.StringToHash("IsMove");
     readonly int isUsehash = Animator.StringToHash("Use");
+    readonly int isDiehash = Animator.StringToHash("IsDie");
     bool isjumping = false;
     float jumpTime = -1.0f;
     bool IsJumpAvailable => !isjumping && (jumpTime < 0.0f);
+    bool isAlive = true;
 
     PlayerInputAction inputActions;
     Animator anim;
@@ -98,6 +99,24 @@ public class Player : MonoBehaviour
             isjumping = true;
         }
     }   //Force-기본(서서히,질량참고) Acceleration-기본(서서히,질량무시) Impulse-가속(한번에,질량참고) VelocityChange-가속(한번에,질량무시)
+
+    public void Die() 
+    {
+        if (isAlive)
+        {
+            anim.SetTrigger(isDiehash);
+            inputActions.Player.Disable();
+
+            rigid.constraints = RigidbodyConstraints.None;    //프리즈 포지션과 로테있는 속성, 이넘으로 되어있어 경우의 수에 숫자가 븥어있다. 전부 해제는 0
+            Transform head = transform.GetChild(0);
+
+            rigid.AddForceAtPosition(-transform.forward, head.position, ForceMode.Impulse);
+            rigid.AddTorque(transform.up * 1.5f, ForceMode.Impulse);
+            OnDie?.Invoke();
+
+            isAlive = false;
+        }
+    }
 
     private void FixedUpdate()
     {
