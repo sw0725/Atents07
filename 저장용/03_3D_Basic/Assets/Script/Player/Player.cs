@@ -12,6 +12,7 @@ public class Player : MonoBehaviour, IAive
 
     float MoveDirection = 0.0f;                //1:전진 -1:후진 0:정지
     float RotateDirection = 0.0f;              //1:우회전 -1:좌회전 0:정지
+    float currentMoveSpeed = 5.0f;
     readonly int isMovehash = Animator.StringToHash("IsMove");
     readonly int isUsehash = Animator.StringToHash("Use");
     readonly int isDiehash = Animator.StringToHash("IsDie");
@@ -54,6 +55,11 @@ public class Player : MonoBehaviour, IAive
         inputActions.Player.Disable();
     }
 
+    private void Start()
+    {
+        currentMoveSpeed = moveSpeed;
+    }
+
     private void OnMove(InputAction.CallbackContext context)        //context.started/perfrmed/canceled 로 따로 함수 안나눠도 시작/중단 분리가능
     {
         SetInput(context.ReadValue<Vector2>(), !context.canceled);
@@ -79,7 +85,7 @@ public class Player : MonoBehaviour, IAive
 
     void Move() 
     {
-        rigid.MovePosition(rigid.position + Time.fixedDeltaTime * moveSpeed * MoveDirection * transform.forward);
+        rigid.MovePosition(rigid.position + Time.fixedDeltaTime * currentMoveSpeed * MoveDirection * transform.forward);
     }
 
     void Rotate()
@@ -118,6 +124,16 @@ public class Player : MonoBehaviour, IAive
         }
     }
 
+    public void SetSpeedModifier(float ratio =1.0f)
+    {
+        currentMoveSpeed = moveSpeed * ratio;
+    }
+
+    public void RestoreMoveSpeed() 
+    {
+        currentMoveSpeed = moveSpeed;
+    }
+
     private void FixedUpdate()
     {
         Move();
@@ -135,5 +151,36 @@ public class Player : MonoBehaviour, IAive
         {
             isjumping = false;
         }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isjumping = true;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        PlatformBase platform = other.GetComponent<PlatformBase>();
+        if (platform != null) 
+        {
+            platform.onMove += OnRideMovingObject;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        PlatformBase platform = other.GetComponent<PlatformBase>();
+        if (platform != null)
+        {
+            platform.onMove -= OnRideMovingObject;
+        }
+    }
+
+    void OnRideMovingObject(Vector3 delta) 
+    {
+        rigid.MovePosition(rigid.position + delta);
     }
 }
