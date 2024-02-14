@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,7 +9,10 @@ public class Player : MonoBehaviour, IAive
     public float rotateSpeed = 180.0f;
     public float jumpPower = 6.0f;
     public float jumpCoolTime = 1.0f;
+    public float startLiftime = 10.0f;
     public Action OnDie;
+    public Action<float> OnLifeTimeChange;
+    public Action<float> onJumpCoolTimeChange;
 
     float MoveDirection = 0.0f;                //1:전진 -1:후진 0:정지
     float RotateDirection = 0.0f;              //1:우회전 -1:좌회전 0:정지
@@ -16,10 +20,49 @@ public class Player : MonoBehaviour, IAive
     readonly int isMovehash = Animator.StringToHash("IsMove");
     readonly int isUsehash = Animator.StringToHash("Use");
     readonly int isDiehash = Animator.StringToHash("IsDie");
-    bool isjumping = false;
     float jumpTime = -1.0f;
-    bool IsJumpAvailable => !isjumping && (jumpTime < 0.0f);
+    float JumpTime 
+    {
+        get => jumpTime;
+        set 
+        {
+            jumpTime = value;
+            onJumpCoolTimeChange?.Invoke(jumpTime/jumpCoolTime);
+        }
+    }
+    bool IsJumpAvailable => !InAir && (jumpTime < 0.0f) && isAlive;
     bool isAlive = true;
+    bool InAir 
+    {
+        get => GroundCount<1;
+    }
+    int groundCount = 0;
+    int GroundCount 
+    {
+        get => groundCount;
+        set
+        {
+            if (groundCount < 0) { groundCount = 0; }
+            groundCount = value;
+            if (groundCount < 0) { groundCount = 0; }
+        }
+    }
+
+    float lifeTime = 0.0f;
+    float LifeTime 
+    {
+        get => lifeTime;
+        set 
+        {
+            lifeTime = value;
+            if (lifeTime < 0.0f) 
+            {
+                lifeTime = 0.0f;
+                Die(); 
+            }
+            OnLifeTimeChange?.Invoke(lifeTime/startLiftime);                //전체의 몇퍼센트인가
+        }
+    }
 
     PlayerInputAction inputActions;
     Animator anim;
@@ -58,6 +101,22 @@ public class Player : MonoBehaviour, IAive
     private void Start()
     {
         currentMoveSpeed = moveSpeed;
+        LifeTime = startLiftime;
+
+        VirtualStick stick = GameManager.Instance.Stick;
+        if (stick != null) 
+        {
+            stick.onMoveInput += (inputDelta) => SetInput(inputDelta, inputDelta.sqrMagnitude > 0.0025f);
+            OnDie += stick.Stop;
+        }
+
+        VirtualButton botton = GameManager.Instance.Button;
+        if (botton != null)
+        {
+            botton.onJumpInput += Jump;
+            onJumpCoolTimeChange += botton.RefreashCoolTime;
+            OnDie += botton.Stop;
+        }
     }
 
     private void OnMove(InputAction.CallbackContext context)        //context.started/perfrmed/canceled 로 따로 함수 안나눠도 시작/중단 분리가능
@@ -101,8 +160,7 @@ public class Player : MonoBehaviour, IAive
         if (IsJumpAvailable) 
         {
             rigid.AddForce(jumpPower * Vector3.up, ForceMode.Impulse);
-            jumpTime = jumpCoolTime;
-            isjumping = true;
+            JumpTime = jumpCoolTime;
         }
     }   //Force-기본(서서히,질량참고) Acceleration-기본(서서히,질량무시) Impulse-가속(한번에,질량참고) VelocityChange-가속(한번에,질량무시)
 
@@ -118,6 +176,7 @@ public class Player : MonoBehaviour, IAive
 
             rigid.AddForceAtPosition(-transform.forward, head.position, ForceMode.Impulse);
             rigid.AddTorque(transform.up * 1.5f, ForceMode.Impulse);
+            GameManager.Instance.GameOver();
             OnDie?.Invoke();
 
             isAlive = false;
@@ -142,14 +201,15 @@ public class Player : MonoBehaviour, IAive
 
     private void Update()
     {
-        jumpTime = -Time.deltaTime;
+        JumpTime -= Time.deltaTime;
+        LifeTime -= Time.deltaTime;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground")) 
         {
-            isjumping = false;
+            GroundCount++;
         }
     }
 
@@ -157,7 +217,7 @@ public class Player : MonoBehaviour, IAive
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isjumping = true;
+            GroundCount--;
         }
     }
 
