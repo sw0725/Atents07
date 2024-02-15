@@ -54,15 +54,19 @@ public class Player : MonoBehaviour, IAive
         get => lifeTime;
         set 
         {
-            lifeTime = value;
-            if (lifeTime < 0.0f) 
+            if (isPlaying) 
             {
-                lifeTime = 0.0f;
-                Die(); 
+                lifeTime = value;
+                if (lifeTime < 0.0f) 
+                {
+                    lifeTime = 0.0f;
+                    Die(); 
+                }
+                OnLifeTimeChange?.Invoke(lifeTime/startLiftime);                //전체의 몇퍼센트인가
             }
-            OnLifeTimeChange?.Invoke(lifeTime/startLiftime);                //전체의 몇퍼센트인가
         }
     }
+    bool isPlaying = true;
 
     PlayerInputAction inputActions;
     Animator anim;
@@ -117,6 +121,8 @@ public class Player : MonoBehaviour, IAive
             onJumpCoolTimeChange += botton.RefreashCoolTime;
             OnDie += botton.Stop;
         }
+        GameManager.Instance.onClear += OnGameClear;
+        GameManager.Instance.onOver += OnGameOver;
     }
 
     private void OnMove(InputAction.CallbackContext context)        //context.started/perfrmed/canceled 로 따로 함수 안나눠도 시작/중단 분리가능
@@ -242,5 +248,15 @@ public class Player : MonoBehaviour, IAive
     void OnRideMovingObject(Vector3 delta) 
     {
         rigid.MovePosition(rigid.position + delta);
+    }
+
+    private void OnGameClear() 
+    {
+        isPlaying = false;
+        inputActions.Player.Disable();
+    }
+    private void OnGameOver()
+    {
+        isPlaying = false;
     }
 }

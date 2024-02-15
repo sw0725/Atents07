@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class GameClearPanel : MonoBehaviour
 {
-    private void Start()
+    CanvasGroup canvasGroup;
+
+    private void Awake()
     {
-        GameManager.Instance.onClear += ClearPanel;
-        gameObject.SetActive(false);
+        canvasGroup = GetComponent<CanvasGroup>();
     }
 
-    void ClearPanel() 
+    private void Start()
     {
-        gameObject.SetActive(true);
+        GameManager.Instance.onClear += () =>
+        {
+            canvasGroup.alpha = 1;
+            canvasGroup.blocksRaycasts = true;
+        };
     }
 }

@@ -7,6 +7,7 @@ public class GameManager : Singltrun<GameManager>
 {
     public Action onClear;
     public Action onOver;
+    public bool IsPlaying => !isClear && !isOver;
 
     bool isClear = false;
     bool isOver = false;

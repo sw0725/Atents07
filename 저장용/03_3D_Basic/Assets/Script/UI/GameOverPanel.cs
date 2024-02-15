@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class GameOverPanel : MonoBehaviour
 {
-    private void Start()
+    CanvasGroup canvasGroup;
+
+    private void Awake()
     {
-        GameManager.Instance.onOver += OverPanel;
-        gameObject.SetActive(false);
+        canvasGroup = GetComponent<CanvasGroup>();
     }
 
-    void OverPanel()
+    private void Start()
     {
-        gameObject.SetActive(true);
+        GameManager.Instance.onOver += () =>
+        {
+            canvasGroup.alpha = 1;
+            canvasGroup.blocksRaycasts = true;          //클리어시 UI간섭 방지  **UI는 맨아래가 맨 위에 그려진다(우선권이 있다)
+        };
     }
 }
