@@ -12,7 +12,7 @@ public class ObjectPool<T> : MonoBehaviour where T : RecycleObject
 
     Queue<T> Queue;
 
-    public void Initialized()
+    public void Initialize()
     {
         if (Pool == null)
         {

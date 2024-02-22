@@ -4,41 +4,41 @@ using UnityEngine;
 
 public enum PoolObjectType
 {
-    None = 0,
+    Slime= 0,
 }
 
 public class Factory : Singleton<Factory>
 {
-    //BulletPool bulletPool;
+    SlimePool slimePool;
 
-    //protected override void OnInitialize()
-    //{
-    //    base.OnInitialize();
+    protected override void OnInitialize()
+    {
+        base.OnInitialize();
 
-    //    bulletPool = GetComponentInChildren<BulletPool>();
-    //    if (bulletPool != null) bulletPool.Initialize();
-    //}
- 
-    //public GameObject GetObject(PoolObjectType type, Vector3? position = null, Vector3? euler = null)
-    //{
-    //    GameObject result = null;
-    //    switch (type)
-    //    {
-    //        case PoolObjectType.Bullet:
-    //            result = bulletPool.GetObject(position, euler).gameObject;
-    //            break;
-    //    }
+        slimePool = GetComponentInChildren<SlimePool>();
+        if (slimePool != null) slimePool.Initialize();
+    }
 
-    //    return result;
-    //}
+    public GameObject GetObject(PoolObjectType type, Vector3? position = null, Vector3? euler = null)
+    {
+        GameObject result = null;
+        switch (type)
+        {
+            case PoolObjectType.Slime:
+                result = slimePool.GetObject(position, euler).gameObject;
+                break;
+        }
 
-    //public Bullet GetBullet()
-    //{
-    //    return bulletPool.GetObject();
-    //}
+        return result;
+    }
 
-    //public Bullet GetBullet(Vector3 position, float angle = 0.0f)
-    //{
-    //    return bulletPool.GetObject(position, angle * Vector3.forward);
-    //}
+    public Slime GetSlime()
+    {
+        return slimePool.GetObject();
+    }
+
+    public Slime GetSlime(Vector3 position, float angle = 0.0f)
+    {
+        return slimePool.GetObject(position, angle * Vector3.forward);
+    }
 }

@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
     PlayerInputAction inputAction;
     Rigidbody2D rigid2d;
     Animator animator;
+    Transform attackSensorAxis;
 
     private void OnMove(InputAction.CallbackContext context)
     {
@@ -34,6 +35,8 @@ public class Player : MonoBehaviour
 
         isMove = true;
         animator.SetBool(isMove_Hash, isMove);
+
+        AttackSensorRotate(inputDir);
     }
 
     private void OnStop(InputAction.CallbackContext _)
@@ -59,11 +62,36 @@ public class Player : MonoBehaviour
         currentSpeed = moveSpeed;
     }
 
+    void AttackSensorRotate(Vector2 dir) 
+    {
+        if (dir.y < 0)
+        {
+            attackSensorAxis.rotation = Quaternion.identity;
+        }
+        else if (dir.y > 0)
+        {
+            attackSensorAxis.rotation = Quaternion.Euler(0, 0, 180);
+        }
+        else if (dir.x < 0)
+        {
+            attackSensorAxis.rotation = Quaternion.Euler(0, 0, -90);
+        }
+        else if (dir.x > 0)
+        {
+            attackSensorAxis.rotation = Quaternion.Euler(0, 0, 90);
+        }
+        else
+        {
+            attackSensorAxis.rotation = Quaternion.identity;
+        }
+    }
+
     private void Awake()
     {
         inputAction = new PlayerInputAction();
         animator = GetComponent<Animator>();
         rigid2d = GetComponent<Rigidbody2D>();
+        attackSensorAxis = transform.GetChild(0);
         currentSpeed = moveSpeed;
     }
 
