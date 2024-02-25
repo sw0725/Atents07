@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
     float currentAtteckCoolTime = 0.0f;
     float currentSpeed= 3.0f;
     bool isMove = false;
+    bool isAtteckValid = false;
 
     bool IsAtteckReady => currentAtteckCoolTime < 0.0f;
 
@@ -21,6 +22,8 @@ public class Player : MonoBehaviour
     readonly int inputY_Hash = Animator.StringToHash("InputY");
     readonly int isMove_Hash = Animator.StringToHash("IsMove");
     readonly int Atteck_Hash = Animator.StringToHash("Atteck");
+
+    List<Slime> attackTargets;
 
     PlayerInputAction inputAction;
     Rigidbody2D rigid2d;
@@ -54,6 +57,7 @@ public class Player : MonoBehaviour
             animator.SetTrigger(Atteck_Hash);
             currentAtteckCoolTime = atteckCoolTime;
             currentSpeed = 0;
+            isAtteckValid = false;
         }
     }
 
@@ -86,13 +90,49 @@ public class Player : MonoBehaviour
         }
     }
 
+    void AttackValid()  //공격 애니메중 애니메 이벤트를 통해 호출됨 
+    {                   //유효시(공격 시작시) 작동
+        isAtteckValid = true;
+        foreach (var slime in attackTargets) //var = C#이 알아서 넣는 타입
+        {
+            slime.Die();
+        }
+        attackTargets.Clear();
+    }
+
+    void AttackNotValid() 
+    {                   //무효시(공격동작 끝) 작동
+        isAtteckValid = false;
+    }
+
     private void Awake()
     {
         inputAction = new PlayerInputAction();
         animator = GetComponent<Animator>();
         rigid2d = GetComponent<Rigidbody2D>();
         attackSensorAxis = transform.GetChild(0);
+        
         currentSpeed = moveSpeed;
+
+        attackTargets = new List<Slime>(4);
+        AttackSensor sensor = attackSensorAxis.GetComponentInChildren<AttackSensor>();
+        sensor.onEnemyEnter += (slime) =>
+        {
+            if (isAtteckValid)
+            {
+                slime.Die();
+            }
+            else 
+            {
+                attackTargets.Add(slime);
+            }
+            slime.ShowOutLine();
+        };
+        sensor.onEnemyExit += (slime) =>
+        {
+            attackTargets.Remove(slime);
+            slime.ShowOutLine(false);
+        };
     }
 
     private void OnEnable()

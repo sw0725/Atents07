@@ -1,36 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackSensor : MonoBehaviour
 {
-    public bool go = false;
-
-    List<Slime> slimes;
-
-    void Attack()
-    {
-        foreach (Slime slime in slimes)
-        {
-            slime.TestDie();
-        }
-    }
-
-    private void Update()
-    {
-        if (go) 
-        {
-            Attack();
-        }
-    }
+    public Action<Slime> onEnemyEnter;
+    public Action<Slime> onEnemyExit;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Slime slime = collision.GetComponent<Slime>();
         if (slime != null) 
         {
-            slime.ShowOutLine();
-            slimes.Add(slime);
+            onEnemyEnter?.Invoke(slime);
         }
     }
 
@@ -39,8 +22,7 @@ public class AttackSensor : MonoBehaviour
         Slime slime = collision.GetComponent<Slime>();
         if (slime != null)
         {
-            slime.ShowOutLine(false);
-            slimes.Remove(slime);
+            onEnemyExit?.Invoke(slime);
         }
     }
 }

@@ -36,7 +36,7 @@ public class Slime : RecycleObject
         StartCoroutine(StartPhase());
     }
 
-    void Die() 
+    public void Die() 
     {
         StartCoroutine(StartDissolve());
     }
