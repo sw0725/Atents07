@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class GridMap
 {
-    Node[] nodes;           //2차원 배열은 개느려서 쓰지 않는게 좋다
+    protected Node[] nodes;           //2차원 배열은 개느려서 쓰지 않는게 좋다
 
-    int width;
-    int height;
+    protected int width;
+    protected int height;
+
+    protected GridMap() { }
 
     public GridMap(int width, int height) 
     {
@@ -71,26 +73,42 @@ public class GridMap
         return IsSlime(position.x, position.y);
     }
 
-    bool GridToIndex(int x, int y, out int? index)  //좌표를 인덱스값으로
+    public bool IsPlain(int x, int y)
+    {
+        Node node = GetNode(x, y);
+        return node != null && node.type == Node.NodeType.Plain;
+    }
+
+    public bool IsPlain(Vector2Int position)
+    {
+        return IsSlime(position.x, position.y);
+    }
+
+    protected bool GridToIndex(int x, int y, out int? index)  //좌표를 인덱스값으로
     {
         bool result = false;
         index = null;
 
         if (isValidPosition(x, y)) 
         {
-            index = x + y * width;      //2차원 배열을 한줄로 풀어놓은것
+            index = CalcIndex(x, y);
             result = true;
         }
 
         return result;
     }
 
-    Vector2Int IndexToGrid(int index) 
+    protected virtual int CalcIndex(int x, int y) 
+    {
+        return x + y * width;           //2차원 배열을 한줄로 풀어놓은것
+    }
+
+    public Vector2Int IndexToGrid(int index) 
     {
         return new Vector2Int(index % width, index / width);
     }
 
-    public bool isValidPosition(int x, int y) //GridToIndex 에 들간 좌표가 유효한 좌표인가 식별
+    public virtual bool isValidPosition(int x, int y) //GridToIndex 에 들간 좌표가 유효한 좌표인가 식별
     {
         return  x < width && y < height && x >= 0 && y >= 0 ;
     }
