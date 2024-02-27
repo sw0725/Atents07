@@ -81,7 +81,7 @@ public class GridMap
 
     public bool IsPlain(Vector2Int position)
     {
-        return IsSlime(position.x, position.y);
+        return IsPlain(position.x, position.y);
     }
 
     protected bool GridToIndex(int x, int y, out int? index)  //ÁÂÇ¥¸¦ ÀÎµ¦½º°ªÀ¸·Î

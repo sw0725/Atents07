@@ -5,7 +5,9 @@ using UnityEngine.Tilemaps;
 
 public class TileGridMap : GridMap
 {
+    Vector2Int[] moveablePosition;
     Vector2Int origin;
+
     Tilemap background;
 
     public TileGridMap(Tilemap background, Tilemap obstacle) 
@@ -21,6 +23,7 @@ public class TileGridMap : GridMap
         Vector2Int min = (Vector2Int)background.cellBounds.min;
         Vector2Int max = (Vector2Int)background.cellBounds.max;
 
+        List<Vector2Int> moveable = new List<Vector2Int>(width * height);       //배열 크기 따기위한 임시리스트
         for (int y = min.y; y < max.y; y++)
         {
             for (int x = min.x; x < max.x; x++)
@@ -29,14 +32,19 @@ public class TileGridMap : GridMap
                 {
                     Node.NodeType nodeType = Node.NodeType.Plain;
                     TileBase tile = obstacle.GetTile(new(x, y));    //장애물 맵에 타일존재시
-                    if (tile != null) 
+                    if (tile != null)
                     {
                         nodeType = Node.NodeType.Wall;              //벽으로 설정
                     }
-                    nodes[index.Value] = new Node(x, y);
+                    else 
+                    {
+                        moveable.Add(new(x, y));
+                    }
+                    nodes[index.Value] = new Node(x, y, nodeType);
                 }
             }
         }
+        moveablePosition = moveable.ToArray();
     }
 
     protected override int CalcIndex(int x, int y)
@@ -57,5 +65,11 @@ public class TileGridMap : GridMap
     public Vector2 GridToWorld(Vector2Int gridPosition)
     {                                                                   //좌표를 타일의 가운데로 지정
         return background.CellToWorld((Vector3Int)gridPosition) + new Vector3(0.5f, 0.5f);
+    }
+
+    public Vector2Int GetRandomMoveableposition() 
+    {
+        int index = Random.Range(0, moveablePosition.Length);
+        return moveablePosition[index];
     }
 }

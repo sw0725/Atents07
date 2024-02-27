@@ -55,7 +55,7 @@ public static class AStar
                                 if (node.parent == null) //open에 있는가
                                 {                        //리스트에 넣을때는 반드시 부모가 설정됨으로
                                     node.H = GetHeuristic(node, end);
-                                    open.Add(current);
+                                    open.Add(node);
                                 }
                                 node.G = current.G + distanse;
                                 node.parent = current;

@@ -8,9 +8,30 @@ public class Slime : RecycleObject
 {
     public float phaseDuration = 0.5f;
     public float dissolveDuration = 1.0f;
+    public float moveSpeed = 2.0f;
+    public Action OnDie;
+    public Transform Pool 
+    {
+        set 
+        {
+            if (pool == null) 
+            {
+                pool = value;
+            }
+        }
+    }
+
+    Vector2Int GridPosition => map.WorldToGrid(transform.position);
+    bool isMoveActivate = false;
 
     Material material;
+    PathLine pathLine;
+    TileGridMap map;
     Action onDissolveEnd;
+    Action onPhaseEnd;
+    Transform pool;
+
+    List<Vector2Int> path;
 
     const float VisialeOutLine = 0.004f;
     const float VisiablePhase = 0.1f;
@@ -26,6 +47,10 @@ public class Slime : RecycleObject
         material = slime.material;
 
         onDissolveEnd += ReturnToPool;
+        onPhaseEnd += () => isMoveActivate = true;
+
+        path = new List<Vector2Int>();
+        pathLine = GetComponentInChildren<PathLine>();
     }
 
     protected override void OnEnable()
@@ -34,15 +59,38 @@ public class Slime : RecycleObject
 
         ResetShader();                      //재사용시 중간에 멈춘채로 이어시작하는것 방지용
         StartCoroutine(StartPhase());
+        isMoveActivate = false;
     }
+
+    protected override void OnDisable()
+    {
+        path.Clear();
+        pathLine.ClearPath();
+        base.OnDisable();
+    }
+
+    private void Update()
+    {
+        MoveUpdate();
+    }
+
+    public void Initialized(TileGridMap gridMap, Vector3 world)     //슬라임 초기화용 스폰직후 실행
+    {                                               //슬라임 시작위치
+        map = gridMap;
+        transform.position = map.GridToWorld(map.WorldToGrid(world));
+    }           //자동적으로 셀의 가운데 계산을 위한
 
     public void Die() 
     {
+        isMoveActivate = false;
+        OnDie?.Invoke();
+        OnDie = null;
         StartCoroutine(StartDissolve());
     }
 
     void ReturnToPool() 
     {
+        transform.SetParent(pool);
         gameObject.SetActive(false);
     }
 
@@ -78,9 +126,12 @@ public class Slime : RecycleObject
 
             yield return null;
         }
-        material.SetFloat(PhaseId, 0); ;
-        material.SetFloat(SplitId, 0); ;
+        material.SetFloat(PhaseId, 0);
+        material.SetFloat(SplitId, 0);
+
+        onPhaseEnd?.Invoke();
     }
+
     IEnumerator StartDissolve()
     {
         float nomalrise = 1.0f / dissolveDuration;
@@ -98,6 +149,45 @@ public class Slime : RecycleObject
 
         onDissolveEnd?.Invoke();
     }
+
+    public void SetDestination(Vector2Int destination) 
+    {
+        path = AStar.PathFind(map, GridPosition, destination);
+        pathLine.DrawPath(map, path);
+    }
+
+    void OnDestinationArrive() 
+    {
+        SetDestination(map.GetRandomMoveableposition());
+    }
+
+    void MoveUpdate() 
+    {
+        if (isMoveActivate) 
+        {
+            if (path.Count > 0) //패스에 남은 경로가 있다면
+            {
+                Vector2Int destGrid = path[0];
+                Vector3 destPosition = map.GridToWorld(destGrid);           //벡터3로 목적지 월드 좌표를 받기
+                Vector3 direction = (destPosition - transform.position);    //를 방향백터로 전환
+
+                if (direction.sqrMagnitude < 0.001f)                        //백터의 길이를 확인 일정 이하 시
+                {
+                    transform.position = destPosition;                      //오차보정 및
+                    path.RemoveAt(0);                                       //다음 패스로
+                }
+                else
+                {
+                    transform.Translate(Time.deltaTime * moveSpeed * direction.normalized);
+                }
+            }
+            else
+            {
+                OnDestinationArrive();
+            }
+        }
+    }
+
 #if UNITY_EDITOR
     public void TestShader(int index) 
     {

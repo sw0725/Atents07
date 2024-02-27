@@ -45,6 +45,11 @@ public class ObjectPool<T> : MonoBehaviour where T : RecycleObject
         }
     }
 
+    protected virtual void OnGenerateObject(T comp) 
+    {
+        
+    }
+
     public T GetObject(Vector3? position = null, Vector3? eulerAngle = null)
     {
         if (Queue.Count > 0)
