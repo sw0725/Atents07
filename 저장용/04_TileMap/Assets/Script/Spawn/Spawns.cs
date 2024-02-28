@@ -53,7 +53,7 @@ public class Spawns : MonoBehaviour
 
     bool IsSpawnAvailable(out Vector3 spawnablePosition) //out(출력용)은 반드시 값을 설정해줘야 함
     {
-        spawnablePosition = Vector3.zero;
+        bool result = false;
         List<Node> positions = new List<Node>();
 
         foreach (Node node in spawnAreaList) 
@@ -69,13 +69,13 @@ public class Spawns : MonoBehaviour
             int index = Random.Range(0, positions.Count);
             Node target = positions[index];
             spawnablePosition = map.GridToWorld(target.X, target.Y);
-            return true;
+            result = true;                            //빈칸있음 => 스폰가능
         }
         else 
         {
-            spawnablePosition = Vector3.zero;
+            spawnablePosition = Vector3.zero;       //빈칸없음 => 스폰 불가능
         }
-        return false;
+        return result;
     }
 
 #if UNITY_EDITOR

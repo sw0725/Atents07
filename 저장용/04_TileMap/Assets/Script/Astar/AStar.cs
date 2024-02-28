@@ -11,7 +11,7 @@ public static class AStar
     {
         List<Vector2Int> path = null;
 
-        if (map.isValidPosition(start) && map.isValidPosition(end) && map.IsPlain(start) && map.IsPlain(end)) 
+        if (map.isValidPosition(start) && map.isValidPosition(end) && !map.IsWall(start) && !map.IsWall(end)) 
         {
             map.ClearMapData();
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 public class TileGridMap : GridMap
 {
@@ -71,5 +72,10 @@ public class TileGridMap : GridMap
     {
         int index = Random.Range(0, moveablePosition.Length);
         return moveablePosition[index];
+    }
+
+    public Node GetNode(Vector3 world)
+    {
+        return GetNode(WorldToGrid(world));
     }
 }

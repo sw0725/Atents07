@@ -19,4 +19,13 @@ public class GameManager : Singleton<GameManager>
     {
         player = FindAnyObjectByType<Player>();
     }
+
+    WorldManager world;
+    public WorldManager World => world;
+
+    protected override void OnPreInitialize()
+    {
+        base.OnPreInitialize();
+        world = GetComponent<WorldManager>();
+    }
 }
