@@ -13,16 +13,19 @@ public class PathLine : MonoBehaviour
 
     public void DrawPath(TileGridMap map, List<Vector2Int> path) 
     {
-        if (map != null && path != null) 
+        if (gameObject.activeSelf) //자기자신이 활성화 되어있다면
         {
-            lineRenderer.positionCount = path.Count;    //경로 수 만큼 라인랜더러의 위치 추가
-
-            int index = 0;
-            foreach (Vector2Int pos in path) 
+            if (map != null && path != null)
             {
-                Vector2 world = map.GridToWorld(pos);
-                lineRenderer.SetPosition(index, world); //라인랜더러에 설정
-                index++;
+                lineRenderer.positionCount = path.Count;    //경로 수 만큼 라인랜더러의 위치 추가
+
+                int index = 0;
+                foreach (Vector2Int pos in path)
+                {
+                    Vector2 world = map.GridToWorld(pos);
+                    lineRenderer.SetPosition(index, world); //라인랜더러에 설정
+                    index++;
+                }
             }
         }
     }

@@ -8,4 +8,31 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Common/LoadSampleScene.unity
     guid: dd1d3be58f56a3945b7d62ec1bb41c19
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_00.unity
+    guid: 82048c2003005ee41a010f25d29072d9
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_01.unity
+    guid: 3ea9d21283e82a946b465f5cba6d3f61
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_02.unity
+    guid: c87d3cffaf07f0e48a6a982e9a358f7b
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_10.unity
+    guid: 57a1f0b6c0f4ddc42a817a168a7251f8
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_11.unity
+    guid: 7aa574a5db8d67240a33204aa96720be
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_12.unity
+    guid: fce9c9dca4d0ef54a91909857546e3cd
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_20.unity
+    guid: 9315f484572040f46be459291296e4be
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_21.unity
+    guid: 888b8efb32791264883928be9e71a084
+  - enabled: 1
+    path: Assets/Scenes/SceneLess/SceneLess_22.unity
+    guid: 7fa2a3babb15cb44b85e450d26f3d7e0
   m_configObjects: {}

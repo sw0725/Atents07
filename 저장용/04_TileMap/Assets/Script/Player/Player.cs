@@ -9,8 +9,22 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed = 3.0f;
     public float atteckCoolTime = 1.0f;
+    public Action<Vector2Int> onMapChange;
 
     Vector2 inputDir = Vector2.zero;
+    Vector2Int currntMap;
+    Vector2Int CurrentMap 
+    {
+        get => currntMap;
+        set 
+        {
+            if (value != currntMap) 
+            {
+                currntMap = value;
+                onMapChange?.Invoke(currntMap);
+            }
+        }
+    }
     float currentAtteckCoolTime = 0.0f;
     float currentSpeed= 3.0f;
     bool isMove = false;
@@ -29,6 +43,7 @@ public class Player : MonoBehaviour
     Rigidbody2D rigid2d;
     Animator animator;
     Transform attackSensorAxis;
+    WorldManager world;
 
     private void OnMove(InputAction.CallbackContext context)
     {
@@ -151,9 +166,15 @@ public class Player : MonoBehaviour
         inputAction.Player.Disable();
     }
 
+    private void Start()
+    {
+        world = GameManager.Instance.World;
+    }
+
     private void FixedUpdate()
     {
         rigid2d.MovePosition(rigid2d.position + (Vector2)(Time.fixedDeltaTime * currentSpeed * inputDir));
+        CurrentMap = world.WorldToGrid(rigid2d.position);
     }
 
     private void Update()

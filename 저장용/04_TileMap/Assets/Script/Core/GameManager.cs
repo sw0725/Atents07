@@ -15,17 +15,30 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    WorldManager world;
+    public WorldManager World => world;
+
     protected override void OnInitialize()
     {
         player = FindAnyObjectByType<Player>();
+        world.Initialize();
     }
-
-    WorldManager world;
-    public WorldManager World => world;
 
     protected override void OnPreInitialize()
     {
         base.OnPreInitialize();
         world = GetComponent<WorldManager>();
+        world.PreInitialize();
+    }
+
+    public bool showSlimePath = false;
+
+    private void OnValidate()       //멤버변수의 값이 바뀔때마다.
+    {
+        Slime[] slimes = FindObjectsOfType<Slime>();
+        foreach (Slime slime in slimes)
+        {
+            slime.ShowPath(showSlimePath);
+        }
     }
 }

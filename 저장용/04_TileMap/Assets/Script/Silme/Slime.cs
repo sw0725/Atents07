@@ -112,7 +112,7 @@ public class Slime : RecycleObject
         StartCoroutine(StartDissolve());
     }
 
-    void ReturnToPool() 
+    public void ReturnToPool() 
     {
         Currnt = null;
         transform.SetParent(pool);
@@ -189,8 +189,8 @@ public class Slime : RecycleObject
     void MoveUpdate() 
     {
         if (isMoveActivate) 
-        {
-            if (path.Count > 0 && pathWaitTime < MaxPathWaitTime) //패스에 남은 경로가 있다면, d오래 기다리지 않았다면
+        {           //길을 못찾아 경로가 없을때
+            if (path != null && path.Count > 0 && pathWaitTime < MaxPathWaitTime) //패스에 남은 경로가 있다면, d오래 기다리지 않았다면
             {
                 Vector2Int destGrid = path[0];                      //내가있는(가는중인)
                 if (!map.IsSlime(destGrid) || map.GetNode(destGrid) == Currnt)
@@ -221,6 +221,15 @@ public class Slime : RecycleObject
                 pathWaitTime = 0.0f;
                 OnDestinationArrive();
             }
+        }
+    }
+
+    public void ShowPath(bool isShow = true) 
+    {
+        pathLine.gameObject.SetActive(isShow);
+        if (isShow) 
+        {
+            pathLine.DrawPath(map, path);
         }
     }
 
