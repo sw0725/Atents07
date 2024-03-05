@@ -9,7 +9,10 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed = 3.0f;
     public float atteckCoolTime = 1.0f;
+    public float maxLifeTime = 10.0f;
     public Action<Vector2Int> onMapChange;
+    public Action<float> onLifeTimeChange;      //float = 수명의 비율 life/max
+    public Action<int> onKillCountChange;
 
     Vector2 inputDir = Vector2.zero;
     Vector2Int currntMap;
@@ -27,8 +30,36 @@ public class Player : MonoBehaviour
     }
     float currentAtteckCoolTime = 0.0f;
     float currentSpeed= 3.0f;
+    float lifeTime;
+    float LifeTime 
+    {
+        get => lifeTime;
+        set 
+        {
+            if (lifeTime != value) 
+            {
+                lifeTime = value;
+
+                lifeTime = Mathf.Clamp(lifeTime, 0.0f, maxLifeTime);
+                onLifeTimeChange?.Invoke(lifeTime/maxLifeTime);
+            }
+        }
+    }
     bool isMove = false;
     bool isAtteckValid = false;
+    int killCount = 0;
+    int KillCount 
+    {
+        get => killCount;
+        set 
+        {
+            if(killCount != value) 
+            {
+                killCount = value;
+                onKillCountChange?.Invoke(killCount);
+            }
+        }
+    }
 
     bool IsAtteckReady => currentAtteckCoolTime < 0.0f;
 
@@ -120,6 +151,12 @@ public class Player : MonoBehaviour
         isAtteckValid = false;
     }
 
+    public void MonsterKill(float bonus) 
+    {
+        LifeTime += bonus;
+        KillCount++;
+    }
+
     private void Awake()
     {
         inputAction = new PlayerInputAction();
@@ -169,6 +206,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         world = GameManager.Instance.World;
+        LifeTime = maxLifeTime;
     }
 
     private void FixedUpdate()
@@ -180,6 +218,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         currentAtteckCoolTime -= Time.deltaTime;
+        LifeTime -= Time.deltaTime;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

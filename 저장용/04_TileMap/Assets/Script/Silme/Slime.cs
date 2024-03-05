@@ -9,6 +9,7 @@ public class Slime : RecycleObject
     public float phaseDuration = 0.5f;
     public float dissolveDuration = 1.0f;
     public float moveSpeed = 2.0f;
+    public float lifeTimeBonus = 2.0f;
     public Action OnDie;
     public Transform Pool 
     {
@@ -227,10 +228,6 @@ public class Slime : RecycleObject
     public void ShowPath(bool isShow = true) 
     {
         pathLine.gameObject.SetActive(isShow);
-        if (isShow) 
-        {
-            pathLine.DrawPath(map, path);
-        }
     }
 
 #if UNITY_EDITOR

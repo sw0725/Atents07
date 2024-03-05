@@ -35,7 +35,7 @@ public class GameManager : Singleton<GameManager>
 
     private void OnValidate()       //멤버변수의 값이 바뀔때마다.
     {
-        Slime[] slimes = FindObjectsOfType<Slime>();
+        Slime[] slimes = FindObjectsOfType<Slime>(true);
         foreach (Slime slime in slimes)
         {
             slime.ShowPath(showSlimePath);

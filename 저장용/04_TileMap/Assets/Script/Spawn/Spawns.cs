@@ -16,11 +16,13 @@ public class Spawns : MonoBehaviour
 
     List<Node> spawnAreaList;
     MapArea map;
+    Player player;
 
     private void Start()
     {
         map = GetComponentInParent<MapArea>();              //이런 서로가 서로를 참조하는 상황은 이렁나지 않는게 좋다 (상호참조)
         spawnAreaList = map.CalcSpawnArea(this);
+        player = GameManager.Instance.Player;
     }
 
     private void Update()
@@ -45,6 +47,7 @@ public class Spawns : MonoBehaviour
             slime.OnDie += () =>
             {
                 count--;
+                player.MonsterKill(slime.lifeTimeBonus);
             };
             slime.transform.SetParent(transform);
             count++;
