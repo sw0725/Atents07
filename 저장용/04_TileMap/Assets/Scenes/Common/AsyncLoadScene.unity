@@ -698,7 +698,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ec35f5f705b14749bd74667981c907b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextSceneName: LoadSampleScene
+  nextSceneName: SeemlessBace
   loadindBarSpeed: 1
 --- !u!4 &1681865048
 Transform:

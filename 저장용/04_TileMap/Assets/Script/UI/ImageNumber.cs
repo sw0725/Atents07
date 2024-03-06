@@ -11,61 +11,30 @@ public class ImageNumber : MonoBehaviour
 
     Image[] digits;
 
-    int number = 0;
+    int number = -1;
 
     public int Number 
     {
         get => number;
         set 
         {
-            if(number != value) 
+            if (number != value)
             {
-                number = value;
-
-                if (number % 10 > 0)
+                number = Mathf.Min(value, 99999);
+                int num = number;
+                for (int i = 0; i < digits.Length; i++) 
                 {
-                    digits[0].sprite = numberImage[number % 10];
-                    digits[0].gameObject.SetActive(true);
-                }
-                else 
-                {
-                    digits[0].gameObject.SetActive(false);
-                }
-                if ((number / 10) % 10 > 0)
-                {
-                    digits[1].sprite = numberImage[(number / 10) % 10];
-                    digits[0].gameObject.SetActive(true); digits[1].gameObject.SetActive(true);
-                }
-                else
-                {
-                    digits[1].gameObject.SetActive(false);
-                }
-                if ((number / 100) % 10 > 0)
-                {
-                    digits[2].sprite = numberImage[(number / 100) % 10];
-                    digits[0].gameObject.SetActive(true); digits[1].gameObject.SetActive(true); digits[2].gameObject.SetActive(true);
-                }
-                else
-                {
-                    digits[2].gameObject.SetActive(false);
-                }
-                if ((number / 1000) % 10 > 0)
-                {
-                    digits[3].sprite = numberImage[(number / 1000) % 10];
-                    digits[0].gameObject.SetActive(true); digits[1].gameObject.SetActive(true); digits[2].gameObject.SetActive(true); digits[3].gameObject.SetActive(true);
-                }
-                else
-                {
-                    digits[3].gameObject.SetActive(false);
-                }
-                if ((number / 10000) % 10 > 0)
-                {
-                    digits[4].sprite = numberImage[(number / 10000) % 10];
-                    digits[0].gameObject.SetActive(true); digits[1].gameObject.SetActive(true); digits[2].gameObject.SetActive(true); digits[3].gameObject.SetActive(true); digits[4].gameObject.SetActive(true);
-                }
-                else
-                {
-                    digits[4].gameObject.SetActive(false);
+                    if (num != 0 || i ==0)
+                    {
+                        int digit = num % 10;
+                        digits[i].sprite = numberImage[digit];
+                        digits[i].gameObject.SetActive(true);
+                    }
+                    else 
+                    {
+                        digits[i].gameObject.SetActive(false);
+                    }
+                    num /= 10;
                 }
             }
         }
@@ -74,16 +43,5 @@ public class ImageNumber : MonoBehaviour
     private void Awake()
     {
         digits = GetComponentsInChildren<Image>();
-    }
-
-    private void Start()
-    {
-        Player player = GameManager.Instance.Player;
-        player.onKillCountChange += KillCountChange;
-    }
-
-    private void KillCountChange(int killcount)
-    {
-        Number = killcount;
     }
 }

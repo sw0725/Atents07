@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     public Action<Vector2Int> onMapChange;
     public Action<float> onLifeTimeChange;      //float = 수명의 비율 life/max
     public Action<int> onKillCountChange;
+    public Action<float, int> onDie;           //float = playtime int = killcount
 
     Vector2 inputDir = Vector2.zero;
     Vector2Int currntMap;
@@ -39,15 +40,21 @@ public class Player : MonoBehaviour
             if (lifeTime != value) 
             {
                 lifeTime = value;
-
-                lifeTime = Mathf.Clamp(lifeTime, 0.0f, maxLifeTime);
-                onLifeTimeChange?.Invoke(lifeTime/maxLifeTime);
+                if (isAlive && lifeTime < 0.0f)
+                {
+                    Die();
+                }
+                else 
+                {
+                    lifeTime = Mathf.Clamp(lifeTime, 0.0f, maxLifeTime);
+                    onLifeTimeChange?.Invoke(lifeTime/maxLifeTime);
+                }
             }
         }
     }
     bool isMove = false;
     bool isAtteckValid = false;
-    int killCount = 0;
+    int killCount = -1;
     int KillCount 
     {
         get => killCount;
@@ -60,6 +67,8 @@ public class Player : MonoBehaviour
             }
         }
     }
+    bool isAlive = true;
+    float totalLifeTime = 0.0f;
 
     bool IsAtteckReady => currentAtteckCoolTime < 0.0f;
 
@@ -157,6 +166,15 @@ public class Player : MonoBehaviour
         KillCount++;
     }
 
+    void Die() 
+    {
+        isAlive = false;
+        lifeTime = 0.0f;
+        onLifeTimeChange(0);
+        inputAction.Player.Disable();
+        onDie?.Invoke(totalLifeTime, killCount);
+    }
+
     private void Awake()
     {
         inputAction = new PlayerInputAction();
@@ -207,6 +225,7 @@ public class Player : MonoBehaviour
     {
         world = GameManager.Instance.World;
         LifeTime = maxLifeTime;
+        KillCount = 0;
     }
 
     private void FixedUpdate()
@@ -219,10 +238,13 @@ public class Player : MonoBehaviour
     {
         currentAtteckCoolTime -= Time.deltaTime;
         LifeTime -= Time.deltaTime;
+        totalLifeTime += Time.deltaTime;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+#if UNITY_EDITOR
+    public void TestDie()
     {
-
+        Die();
     }
+#endif
 }

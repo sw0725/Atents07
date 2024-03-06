@@ -83,6 +83,17 @@ public class WorldManager : MonoBehaviour
                 RefreshScenes(currentGrid.x, currentGrid.y);
             };
 
+            player.onDie += (_, _) =>
+            {
+                for (int y = 0; y < HeightCount; y++)
+                {
+                    for (int x = 0; x < WidthCount; x++) 
+                    {
+                        RequestAsyncSceneUnload(x, y);
+                    }
+                }
+            };
+
             Vector2Int grid = WorldToGrid(player.transform.position);
             RequestAsyncSceneLoad(grid.x, grid.y);                      //플레이어가 있는 맵을 최우선 로딩
             RefreshScenes(grid.x, grid.y);

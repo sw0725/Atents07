@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class Test_SceneAdditiveLoad : TestBase
 {
+# if UNITY_EDITOR
     [Range(0, 2)]
     public int targetX = 0;
     [Range(0, 2)]
@@ -48,4 +49,5 @@ public class Test_SceneAdditiveLoad : TestBase
     {
         world.TestUnloadAllScene();
     }
+#endif
 }
