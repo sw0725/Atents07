@@ -9,6 +9,7 @@ public class PlayerInputController : MonoBehaviour
 {
     public float walkSpeed = 3.0f;
     public float runSpeed = 5.0f;
+    public float turnSpeed = 10.0f;
     
     float currentSpeed = 0.0f;
 
@@ -31,6 +32,7 @@ public class PlayerInputController : MonoBehaviour
         }
     }
     Vector3 inputDir = Vector3.zero;    //점프없음 - y=0
+    Quaternion targetRotation = Quaternion.identity;    //바라볼 방향
 
     PlayerInputAction inputAction;
     Animator animator;
@@ -64,6 +66,12 @@ public class PlayerInputController : MonoBehaviour
         inputAction.Player.Disable();
     }
 
+    private void Update()
+    {
+        characterController.Move(Time.deltaTime * currentSpeed * inputDir);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
+    }
+
     private void OnMove(InputAction.CallbackContext context)
     {
         Vector3 input = context.ReadValue<Vector2>();
@@ -73,7 +81,11 @@ public class PlayerInputController : MonoBehaviour
         inputDir.z = input.y;
         if (!context.canceled) //눌려짐
         {
-            MoveSpeedChange(currentSpeedMode);
+            Quaternion camY = Quaternion.Euler(0, Camera.main.transform.rotation.eulerAngles.y, 0); //cam의 y축 회전 추출
+            inputDir = camY * inputDir;                                     //입력 방향을 카메라의 y 회전과 같은 정도로 회전
+            targetRotation = Quaternion.LookRotation(inputDir);         //몸체 회전
+
+            MoveSpeedChange(CurrentSpeedMode);
         }
         else 
         {
@@ -105,7 +117,7 @@ public class PlayerInputController : MonoBehaviour
         }
         else 
         {
-            CurrentSpeedMode -= MoveMode.Walk;
+            CurrentSpeedMode = MoveMode.Walk;
         }
     }
 }
