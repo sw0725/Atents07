@@ -13,4 +13,14 @@ public class GameManager : Singltrun<GameManager>
     {
         player = FindAnyObjectByType<Player>();
     }
+
+    ItemDataManager itemDataManager;
+    public ItemDataManager ItemData => itemDataManager;
+
+    protected override void OnpreInitialize()
+    {
+        base.OnpreInitialize();
+        itemDataManager = GetComponent<ItemDataManager>();
+    }
+
 }
