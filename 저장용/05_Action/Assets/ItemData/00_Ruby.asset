@@ -17,5 +17,5 @@ MonoBehaviour:
   itemDescription: "\uBD89\uC740\uBE5B \uBCF4\uC11D"
   itemIcon: {fileID: 21300000, guid: 70e92df91699f664ab5bad7bf4723022, type: 3}
   price: 500
-  maxStackCount: 3
+  maxStackCount: 10
   modelPrefab: {fileID: 0}
