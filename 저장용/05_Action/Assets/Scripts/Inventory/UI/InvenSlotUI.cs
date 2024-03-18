@@ -6,10 +6,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerClickHandler
 {
     public Action<uint> onDragBegin;               //uint 드래그가 시작된 슬롯
     public Action<uint, bool> onDragEnd;           //슬롯에서 드래그가 끝날시 true
+    public Action<uint> onClick;
     TextMeshProUGUI equipText;
 
     protected override void Awake()
@@ -33,7 +34,6 @@ public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDrag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log($"드래그 시작 : [{Index}]번 슬롯");
         onDragBegin?.Invoke(Index);
     }
 
@@ -50,7 +50,6 @@ public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDrag
             InvenSlotUI endSlot = obj.GetComponent<InvenSlotUI>();
             if (endSlot != null)
             {
-                Debug.Log($"드래그 종료 : [{endSlot.Index}]번 슬롯");
                 onDragEnd?.Invoke(endSlot.Index, true);
             }
             else 
@@ -63,5 +62,10 @@ public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDrag
         {
             Debug.Log("UI없음");
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        onClick?.Invoke(Index);
     }
 }

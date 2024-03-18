@@ -26,6 +26,7 @@ public class InventoryUI : MonoBehaviour
             slotUIs[i].InitalizeSlot(inven[i]);                 //안의 슬롯 초기화(연결)
             slotUIs[i].onDragBegin += OnItemMoveBegin;
             slotUIs[i].onDragEnd += OnItemMoveEnd;
+            slotUIs[i].onClick += OnSlotClick;
         }
 
         tempSlotUI.InitalizeSlot(inven.TempSlot);
@@ -34,10 +35,38 @@ public class InventoryUI : MonoBehaviour
     private void OnItemMoveBegin(uint index)
     {
         inven.MoveItem(index, tempSlotUI.Index);
+        tempSlotUI.Open();
     }
 
-    private void OnItemMoveEnd(uint index, bool isSucess)
+    private void OnItemMoveEnd(uint index, bool isSlotEnd)
     {
+        //uint finalIndex = index;
+        //if (isSlotEnd) 
+        //{
+        //    if (inven.FindEmptySlot(out uint emptySlotIndex))
+        //    {
+        //        finalIndex = emptySlotIndex;
+        //    }
+        //    else 
+        //    {
+        //        //바닥에 드랍
+        //        Debug.Log("아이템 드롭 필요");
+        //        return;
+        //    }
+        //}
         inven.MoveItem(tempSlotUI.Index, index);
+
+        if (tempSlotUI.InvenSlot.IsEmpty) 
+        {
+            tempSlotUI.Close();
+        }
+    }
+
+    private void OnSlotClick(uint index)
+    {
+        if (!tempSlotUI.InvenSlot.IsEmpty) 
+        {
+            OnItemMoveEnd(index, true);     //슬롯이 클릭됫을때 실행-> 항상트루
+        }
     }
 }

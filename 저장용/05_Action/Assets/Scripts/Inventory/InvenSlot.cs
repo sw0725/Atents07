@@ -55,14 +55,13 @@ public class InvenSlot
         IsEquipped = false;
     }
 
-    public void AssignSlotItem(ItemData data, uint count = 1, bool isEquip = false) //슬롯에 아이템 설정(줍기) 
-    {
+    public void AssignSlotItem(ItemData data, uint count = 1, bool isEquip = false)   //슬롯에 아이템 설정(줍기) 
+    {                                                                                             
         if (data != null)
         {
             ItemData = data;
             ItemCount = count;
             IsEquipped = isEquip;
-            Debug.Log($"인벤토리 {slotIndex}번 슬롯에 [{ItemData.itemName}]아이템 [{itemCount}]추가");
         }
         else 
         {
@@ -70,12 +69,11 @@ public class InvenSlot
         }
     }
 
-    public void ClearSlotItem()       //슬롯에 아이템 제거(버리기)
+    public virtual void ClearSlotItem()       //슬롯에 아이템 제거(버리기)
     {
         ItemData = null;
         ItemCount = 0;
         IsEquipped = false;
-        Debug.Log($"인벤토리 {slotIndex}번 슬롯을 비웁니다.");
     }
 
     public bool IncreaseSlotItem(out uint overCount, uint increaseCount = 1)    //디폴트 매개변수는 가장 나중에 적어준다(구분이 안가서)
@@ -84,20 +82,17 @@ public class InvenSlot
         uint newCount = ItemCount + increaseCount;
         int over = (int)newCount - (int)ItemData.maxStackCount;
 
-        Debug.Log($"인벤토리 [{slotIndex}]번 슬롯에 아이템 증가, 현재[{ItemCount}]개");
         if (over > 0)//넘침
         {
             ItemCount = ItemData.maxStackCount;
             overCount = (uint)over;
             result = false;
-            Debug.Log($"아이템 최대치까지 증가, [{over}]개 넘침");
         }
         else 
         {
             ItemCount = newCount;
             overCount = 0;
             result = true;
-            Debug.Log($"아이템 [{increaseCount}]개 증가.");
         }
         return result;
     }
@@ -108,7 +103,6 @@ public class InvenSlot
         if (newCount > 0)   //남았다
         {
             ItemCount = (uint)newCount;
-            Debug.Log($"인벤토리 [{slotIndex}]번 슬롯에 [{ItemData.itemName}]이 [{decreaseCount}]개 감소, 현재[{ItemCount}]개");
         }
         else 
         {

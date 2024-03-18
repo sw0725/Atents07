@@ -10,13 +10,15 @@ public class Inventory
     int SlotCount => slots.Length;
     public InvenSlot this[uint index] => slots[index];  //인벤토리 슬롯에 접근 위한 인덱서
 
-    InvenSlot tempSlot;                                 //임시슬롯(아이템 위치 바꿀때 같은)
+    InvenTempSlot tempSlot;                                 //임시슬롯(아이템 위치 바꿀때 같은)
     uint tempSlotIndex = 1111111;
-    public InvenSlot TempSlot => tempSlot;
+    public InvenTempSlot TempSlot => tempSlot;
 
     ItemDataManager ItemDataManager;                    //아이템 데이터 매니져 - 아이템 종류별 정보 모두 가짐
     Player owner;
     public Player Owner => owner;
+
+    const uint FailFind = uint.MaxValue;
 
     public Inventory(Player owner, uint size = Default_Inventory_Size) 
     {
@@ -25,7 +27,7 @@ public class Inventory
         {
             slots[i] = new InvenSlot(i);
         }
-        tempSlot = new InvenSlot(tempSlotIndex);
+        tempSlot = new InvenTempSlot(tempSlotIndex);
         ItemDataManager = GameManager.Instance.ItemData;    //이거때문에 인벤토리는 스타트에서나야 생성가능하다
 
         this.owner = owner;
@@ -110,30 +112,66 @@ public class Inventory
     {
         if ((from != to) && IsValidIndex(from) && IsValidIndex(to)) 
         {
-            InvenSlot fromSlot = (from == tempSlotIndex) ? TempSlot : slots[from];
+            bool fromIsTemp = (from == tempSlotIndex);
+            InvenSlot fromSlot = fromIsTemp ? TempSlot : slots[from];       //from가져오기
 
-            if (!fromSlot.IsEmpty) 
+            if (!fromSlot.IsEmpty)                                          //아이템있다
             {
-                InvenSlot toSlot = (to == tempSlotIndex) ? TempSlot : slots[to];
+                InvenSlot toSlot = null;
+
+                if (to == tempSlotIndex)
+                {
+                    toSlot = tempSlot;
+                    TempSlot.SetFromIndex(fromSlot.Index);                  //드래그 시작 인덱스 저장 = from
+                }
+                else 
+                {
+                    toSlot = slots[to];                                     //temp아니면 슬롯만 저장
+                }
 
                 if (fromSlot.ItemData == toSlot.ItemData)                   //동종의 아이템
                 {                                                           //to를 최대치로 form은 나머지 갯수
                     toSlot.IncreaseSlotItem(out uint overcount, fromSlot.ItemCount);
                     fromSlot.DeCreaseSlotItem(fromSlot.ItemCount - overcount);      //over가 from이 가질 갯수이므로
-                    Debug.Log($"[{from}]번 슬롯에서 [{to}]번 슬롯으로 아이템 합치기");
                 }
                 else                                                        //이종의 아이템이나 비어있거나
                 {
-                    ItemData tempData = fromSlot.ItemData;
-                    uint tempCount = fromSlot.ItemCount;
-                    bool tempEquip = fromSlot.IsEquipped;
-
-                    fromSlot.AssignSlotItem(toSlot.ItemData, toSlot.ItemCount, toSlot.IsEquipped);
-                    toSlot.AssignSlotItem(tempData, tempCount, tempEquip);
-                    Debug.Log($"[{from}]번 슬롯에서 [{to}]번 슬롯의 아이템 교체");
+                    //드래그종료시 temp => to
+                    if (fromIsTemp)                                         //temp가 기록한 fromIndex의 슬롯(returnSlot) 에 toSlot 의 데이터 넣기
+                    {                                                       //toSlot에 tempSlot의 데이터 넣기
+                        InvenSlot returnSlot = slots[TempSlot.FromIndex];   //프롬슬롯
+                        if (returnSlot.IsEmpty)                             //비엇다(to->return, temp -> to, temp비움)
+                        {
+                            returnSlot.AssignSlotItem(toSlot.ItemData, toSlot.ItemCount, false);
+                            toSlot.AssignSlotItem(TempSlot.ItemData, TempSlot.ItemCount, false);
+                            TempSlot.ClearSlotItem();
+                        }
+                        else 
+                        {
+                            if (returnSlot.ItemData == toSlot.ItemData)     //동종 들가있다
+                            {
+                                returnSlot.IncreaseSlotItem(out uint overCount, toSlot.ItemCount);
+                                toSlot.DeCreaseSlotItem(toSlot.ItemCount - overCount);
+                            }
+                            SwapSlot(tempSlot, toSlot);                     //스왑(다른경우 일없다)
+                        }                                                   
+                    }
+                    else                                                    //from이 temp가 아님, from과 to스왑
+                    {
+                        SwapSlot(fromSlot, toSlot);
+                    }
                 }
             }
         }
+    }
+
+    void SwapSlot(InvenSlot slotA, InvenSlot slotB) 
+    {
+        ItemData tempData = slotA.ItemData;          //스왑(다른경우 일없다)
+        uint tempCount = slotA.ItemCount;
+
+        slotA.AssignSlotItem(slotB.ItemData, slotB.ItemCount, false);
+        slotB.AssignSlotItem(tempData, tempCount, false);
     }
 
     public void SplitItem(uint slotIndex, uint count)                       //특정슬롯에서 아이템을 일정량 덜어 임시 슬롯으로 보냄
@@ -240,6 +278,23 @@ public class Inventory
     bool IsValidIndex(uint index)                                           //사용가능한 인덱스인지 확인
     {
         return (index < SlotCount) || (index == tempSlotIndex);
+    }
+
+    public bool FindEmptySlot(out uint index)                               //비어있는 슬롯 찾기, 찾으면 true
+    {
+        bool result = false;
+        index = FailFind;
+
+        foreach (var item in slots)
+        {
+            if (item.IsEmpty) 
+            {
+                index = item.Index;
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
 #if UNITY_EDITOR
