@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   code: 2
   itemName: "\uC0AC\uD30C\uC774\uC5B4"
-  itemDescription: "\uCCAD\uC0C9\uC758 \uBCF4\uC11D"
+  itemDescription: "\uAC00\uACF5\uB418\uC9C0 \uC54A\uC740 \uCCAD\uC0C9 \uB0A8\uBCF4\uC11D"
   itemIcon: {fileID: 21300000, guid: 3c9805506cdde8f44889fc034ab0097e, type: 3}
   price: 1500
   maxStackCount: 3

@@ -6,11 +6,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerClickHandler
+public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
 {
     public Action<uint> onDragBegin;               //uint 드래그가 시작된 슬롯
     public Action<uint, bool> onDragEnd;           //슬롯에서 드래그가 끝날시 true
     public Action<uint> onClick;
+
+    public Action<uint> onPointerEnter;
+    public Action onPointerExit;
+    public Action<Vector2> onPointerMove;
     TextMeshProUGUI equipText;
 
     protected override void Awake()
@@ -67,5 +71,20 @@ public class InvenSlotUI : SlotUIBase, IDragHandler, IBeginDragHandler, IEndDrag
     public void OnPointerClick(PointerEventData eventData)
     {
         onClick?.Invoke(Index);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        onPointerEnter?.Invoke(Index);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        onPointerExit?.Invoke();
+    }
+
+    public void OnPointerMove(PointerEventData eventData)
+    {
+        onPointerMove?.Invoke(eventData.position);  //마우스 스크린좌표 넘기기
     }
 }

@@ -9,6 +9,7 @@ public class InventoryUI : MonoBehaviour
 
     InvenSlotUI[] slotUIs;      //안의 슬롯 ui
     TempSlotUI tempSlotUI;
+    DetaiInfo detaiInfo;
 
     private void Awake()
     {
@@ -16,6 +17,7 @@ public class InventoryUI : MonoBehaviour
         slotUIs = c.GetComponentsInChildren<InvenSlotUI>();
 
         tempSlotUI = GetComponentInChildren<TempSlotUI>();
+        detaiInfo = GetComponentInChildren<DetaiInfo>();
     }
     public void InitializeInventory(Inventory playerInventory)  //초기화
     {
@@ -27,6 +29,9 @@ public class InventoryUI : MonoBehaviour
             slotUIs[i].onDragBegin += OnItemMoveBegin;
             slotUIs[i].onDragEnd += OnItemMoveEnd;
             slotUIs[i].onClick += OnSlotClick;
+            slotUIs[i].onPointerEnter += OnItemDetailOn;
+            slotUIs[i].onPointerExit += OnItemDetailOff;
+            slotUIs[i].onPointerMove += OnSlotPointerMove;
         }
 
         tempSlotUI.InitalizeSlot(inven.TempSlot);
@@ -34,12 +39,13 @@ public class InventoryUI : MonoBehaviour
 
     private void OnItemMoveBegin(uint index)
     {
+        detaiInfo.IsPause = true;               //드래그할때 안보이게
         inven.MoveItem(index, tempSlotUI.Index);
         tempSlotUI.Open();
     }
 
     private void OnItemMoveEnd(uint index, bool isSlotEnd)
-    {
+    {                               //슬롯에서 드래그 끝나면 끝슬롯 아니면 시작슬롯
         //uint finalIndex = index;
         //if (isSlotEnd) 
         //{
@@ -60,6 +66,11 @@ public class InventoryUI : MonoBehaviour
         {
             tempSlotUI.Close();
         }
+        detaiInfo.IsPause = false;
+        if (isSlotEnd)                              //놓은직후에 아이템 보이게
+        {
+            detaiInfo.Open(inven[index].ItemData);
+        }
     }
 
     private void OnSlotClick(uint index)
@@ -68,5 +79,20 @@ public class InventoryUI : MonoBehaviour
         {
             OnItemMoveEnd(index, true);     //슬롯이 클릭됫을때 실행-> 항상트루
         }
+    }
+
+    private void OnSlotPointerMove(Vector2 screen)
+    {
+        detaiInfo.MovePosition(screen);
+    }
+
+    private void OnItemDetailOff()
+    {
+        detaiInfo.Close();
+    }
+
+    private void OnItemDetailOn(uint index)
+    {
+        detaiInfo.Open(slotUIs[index].InvenSlot.ItemData);
     }
 }
