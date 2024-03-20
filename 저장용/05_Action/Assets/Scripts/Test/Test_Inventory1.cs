@@ -39,7 +39,7 @@ public class Test_Inventory1 : TestBase
 
     protected override void OnTest2(InputAction.CallbackContext context)
     {
-        inventory.SplitItem(index, to);
+        inventory.DividItem(index, to);
         inventory.Test_InventoryPrint();
     }
 

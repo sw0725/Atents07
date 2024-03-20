@@ -169,20 +169,43 @@ public class Inventory
     {
         ItemData tempData = slotA.ItemData;          //스왑(다른경우 일없다)
         uint tempCount = slotA.ItemCount;
-
-        slotA.AssignSlotItem(slotB.ItemData, slotB.ItemCount, false);
-        slotB.AssignSlotItem(tempData, tempCount, false);
+        bool tempEquip = slotA.IsEquipped;
+        slotA.AssignSlotItem(slotB.ItemData, slotB.ItemCount, slotB.IsEquipped);
+        slotB.AssignSlotItem(tempData, tempCount, tempEquip);
     }
 
-    public void SplitItem(uint slotIndex, uint count)                       //특정슬롯에서 아이템을 일정량 덜어 임시 슬롯으로 보냄
+    public void DividItem(uint slotIndex, uint count)                       //특정슬롯에서 아이템을 일정량 덜어 임시 슬롯으로 보냄
     {
         if (IsValidIndex(slotIndex)) 
         {
             InvenSlot slot = slots[slotIndex];
             count = System.Math.Min(count, slot.ItemCount);                 //count가 들간 개수보다 크면 슬롯에 들가있는 개수까지만 사용
 
-            TempSlot.AssignSlotItem(slot.ItemData, count);
-            slot.DeCreaseSlotItem(count);
+            TempSlot.AssignSlotItem(slot.ItemData, count);                  //임시슬롯에 우선 넣기
+            TempSlot.SetFromIndex(slotIndex);                               //나누는 슬롯 인덱스 저장
+            slot.DeCreaseSlotItem(count);                                   //원 슬롯에서 아이템빼기
+        }
+    }
+
+    public void MergeItems()                                                //같은종류의 아이템 합치기
+    {
+        uint count = (uint)(slots.Length - 1);
+        for (uint i = 0; i < count; i++) 
+        {
+            InvenSlot target = slots[i];
+            for (uint j = count; j > i; j--) 
+            {
+                if (target.ItemData == slots[j].ItemData)                   //동종일때
+                {
+                    MoveItem(j, i);                                         //j를 i로
+
+                    if (!slots[j].IsEmpty)                                  //남으면
+                    {
+                        SwapSlot(slots[i + 1], slots[j]);                   //동종에 붙인다
+                        break;
+                    }
+                }
+            }
         }
     }
 

@@ -2,23 +2,53 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
     Inventory inven;            //보여줄 인벤토리
+    PlayerInputAction inputAction;
+    CanvasGroup canvasGroup;
 
     InvenSlotUI[] slotUIs;      //안의 슬롯 ui
     TempSlotUI tempSlotUI;
     DetaiInfo detaiInfo;
+    ItemDividerUI itemDividerUI;
+    MoneyPanelUI moneyPanelUI;
+    SortPanelUI sortPanelUI;
 
     private void Awake()
     {
         Transform c = transform.GetChild(0);
         slotUIs = c.GetComponentsInChildren<InvenSlotUI>();
 
+        c = transform.GetChild(4);
+        Button close = c.GetComponent<Button>();
+        close.onClick.AddListener(Close);
+
         tempSlotUI = GetComponentInChildren<TempSlotUI>();
         detaiInfo = GetComponentInChildren<DetaiInfo>();
+        itemDividerUI = GetComponentInChildren<ItemDividerUI>(true);
+        moneyPanelUI = GetComponentInChildren<MoneyPanelUI>();
+        sortPanelUI = GetComponentInChildren<SortPanelUI>();
+
+        inputAction = new PlayerInputAction();
+        canvasGroup = GetComponent<CanvasGroup>();
     }
+
+    private void OnEnable()
+    {
+        inputAction.UI.Enable();
+        inputAction.UI.InvenOnOff.performed += onInvenOnOff;
+    }
+
+    private void OnDisable()
+    {
+        inputAction.UI.InvenOnOff.performed -= onInvenOnOff;
+        inputAction.UI.Disable();
+    }
+
     public void InitializeInventory(Inventory playerInventory)  //초기화
     {
         inven = playerInventory;
@@ -35,6 +65,25 @@ public class InventoryUI : MonoBehaviour
         }
 
         tempSlotUI.InitalizeSlot(inven.TempSlot);
+
+        itemDividerUI.onOkClick += OnDividerOk;
+        itemDividerUI.onCancle += OnDividerCancle;
+        itemDividerUI.Close();
+
+        sortPanelUI.onSortRequest += ((by) => 
+        {
+            bool isAcending = true;
+            switch (by) 
+            {
+                case ItemSortBy.Price:
+                    isAcending = false;
+                    break;
+            }
+            inven.MergeItems();
+            inven.SlotSorting(by, isAcending);
+        });
+
+        Close();
     }
 
     private void OnItemMoveBegin(uint index)
@@ -75,7 +124,19 @@ public class InventoryUI : MonoBehaviour
 
     private void OnSlotClick(uint index)
     {
-        if (!tempSlotUI.InvenSlot.IsEmpty) 
+        if (tempSlotUI.InvenSlot.IsEmpty)
+        {
+            bool isShiftPress = (Keyboard.current.shiftKey.ReadValue() > 0);
+            if (isShiftPress) 
+            {
+                OnItemDividerOpen(index);
+            }
+            else    //아이템사용 or장비
+            {
+            
+            }
+        }
+        else                                //임시슬롯에 뭐 있음
         {
             OnItemMoveEnd(index, true);     //슬롯이 클릭됫을때 실행-> 항상트루
         }
@@ -94,5 +155,51 @@ public class InventoryUI : MonoBehaviour
     private void OnItemDetailOn(uint index)
     {
         detaiInfo.Open(slotUIs[index].InvenSlot.ItemData);
+    }
+    void OnItemDividerOpen(uint index)      //분리창 열기
+    {
+        InvenSlotUI target = slotUIs[index];
+        itemDividerUI.transform.position = target.transform.position + Vector3.up * 100;
+        if (itemDividerUI.Open(target.InvenSlot)) 
+        {
+            detaiInfo.IsPause = true;
+        }
+    }
+
+    private void OnDividerCancle()
+    {
+        detaiInfo.IsPause = false;
+    }
+
+    private void OnDividerOk(uint targetIndex, uint dividCount)
+    {
+        inven.DividItem(targetIndex, dividCount);
+        tempSlotUI.Open();
+    }
+
+    void Open() 
+    {
+        canvasGroup.alpha = 1.0f;
+        canvasGroup.interactable= true;
+        canvasGroup.blocksRaycasts = true;
+    }
+
+    void Close() 
+    {
+        canvasGroup.alpha = 0.0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
+    }
+
+    private void onInvenOnOff(InputAction.CallbackContext context)
+    {
+        if (canvasGroup.interactable)
+        {
+            Close();
+        }
+        else 
+        {
+            Open();
+        }
     }
 }
