@@ -53,6 +53,15 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PickUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""082c5dc0-09f0-4ab3-b4fc-c177aac2b399"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -130,6 +139,17 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9a7f3ad4-35a2-4113-b7fe-70f4ceba0cce"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PickUp"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -278,6 +298,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_MoveModeChange = m_Player.FindAction("MoveModeChange", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
+        m_Player_PickUp = m_Player.FindAction("PickUp", throwIfNotFound: true);
         // Effect
         m_Effect = asset.FindActionMap("Effect", throwIfNotFound: true);
         m_Effect_PointerMove = m_Effect.FindAction("PointerMove", throwIfNotFound: true);
@@ -350,6 +371,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_MoveModeChange;
     private readonly InputAction m_Player_Attack;
+    private readonly InputAction m_Player_PickUp;
     public struct PlayerActions
     {
         private @PlayerInputAction m_Wrapper;
@@ -357,6 +379,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @MoveModeChange => m_Wrapper.m_Player_MoveModeChange;
         public InputAction @Attack => m_Wrapper.m_Player_Attack;
+        public InputAction @PickUp => m_Wrapper.m_Player_PickUp;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -375,6 +398,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Attack.started += instance.OnAttack;
             @Attack.performed += instance.OnAttack;
             @Attack.canceled += instance.OnAttack;
+            @PickUp.started += instance.OnPickUp;
+            @PickUp.performed += instance.OnPickUp;
+            @PickUp.canceled += instance.OnPickUp;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -388,6 +414,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @Attack.started -= instance.OnAttack;
             @Attack.performed -= instance.OnAttack;
             @Attack.canceled -= instance.OnAttack;
+            @PickUp.started -= instance.OnPickUp;
+            @PickUp.performed -= instance.OnPickUp;
+            @PickUp.canceled -= instance.OnPickUp;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -527,6 +556,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnMoveModeChange(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
+        void OnPickUp(InputAction.CallbackContext context);
     }
     public interface IEffectActions
     {

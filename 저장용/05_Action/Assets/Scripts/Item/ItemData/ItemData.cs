@@ -13,5 +13,4 @@ public class ItemData : ScriptableObject        //아이템 한 종류의 정보를 저장하
     public Sprite itemIcon;
     public uint price = 0;              //uint = unsignedInt 부호없는 인트
     public uint maxStackCount = 1;
-    public GameObject modelPrefab;
 }

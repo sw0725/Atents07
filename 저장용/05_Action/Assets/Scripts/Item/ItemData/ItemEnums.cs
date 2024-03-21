@@ -6,7 +6,10 @@ public enum ItemCode    //아이템 ID
 {
     Ruby = 0,
     Emerald,
-    Sapphire
+    Sapphire,
+    CopperCoin,
+    SliverCoin,
+    GoldCoin
 }
 
 public enum ItemSortBy  //아이템 정렬기준

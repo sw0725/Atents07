@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
+    public Player Owner => inven.Owner;
+
     Inventory inven;            //보여줄 인벤토리
     PlayerInputAction inputAction;
     CanvasGroup canvasGroup;
@@ -23,7 +25,7 @@ public class InventoryUI : MonoBehaviour
         Transform c = transform.GetChild(0);
         slotUIs = c.GetComponentsInChildren<InvenSlotUI>();
 
-        c = transform.GetChild(4);
+        c = transform.GetChild(3);
         Button close = c.GetComponent<Button>();
         close.onClick.AddListener(Close);
 
@@ -41,10 +43,12 @@ public class InventoryUI : MonoBehaviour
     {
         inputAction.UI.Enable();
         inputAction.UI.InvenOnOff.performed += onInvenOnOff;
+        inputAction.UI.Click.canceled += OnItemDrop;
     }
 
     private void OnDisable()
     {
+        inputAction.UI.Click.canceled -= OnItemDrop;
         inputAction.UI.InvenOnOff.performed -= onInvenOnOff;
         inputAction.UI.Disable();
     }
@@ -69,6 +73,9 @@ public class InventoryUI : MonoBehaviour
         itemDividerUI.onOkClick += OnDividerOk;
         itemDividerUI.onCancle += OnDividerCancle;
         itemDividerUI.Close();
+
+        Owner.onMoneyChange += moneyPanelUI.Refresh;
+        moneyPanelUI.Refresh(Owner.Money);
 
         sortPanelUI.onSortRequest += ((by) => 
         {
@@ -200,6 +207,18 @@ public class InventoryUI : MonoBehaviour
         else 
         {
             Open();
+        }
+    }
+
+    private void OnItemDrop(InputAction.CallbackContext _)
+    {
+        Vector2 screenPos = Mouse.current.position.ReadValue();
+        Vector2 diff = screenPos - (Vector2)transform.position;
+        RectTransform rect = (RectTransform)transform;
+
+        if (!rect.rect.Contains(diff)) //영역밖
+        {
+            tempSlotUI.OnDrop(screenPos);
         }
     }
 }

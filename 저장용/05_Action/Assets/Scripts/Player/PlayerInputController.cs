@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +9,7 @@ public class PlayerInputController : MonoBehaviour
     public Action<Vector2, bool> onMove;
     public Action onMoveModeChange;
     public Action onAttack;
+    public Action onItemPickUp;
 
     PlayerInputAction inputAction;
 
@@ -25,6 +25,7 @@ public class PlayerInputController : MonoBehaviour
         inputAction.Player.Move.canceled += OnMove;
         inputAction.Player.MoveModeChange.performed += OnMoveModeChage;
         inputAction.Player.Attack.performed += OnAttack;
+        inputAction.Player.PickUp.performed += OnPickUp;
     }
 
     private void OnDisable()
@@ -33,6 +34,7 @@ public class PlayerInputController : MonoBehaviour
         inputAction.Player.Move.canceled -= OnMove;
         inputAction.Player.MoveModeChange.performed -= OnMoveModeChage;
         inputAction.Player.Attack.performed -= OnAttack;
+        inputAction.Player.PickUp.performed -= OnPickUp;
         inputAction.Player.Disable();
     }
 
@@ -50,5 +52,10 @@ public class PlayerInputController : MonoBehaviour
     private void OnAttack(InputAction.CallbackContext context)
     {
         onAttack?.Invoke();
+    }
+
+    private void OnPickUp(InputAction.CallbackContext _)
+    {
+        onItemPickUp?.Invoke();
     }
 }

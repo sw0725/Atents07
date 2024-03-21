@@ -12,9 +12,11 @@ public class GameManager : Singltrun<GameManager>
     protected override void OnInitialize()
     {
         player = FindAnyObjectByType<Player>();
+        inventoryUI = FindAnyObjectByType<InventoryUI>();
     }
 
     ItemDataManager itemDataManager;
+
     public ItemDataManager ItemData => itemDataManager;
 
     protected override void OnpreInitialize()
@@ -22,5 +24,9 @@ public class GameManager : Singltrun<GameManager>
         base.OnpreInitialize();
         itemDataManager = GetComponent<ItemDataManager>();
     }
+
+    InventoryUI inventoryUI;
+
+    public InventoryUI InventoryUI => inventoryUI;
 
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -10,9 +11,26 @@ public class Player : MonoBehaviour
     public float turnSpeed = 10.0f;
     [Range(0, AttackAnimationLength)]
     public float maxCoolTime = 0.3f;
+    public float ItemPickUpRange = 2.0f;
+    public Action<int> onMoneyChange;
+    public Inventory Inventory => inventory;
+    public int Money 
+    {
+        get => money;
+        set 
+        {
+            if (money != value) 
+            {
+                money = value;
+                onMoneyChange?.Invoke(money);
+            }
+        }
+    }
 
     float currentSpeed = 0.0f;
     float coolTime = 0.0f;
+
+    int money = 0;
 
     Transform weaponParent;
     Transform shiledParent;
@@ -20,6 +38,7 @@ public class Player : MonoBehaviour
     Animator animator;
     CharacterController characterController;
     Action<bool> onWeaponEffectEnable;
+    Inventory inventory;
 
     readonly int speed_Hash = Animator.StringToHash("Speed");
     readonly int attack_Hash = Animator.StringToHash("Attack");
@@ -76,12 +95,23 @@ public class Player : MonoBehaviour
         inputController.onMove += OnMoveInput;
         inputController.onMoveModeChange += OnMoveModeChangeInput;
         inputController.onAttack += OnAttackInput;
+        inputController.onItemPickUp += OnItemPickUpInput;
     }
+
     private void Start()
     {
+        inventory = new Inventory(this);        //만들어질때 게임메니져 필요해서 무조건 스타트부터
+        if (GameManager.Instance.InventoryUI != null) 
+        {
+            GameManager.Instance.InventoryUI.InitializeInventory(Inventory);    //인벤토리와 ui연결
+        }
+
         Weapon weapon = weaponParent.GetComponentInChildren<Weapon>();
-        onWeaponEffectEnable += weapon.EffectEnable;
-        ShowWeaponEffect(false);
+        if (weapon != null) 
+        {
+            onWeaponEffectEnable += weapon.EffectEnable;
+            ShowWeaponEffect(false);
+        }
     }
 
     private void Update()
@@ -158,4 +188,34 @@ public class Player : MonoBehaviour
     {
         onWeaponEffectEnable?.Invoke(isShow);
     }
+
+    private void OnItemPickUpInput()
+    {   //스피어 콜라이더를 잠깐 생성, 충돌하는 것을 반환. NonAlloc이 있는 함수는 배열을 생성하지 않는다. 원래있는 배열 재사용 가능
+        Collider[] itemColliders = Physics.OverlapSphere(transform.position, ItemPickUpRange, LayerMask.GetMask("Item"));
+        foreach (Collider collider in itemColliders) 
+        {
+            ItemObject item = collider.GetComponent<ItemObject>();
+            IConumable conumable = item.ItemData as IConumable;
+            if (conumable == null)
+            {
+                if (Inventory.AddItem(item.ItemData.code))
+                {
+                    item.End();
+                }
+            }
+            else 
+            {
+                conumable.Consume(this.gameObject);     //플레이어에게 즉시 사용
+                item.End();
+            }
+        }
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Handles.color = Color.blue;
+        Handles.DrawWireDisc(transform.position, Vector3.up, ItemPickUpRange, 2.0f);
+    }
+#endif
 }
