@@ -9,7 +9,10 @@ public enum ItemCode    //아이템 ID
     Sapphire,
     CopperCoin,
     SliverCoin,
-    GoldCoin
+    GoldCoin,
+    Apple,
+    Bread,
+    Beer
 }
 
 public enum ItemSortBy  //아이템 정렬기준
