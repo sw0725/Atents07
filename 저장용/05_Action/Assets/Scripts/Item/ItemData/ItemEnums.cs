@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemCode    //아이템 ID
+public enum ItemCode : byte    //아이템 ID
 {
     Ruby = 0,
     Emerald,
@@ -12,12 +12,23 @@ public enum ItemCode    //아이템 ID
     GoldCoin,
     Apple,
     Bread,
-    Beer
+    Beer,
+    HealingPotion,
+    ManaPotion,
+    IronSword,
+    SliverSword,
+    OldSword
 }
 
-public enum ItemSortBy  //아이템 정렬기준
+public enum ItemSortBy : byte  //아이템 정렬기준
 {
     Code = 0,
     Name,
     Price
+}
+
+public enum EquipType :byte
+{
+    Weapon,
+    Shield
 }

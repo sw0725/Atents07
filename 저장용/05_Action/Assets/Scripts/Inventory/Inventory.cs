@@ -142,8 +142,8 @@ public class Inventory
                         InvenSlot returnSlot = slots[TempSlot.FromIndex];   //프롬슬롯
                         if (returnSlot.IsEmpty)                             //비엇다(to->return, temp -> to, temp비움)
                         {
-                            returnSlot.AssignSlotItem(toSlot.ItemData, toSlot.ItemCount, false);
-                            toSlot.AssignSlotItem(TempSlot.ItemData, TempSlot.ItemCount, false);
+                            returnSlot.AssignSlotItem(toSlot.ItemData, toSlot.ItemCount, toSlot.IsEquipped);
+                            toSlot.AssignSlotItem(TempSlot.ItemData, TempSlot.ItemCount, tempSlot.IsEquipped);
                             TempSlot.ClearSlotItem();
                         }
                         else 
@@ -293,6 +293,11 @@ public class Inventory
         int index = 0;
         foreach (var data in sortedData)                                    //내용을 슬롯에 설정
         {
+            if (data.Item3)      //장비아이템이면
+            {
+                ItemDataEquip equip = data.Item1 as ItemDataEquip;
+                Owner[equip.EquipType] = slots[index];
+            }
             slots[index].AssignSlotItem(data.Item1, data.Item2, data.Item3);
             index++;
         }

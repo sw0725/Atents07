@@ -112,11 +112,22 @@ public class InvenSlot
 
     public void UseItem(GameObject target)            //아이템 사용
     {
-        
+        IUsable usable = ItemData as IUsable;         //ItemData는 ScriptableObject로 MonoBehaviour가 아니므로 모노 에서 지원하는 겟컴포넌트(유니티 지원)는 사용불가 
+        if (usable != null) 
+        {
+            if (usable.Use(target)) 
+            {
+                DeCreaseSlotItem();
+            }
+        }
     }
 
     public void EquipItem(GameObject target)          //아이템 장비
     {
-
+        IEquipable equipable = ItemData as IEquipable;
+        if (equipable != null) 
+        {
+            equipable.ToggleEquip(target, this);
+        }
     }
 }

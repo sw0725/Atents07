@@ -140,7 +140,8 @@ public class InventoryUI : MonoBehaviour
             }
             else    //아이템사용 or장비
             {
-            
+                if (inven[index].ItemData is IUsable) inven[index].UseItem(Owner.gameObject);
+                if (inven[index].ItemData is IEquipable) inven[index].EquipItem(Owner.gameObject);
             }
         }
         else                                //임시슬롯에 뭐 있음

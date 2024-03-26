@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IHealth, IMana
+public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
 {
     public float walkSpeed = 3.0f;
     public float runSpeed = 5.0f;
@@ -61,6 +62,14 @@ public class Player : MonoBehaviour, IHealth, IMana
     }
     public float MaxMP => maxMP;
     public Action<float> onManaCange { get; set; }
+    public InvenSlot this[EquipType part] 
+    {
+        get => partsSlot[(int)part];
+        set 
+        {
+            partsSlot[(int)part] = value;
+        }
+    }      //part = 확인할 종류 에 해당하는 인트값을 가진 인덱스를반환
 
     float mp = 150.0f;
     float maxMP = 150.0f;
@@ -78,6 +87,7 @@ public class Player : MonoBehaviour, IHealth, IMana
     CharacterController characterController;
     Action<bool> onWeaponEffectEnable;
     Inventory inventory;
+    InvenSlot[] partsSlot;                  //장비 아이템의 부위별 장비 상태(장착한 아이템이 있는 슬롯을 가짐, null일시 장비 없음)
 
     readonly int speed_Hash = Animator.StringToHash("Speed");
     readonly int attack_Hash = Animator.StringToHash("Attack");
@@ -135,6 +145,8 @@ public class Player : MonoBehaviour, IHealth, IMana
         inputController.onMoveModeChange += OnMoveModeChangeInput;
         inputController.onAttack += OnAttackInput;
         inputController.onItemPickUp += OnItemPickUpInput;
+                                    //이넘에서 지원하는 함수, 해당타입의 이넘을 넘긴다.
+        partsSlot = new InvenSlot[Enum.GetValues(typeof(EquipType)).Length];
     }
 
     private void Start()
@@ -309,6 +321,50 @@ public class Player : MonoBehaviour, IHealth, IMana
     public void ManaRegernerateByTick(float tickRegen, float tickInterval, uint totalTickCount)
     {
         StartCoroutine(RegenByTick(tickRegen, tickInterval, totalTickCount, false));
+    }
+
+    public void EquipItem(EquipType part, InvenSlot slot)
+    {
+        ItemDataEquip equip = slot.ItemData as ItemDataEquip;
+        if (equip != null) 
+        {
+            Transform partParent = GetEquipParentTransform(part);
+            GameObject obj = Instantiate(equip.epuipPrefab, partParent);
+            this[part] = slot;
+            slot.IsEquipped = true;
+        }
+    }
+
+    public void UnEquipItem(EquipType part)
+    {
+        InvenSlot slot = partsSlot[(int)part];
+        if (slot != null) 
+        {
+            Transform partParent = GetEquipParentTransform(part);
+            while (partParent.childCount > 0) 
+            {
+                Transform c = partParent.GetChild(0);
+                c.SetParent(null);
+                Destroy(c.gameObject);
+            }
+            slot.IsEquipped = false;
+            this[part] = null;
+        }
+    }
+
+    public Transform GetEquipParentTransform(EquipType part)
+    {
+        Transform result = null;
+        switch(part) 
+        {
+            case EquipType.Weapon:
+                result = weaponParent;
+                break;
+            case EquipType.Shield:
+                result = shiledParent;
+                break;
+        }
+        return result;
     }
 
 #if UNITY_EDITOR
