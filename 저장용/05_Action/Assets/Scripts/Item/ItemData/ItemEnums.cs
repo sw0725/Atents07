@@ -17,7 +17,9 @@ public enum ItemCode : byte    //아이템 ID
     ManaPotion,
     IronSword,
     SliverSword,
-    OldSword
+    OldSword,
+    KiteShield,
+    RoundShield
 }
 
 public enum ItemSortBy : byte  //아이템 정렬기준

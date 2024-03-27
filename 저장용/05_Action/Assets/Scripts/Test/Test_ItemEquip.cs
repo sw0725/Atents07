@@ -15,9 +15,10 @@ public class Test_ItemEquip : TestBase
     {
         player = GameManager.Instance.Player;
         Factory.Instance.MakeItem(ItemCode.IronSword);
-        Factory.Instance.MakeItem(ItemCode.IronSword);
         Factory.Instance.MakeItem(ItemCode.SliverSword);
         Factory.Instance.MakeItem(ItemCode.OldSword);
+        Factory.Instance.MakeItem(ItemCode.KiteShield);
+        Factory.Instance.MakeItem(ItemCode.RoundShield);
     }
 
     protected override void OnTest1(InputAction.CallbackContext context)

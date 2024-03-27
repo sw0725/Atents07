@@ -63,13 +63,13 @@ public class Inventory
                 }
                 else 
                 {
-                    Debug.Log($"아이템 추가 실패 : [{slotIndex}]에 다른 아이템이 들어있습니다.");
+
                 }
             }
         }
         else 
         {
-            Debug.Log($"아이템 추가 실패 : [{slotIndex}]는 잘못된 인덱스입니다.");
+
         }
         return result;
     }
@@ -83,7 +83,7 @@ public class Inventory
         }
         else 
         {
-            Debug.Log($"아이템 감소 실패 : [{slotIndex}]는 잘못된 인덱스입니다.");
+
         }
     }
 
@@ -96,7 +96,7 @@ public class Inventory
         }
         else
         {
-            Debug.Log($"아이템 삭제 실패 : [{slotIndex}]는 잘못된 인덱스입니다.");
+
         }
     }
 
@@ -121,7 +121,7 @@ public class Inventory
 
                 if (to == tempSlotIndex)
                 {
-                    toSlot = tempSlot;
+                    toSlot = TempSlot;
                     TempSlot.SetFromIndex(fromSlot.Index);                  //드래그 시작 인덱스 저장 = from
                 }
                 else 
@@ -143,7 +143,7 @@ public class Inventory
                         if (returnSlot.IsEmpty)                             //비엇다(to->return, temp -> to, temp비움)
                         {
                             returnSlot.AssignSlotItem(toSlot.ItemData, toSlot.ItemCount, toSlot.IsEquipped);
-                            toSlot.AssignSlotItem(TempSlot.ItemData, TempSlot.ItemCount, tempSlot.IsEquipped);
+                            toSlot.AssignSlotItem(TempSlot.ItemData, TempSlot.ItemCount, TempSlot.IsEquipped);
                             TempSlot.ClearSlotItem();
                         }
                         else 
@@ -165,9 +165,9 @@ public class Inventory
         }
     }
 
-    void SwapSlot(InvenSlot slotA, InvenSlot slotB) 
+    void SwapSlot(InvenSlot slotA, InvenSlot slotB)
     {
-        ItemData tempData = slotA.ItemData;          //스왑(다른경우 일없다)
+        ItemData tempData = slotA.ItemData;
         uint tempCount = slotA.ItemCount;
         bool tempEquip = slotA.IsEquipped;
         slotA.AssignSlotItem(slotB.ItemData, slotB.ItemCount, slotB.IsEquipped);
@@ -293,12 +293,14 @@ public class Inventory
         int index = 0;
         foreach (var data in sortedData)                                    //내용을 슬롯에 설정
         {
+            slots[index].AssignSlotItem(data.Item1, data.Item2, data.Item3);    // 복사한 내용을 슬롯에 설정
+
             if (data.Item3)      //장비아이템이면
             {
                 ItemDataEquip equip = data.Item1 as ItemDataEquip;
                 Owner[equip.EquipType] = slots[index];
             }
-            slots[index].AssignSlotItem(data.Item1, data.Item2, data.Item3);
+
             index++;
         }
     }

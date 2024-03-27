@@ -34,10 +34,10 @@ public class TempSlotUI : SlotUIBase      //TempSlot은 드래그시 아이템이 슬롯을 
         gameObject.SetActive(false);
     }
 
-    public void SetFromIndex(uint index) 
-    {
-        tempSlot.SetFromIndex(index);
-    }
+    //public void SetFromIndex(uint index) 
+    //{
+    //    tempSlot.SetFromIndex(index);
+    //}
 
     public void OnDrop(Vector2 screenPos)
     {

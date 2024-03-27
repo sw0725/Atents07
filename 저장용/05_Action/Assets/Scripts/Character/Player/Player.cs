@@ -67,9 +67,14 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
         get => partsSlot[(int)part];
         set 
         {
-            partsSlot[(int)part] = value;
+            if (inventory.TempSlot != value) 
+            {
+                partsSlot[(int)part] = value;
+            }
         }
     }      //part = 확인할 종류 에 해당하는 인트값을 가진 인덱스를반환
+    public float AttackPower => attackPower;
+    public float DefencePower => defencePower;
 
     float mp = 150.0f;
     float maxMP = 150.0f;
@@ -77,6 +82,10 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
     float maxHP = 100.0f;
     float currentSpeed = 0.0f;
     float coolTime = 0.0f;
+    float baseAttackPower = 5.0f;
+    float baseDefencePower = 1.0f;
+    float attackPower = 5.0f;
+    float defencePower = 1.0f;
 
     int money = 0;
 
@@ -86,6 +95,7 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
     Animator animator;
     CharacterController characterController;
     Action<bool> onWeaponEffectEnable;
+    Action<bool> onWeaponBladeEnable;
     Inventory inventory;
     InvenSlot[] partsSlot;                  //장비 아이템의 부위별 장비 상태(장착한 아이템이 있는 슬롯을 가짐, null일시 장비 없음)
 
@@ -156,13 +166,7 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
         {
             GameManager.Instance.InventoryUI.InitializeInventory(Inventory);    //인벤토리와 ui연결
         }
-
-        Weapon weapon = weaponParent.GetComponentInChildren<Weapon>();
-        if (weapon != null) 
-        {
-            onWeaponEffectEnable += weapon.EffectEnable;
-            ShowWeaponEffect(false);
-        }
+        //ShowWeaponEffect(false);
     }
 
     private void Update()
@@ -332,6 +336,22 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
             GameObject obj = Instantiate(equip.epuipPrefab, partParent);
             this[part] = slot;
             slot.IsEquipped = true;
+
+            switch (part) 
+            {
+                case EquipType.Weapon:
+                    Weapon weapon = obj.GetComponentInChildren<Weapon>();
+                    onWeaponEffectEnable += weapon.EffectEnable;
+                    onWeaponBladeEnable += weapon.bladeColliderEnable;
+
+                    ItemDataWeapon weaponData = equip as ItemDataWeapon;
+                    attackPower = baseAttackPower + weaponData.attackPower;
+                    break;
+                case EquipType.Shield:
+                    ItemDataShield shieldData = equip as ItemDataShield;
+                    defencePower = baseDefencePower + shieldData.defencePower;
+                    break;
+            }
         }
     }
 
@@ -349,6 +369,16 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
             }
             slot.IsEquipped = false;
             this[part] = null;
+
+            switch (part)
+            {
+                case EquipType.Weapon:
+                    onWeaponEffectEnable = null;
+                    onWeaponBladeEnable = null;
+                    break;
+                case EquipType.Shield:
+                    break;
+            }
         }
     }
 
@@ -365,6 +395,16 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
                 break;
         }
         return result;
+    }
+
+    void WeaponBladeEnable() 
+    {
+        onWeaponBladeEnable?.Invoke(true);
+    }
+
+    void WeaponBladeDisable()
+    {
+        onWeaponBladeEnable?.Invoke(false);
     }
 
 #if UNITY_EDITOR

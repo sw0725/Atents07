@@ -5,10 +5,12 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     ParticleSystem particle;
+    CapsuleCollider bladeCollider;
 
     private void Awake()
     {
         particle = GetComponent<ParticleSystem>();
+        bladeCollider = GetComponent<CapsuleCollider>();
     }
 
     public void EffectEnable(bool enable) 
@@ -21,5 +23,10 @@ public class Weapon : MonoBehaviour
         {
             particle.Stop();
         }
+    }
+
+    public void bladeColliderEnable(bool isEnable) 
+    {
+        bladeCollider.enabled = isEnable;
     }
 }
