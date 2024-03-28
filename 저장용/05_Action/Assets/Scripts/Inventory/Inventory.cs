@@ -26,6 +26,7 @@ public class Inventory
         for (uint i = 0; i < size; i++) 
         {
             slots[i] = new InvenSlot(i);
+            slots[i].onItemEquip += owner.onItemEquip;
         }
         tempSlot = new InvenTempSlot(tempSlotIndex);
         ItemDataManager = GameManager.Instance.ItemData;    //이거때문에 인벤토리는 스타트에서나야 생성가능하다
@@ -294,13 +295,6 @@ public class Inventory
         foreach (var data in sortedData)                                    //내용을 슬롯에 설정
         {
             slots[index].AssignSlotItem(data.Item1, data.Item2, data.Item3);    // 복사한 내용을 슬롯에 설정
-
-            if (data.Item3)      //장비아이템이면
-            {
-                ItemDataEquip equip = data.Item1 as ItemDataEquip;
-                Owner[equip.EquipType] = slots[index];
-            }
-
             index++;
         }
     }

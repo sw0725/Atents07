@@ -7,6 +7,7 @@ public class InvenSlot
 {
     public uint Index => slotIndex;
     public Action onSlotItemChange;         //슬롯에 들간 아이템의 종류, 개수, 장비여부의 변경
+    public Action<InvenSlot> onItemEquip;
     public ItemData ItemData                //슬롯에 들간 아이템 종류 확인
     {
         get => slotItemData;
@@ -37,6 +38,10 @@ public class InvenSlot
         set 
         {
             isEquipped = value;
+            if (isEquipped) 
+            {
+                onItemEquip?.Invoke(this);
+            }
             onSlotItemChange?.Invoke();
         }
     }

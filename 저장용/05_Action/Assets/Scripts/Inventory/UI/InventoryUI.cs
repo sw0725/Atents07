@@ -185,14 +185,14 @@ public class InventoryUI : MonoBehaviour
         tempSlotUI.Open();
     }
 
-    void Open() 
+    public void Open() 
     {
         canvasGroup.alpha = 1.0f;
         canvasGroup.interactable= true;
         canvasGroup.blocksRaycasts = true;
     }
 
-    void Close() 
+    public void Close() 
     {
         canvasGroup.alpha = 0.0f;
         canvasGroup.interactable = false;

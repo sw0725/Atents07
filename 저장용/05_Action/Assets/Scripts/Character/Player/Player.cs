@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -341,8 +340,8 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
             {
                 case EquipType.Weapon:
                     Weapon weapon = obj.GetComponentInChildren<Weapon>();
-                    onWeaponEffectEnable += weapon.EffectEnable;
-                    onWeaponBladeEnable += weapon.bladeColliderEnable;
+                    onWeaponEffectEnable = weapon.EffectEnable;
+                    onWeaponBladeEnable = weapon.bladeColliderEnable;
 
                     ItemDataWeapon weaponData = equip as ItemDataWeapon;
                     attackPower = baseAttackPower + weaponData.attackPower;
@@ -375,8 +374,10 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
                 case EquipType.Weapon:
                     onWeaponEffectEnable = null;
                     onWeaponBladeEnable = null;
+                    attackPower = baseAttackPower;
                     break;
                 case EquipType.Shield:
+                    defencePower = baseDefencePower;
                     break;
             }
         }
@@ -405,6 +406,12 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
     void WeaponBladeDisable()
     {
         onWeaponBladeEnable?.Invoke(false);
+    }
+
+    public void onItemEquip(InvenSlot slot) 
+    {
+        ItemDataEquip equip = slot.ItemData as ItemDataEquip;
+        this[equip.EquipType] = slot;
     }
 
 #if UNITY_EDITOR

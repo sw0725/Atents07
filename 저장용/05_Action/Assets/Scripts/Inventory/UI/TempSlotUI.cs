@@ -46,6 +46,12 @@ public class TempSlotUI : SlotUIBase      //TempSlot은 드래그시 아이템이 슬롯을 
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             if (Physics.Raycast(ray, out RaycastHit hitInfo, 1000.0f, LayerMask.GetMask("Ground"))) 
             {
+                if (InvenSlot.IsEquipped) //아이템이 장비중이면 장비해제후 드롭
+                {
+                    ItemDataEquip itemData = InvenSlot.ItemData as ItemDataEquip;
+                    owner.UnEquipItem(itemData.EquipType);
+                }
+
                 Vector3 dropPosition = hitInfo.point;                                                       //벽에 부닥칠때 그 아래에 생성
                 dropPosition.y = 0;
 
