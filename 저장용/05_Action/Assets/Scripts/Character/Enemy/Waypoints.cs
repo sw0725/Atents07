@@ -5,28 +5,23 @@ using UnityEngine.AI;
 
 public class Waypoints : MonoBehaviour
 {
-    public Transform Current => waypoints[index];
+    public Vector3 NextTarget => children[index].position;
 
-    Transform[] waypoints;
+    Transform[] children;
     int index = 0;
 
     private void Awake()
     {
-        waypoints = new Transform[transform.childCount];
+        children = new Transform[transform.childCount];
         for (int i = 0; i < transform.childCount; i++)
         {
-            waypoints[i] = transform.GetChild(i);
+            children[i] = transform.GetChild(i);
         }
     }
 
-    public void GoNext()
+    public void StepNextWaypoint()
     {
         index++;
-        index %= waypoints.Length;
-    }
-
-    void ReturnPatrol()
-    {
-
+        index %= children.Length;
     }
 }

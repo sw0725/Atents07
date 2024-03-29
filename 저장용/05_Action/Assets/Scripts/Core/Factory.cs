@@ -4,7 +4,6 @@ using UnityEngine;
 
 public enum PoolObjectType
 {
-    //Item= 0,
 }
 
 public class Factory : Singltrun<Factory>
@@ -12,6 +11,7 @@ public class Factory : Singltrun<Factory>
     public float noisePower = 0.5f;     //노이즈 반지름
 
     ItemPool itemPool;
+    HitEffectPool hitPool;
 
     protected override void OnInitialize()
     {
@@ -19,6 +19,9 @@ public class Factory : Singltrun<Factory>
 
         itemPool = GetComponentInChildren<ItemPool>();
         if (itemPool != null) itemPool.Initialize();
+
+        hitPool = GetComponentInChildren<HitEffectPool>();
+        if (hitPool != null) hitPool.Initialize();
     }
 
     public GameObject GetObject(PoolObjectType type, Vector3? position = null, Vector3? euler = null)
@@ -26,23 +29,18 @@ public class Factory : Singltrun<Factory>
         GameObject result = null;
         //switch (type)
         //{
-        //    case PoolObjectType.Slime:
-        //        result = slimePool.GetObject(position, euler).gameObject;
+        //    case PoolObjectType.Effect:
+        //        result = hitPool.GetObject(position, euler).gameObject;
         //        break;
         //}
 
         return result;
     }
 
-    //public Slime GetSlime()
-    //{
-    //    return slimePool.GetObject();
-    //}
-
-    //public Slime GetSlime(Vector3 position, float angle = 0.0f)
-    //{
-    //    return slimePool.GetObject(position, angle * Vector3.forward);
-    //}
+    public GameObject GetHitEffect(Vector3? position)
+    {
+        return hitPool.GetObject(position).gameObject;
+    }
 
     public GameObject MakeItem(ItemCode code) 
     {

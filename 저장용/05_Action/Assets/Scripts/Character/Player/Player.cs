@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
+public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
 {
     public float walkSpeed = 3.0f;
     public float runSpeed = 5.0f;
@@ -412,6 +412,19 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget
     {
         ItemDataEquip equip = slot.ItemData as ItemDataEquip;
         this[equip.EquipType] = slot;
+    }
+
+    public void Attack(IBattler target)
+    {
+        target.Defence(AttackPower);
+    }
+
+    public void Defence(float damage)
+    {
+        if (IsAlive) 
+        {
+            HP -= MathF.Max(0, (damage - DefencePower)); //0이하로는 떨어지지 않게(회복되니까)
+        }
     }
 
 #if UNITY_EDITOR
