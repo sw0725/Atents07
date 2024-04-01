@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PoolObjectType
-{
-}
 
 public class Factory : Singltrun<Factory>
 {
@@ -12,6 +9,7 @@ public class Factory : Singltrun<Factory>
 
     ItemPool itemPool;
     HitEffectPool hitPool;
+    EnemyPool enemyPool;
 
     protected override void OnInitialize()
     {
@@ -22,19 +20,24 @@ public class Factory : Singltrun<Factory>
 
         hitPool = GetComponentInChildren<HitEffectPool>();
         if (hitPool != null) hitPool.Initialize();
+
+        enemyPool = GetComponentInChildren<EnemyPool>();
+        if (enemyPool != null) enemyPool.Initialize();
     }
 
-    public GameObject GetObject(PoolObjectType type, Vector3? position = null, Vector3? euler = null)
+    public Enemy GetEnemy() 
     {
-        GameObject result = null;
-        //switch (type)
-        //{
-        //    case PoolObjectType.Effect:
-        //        result = hitPool.GetObject(position, euler).gameObject;
-        //        break;
-        //}
+        return enemyPool.GetObject();
+    }
 
-        return result;
+    public Enemy GetEnemy(Vector3 position, float angle = 0.0f)
+    {
+        return enemyPool.GetObject(position, angle * Vector3.forward);
+    }
+
+    public Enemy GetEnemy(int index, Vector3 position, float angle = 0.0f)
+    {
+        return enemyPool.GetObject(index, position, angle * Vector3.forward);
     }
 
     public GameObject GetHitEffect(Vector3? position)

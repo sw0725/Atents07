@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Enemy : MonoBehaviour, IBattler, IHealth
+public class Enemy : RecycleObject, IBattler, IHealth
 {
     protected enum EnemyState 
     {
@@ -45,7 +45,6 @@ public class Enemy : MonoBehaviour, IBattler, IHealth
                     case EnemyState.Chase:
                         agent.isStopped = false;
                         animator.SetTrigger("Move");
-                        Debug.Log("chase");
                         onStateUpdate = Update_Chase;
                         break;
                     case EnemyState.Attack:
@@ -53,6 +52,9 @@ public class Enemy : MonoBehaviour, IBattler, IHealth
                         onStateUpdate = Update_Attack;
                         break;
                     case EnemyState.Dead:
+                        agent.isStopped = true;
+                        agent.velocity = Vector3.zero;
+                        animator.SetTrigger("Die");
                         Debug.Log("dead");
                         onStateUpdate = Update_Dead;
                         break;
@@ -83,7 +85,7 @@ public class Enemy : MonoBehaviour, IBattler, IHealth
     public float sightHalfRange = 50.0f;
     public float nearSightRange = 1.5f;
 
-    public Waypoints waypoints;
+    public Waypoints waypoints;         //프라이빗처럼 쓸것임
 
     public float AttackPower => attackPower;
     public float attackPower = 10.0f;
@@ -122,34 +124,56 @@ public class Enemy : MonoBehaviour, IBattler, IHealth
         public ItemCode code;
         [Range(0,1)]
         public float dropRatio;
+        public uint dropCount;
     }
     public ItemDropInfo[] dropItem;
 
     protected Transform chaseTarget = null;
     protected IBattler attackTarget = null;
 
+    readonly Vector3 EffectResetPosition = new(0.0f, 0.01f, 0.0f);
+
     Animator animator;
     NavMeshAgent agent;
-    SphereCollider collider;
+    SphereCollider bodycollider;
     Rigidbody rb;
     ParticleSystem dieEffect;
+    EnemyHealthBar healthBar;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-        collider = GetComponent<SphereCollider>();
+        bodycollider = GetComponent<SphereCollider>();
         rb = GetComponent<Rigidbody>();
-        //dieEffect = GetComponent<ParticleSystem>();
+
+        Transform c = transform.GetChild(2);
+        healthBar = c.GetComponent<EnemyHealthBar>();
+        c = transform.GetChild(3);
+        dieEffect = c.GetComponent<ParticleSystem>();
     }
 
-    private void Start()
+    protected override void OnEnable()
     {
-        agent.speed = moveSpeed;            //*트리거는 트랜지션을 넘어갈때 True가되고 트랜지션을 넘어오면 False 가 된다.
+        base.OnEnable();
+        agent.speed = moveSpeed;            //트리거는 트랜지션을 넘어갈때 True가되고 트랜지션을 넘어오면 False 가 된다.
                                             //즉 이미 true인 트리거는 자신을 요구로하는 트랜지션을 만나지 못하면 True를 유지한다.
         State = EnemyState.Wait;            //이때 True로 설정된 Stop트리거는 요구하는 트랜지션이 Patrol->Wait에 있으므로 False가 되지 못하고
         animator.ResetTrigger("Stop");      //최초로 Patrol로 넘어갔을때 이미 쌓인 Stop 트리거가 Patrol->Wait 을 만나면서 Patrol애니메이션이 제대로 재생되기 전에 바로 Wait로 넘어가 버리는것
-    }                   //Wait 상태로 전환하면서 stop트리거가 쌓인것을 제거하여 정상작동하게 한다.
+        HP = MaxHP;                         //Wait 상태로 전환하면서 stop트리거가 쌓인것을 제거하여 정상작동하게 한다.
+
+        rb.isKinematic = true;
+        rb.drag = Mathf.Infinity;
+    }                                       
+
+    protected override void OnDisable()
+    {
+        bodycollider.enabled = true;
+        healthBar.gameObject.SetActive(true);
+        agent.enabled = true;
+
+        base.OnDisable();
+    }        
 
     private void Update()
     {
@@ -260,14 +284,50 @@ public class Enemy : MonoBehaviour, IBattler, IHealth
         if (IsAlive) 
         {
             animator.SetTrigger("Hit");
-            HP -= MathF.Max(0, (damage - DefencePower));
-            Debug.Log(HP);
+            HP -= MathF.Max(0, damage - DefencePower);
         }
     }
 
     public void Die()
     {
-        Debug.Log("Die");
+        animator.ResetTrigger("Hit");
+        State = EnemyState.Dead;
+        StartCoroutine(DeadSquence());
+        onDie?.Invoke();
+    }
+
+    IEnumerator DeadSquence()                   //사망연출용
+    {
+        bodycollider.enabled = false;
+        dieEffect.Play();
+        dieEffect.transform.SetParent(null);
+        healthBar.gameObject.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
+
+        MakeDropItems();
+        yield return new WaitForSeconds(1.0f);  //애니메끝날때까지 대기(사망 애니메 시간 1.5초)
+
+        agent.enabled = false;                  //안하면 트랜스폼 변화가 안먹혀서 안내려감
+        rb.isKinematic = false;                 //중력영향 받을것임(콜라이더 없으니 땅으로 꺼진다)
+        rb.drag = 10.0f;                        //천천히떨어지기
+        yield return new WaitForSeconds(2.0f);
+
+        dieEffect.transform.SetParent(this.transform);
+        dieEffect.transform.localPosition = EffectResetPosition;
+
+        gameObject.SetActive(false);
+    }
+
+    void MakeDropItems() 
+    {
+        foreach (var item in dropItem) 
+        {           //0-1사이 랜덤값 생성
+            if (UnityEngine.Random.value < item.dropRatio) 
+            {
+                uint count = (uint)UnityEngine.Random.Range(0, item.dropCount)+1;
+                Factory.Instance.MakeItems(item.code, count, transform.position, true);
+            }
+        }
     }
 
     public void HealthRegernerate(float totalRegen, float duration)
@@ -296,6 +356,29 @@ public class Enemy : MonoBehaviour, IBattler, IHealth
         Handles.DrawWireArc(transform.position, transform.up, q1 * forward, sightHalfRange * 2, farSightRange, 2.0f);
 
         Handles.DrawWireDisc(transform.position, transform.up, nearSightRange);
+    }
+
+    public void Test_DropItem(int testCount) 
+    {
+        uint[] total = new uint[dropItem.Length];
+        uint[] types = new uint[dropItem.Length];
+        for (int i = 0; i<testCount; i++)
+        {
+            int index = 0;
+            foreach (var item in dropItem)
+            {           //0-1사이 랜덤값 생성
+                if (UnityEngine.Random.value < item.dropRatio)
+                {
+                    uint count = (uint)UnityEngine.Random.Range(0, item.dropCount) + 1;
+                    types[index]++;
+                    total[index] += count;
+                }
+                index++;
+            }
+        }
+
+        Debug.Log($"1st {types[0]}번 드랍, {total[0]}개");
+        Debug.Log($"2nd {types[0]}번 드랍, {total[0]}개");
     }
 #endif
 }
