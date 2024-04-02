@@ -48,14 +48,15 @@ public class Enemy : RecycleObject, IBattler, IHealth
                         onStateUpdate = Update_Chase;
                         break;
                     case EnemyState.Attack:
-                        Debug.Log("attack");
+                        agent.isStopped = true;
+                        agent.velocity = Vector3.zero;
+                        attackCoolTime = attackSpeed;
                         onStateUpdate = Update_Attack;
                         break;
                     case EnemyState.Dead:
                         agent.isStopped = true;
                         agent.velocity = Vector3.zero;
                         animator.SetTrigger("Die");
-                        Debug.Log("dead");
                         onStateUpdate = Update_Dead;
                         break;
                 }
@@ -117,6 +118,7 @@ public class Enemy : RecycleObject, IBattler, IHealth
     public bool IsAlive => hp > 0;
 
     public Action onDie { get; set; }
+    public Action<int> onHit { get; set; }
 
     [System.Serializable]//구조체를 에디터에서 볼수 있도록
     public struct ItemDropInfo 
@@ -151,6 +153,28 @@ public class Enemy : RecycleObject, IBattler, IHealth
         healthBar = c.GetComponent<EnemyHealthBar>();
         c = transform.GetChild(3);
         dieEffect = c.GetComponent<ParticleSystem>();
+
+        c= transform.GetChild(4);
+        AttackArea attackArea = c.transform.GetComponent<AttackArea>();
+        attackArea.onPlayerIn += (target) => 
+        {
+            if (State == EnemyState.Chase) 
+            {
+                attackTarget = target;
+                State = EnemyState.Attack;
+            }
+        };
+        attackArea.onPlayerOut += (target) => 
+        {
+            if (attackTarget == target) 
+            {
+                attackTarget = null;
+                if (State != EnemyState.Dead) 
+                {
+                    State = EnemyState.Chase;
+                }
+            } 
+        };
     }
 
     protected override void OnEnable()
@@ -173,8 +197,8 @@ public class Enemy : RecycleObject, IBattler, IHealth
         agent.enabled = true;
 
         base.OnDisable();
-    }        
-
+    }
+ 
     private void Update()
     {
         onStateUpdate(); 
@@ -218,7 +242,12 @@ public class Enemy : RecycleObject, IBattler, IHealth
     }
     void Update_Attack() 
     {
-        
+        attackCoolTime -= Time.deltaTime;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(attackTarget.transform.position - transform.position), 0.1f);
+        if (attackCoolTime < 0) 
+        {
+            Attack(attackTarget);
+        }
     }
     void Update_Dead() 
     {
@@ -276,7 +305,9 @@ public class Enemy : RecycleObject, IBattler, IHealth
 
     public void Attack(IBattler target)
     {
+        animator.SetTrigger("Attack");
         target.Defence(AttackPower);
+        attackCoolTime = attackSpeed;
     }
 
     public void Defence(float damage)
@@ -284,13 +315,15 @@ public class Enemy : RecycleObject, IBattler, IHealth
         if (IsAlive) 
         {
             animator.SetTrigger("Hit");
-            HP -= MathF.Max(0, damage - DefencePower);
+            float final = MathF.Max(0, (damage - DefencePower));
+            HP -= final;
+            onHit?.Invoke(Mathf.RoundToInt(final));
         }
     }
 
     public void Die()
     {
-        animator.ResetTrigger("Hit");
+        //animator.ResetTrigger("Hit");             //애니메이션 우선순위로인해 다이보다 히트가 우선시되는 상황발생 -> 다이중 히트시 히트애니메 재생됨 -> 우선순위 조절로 해결
         State = EnemyState.Dead;
         StartCoroutine(DeadSquence());
         onDie?.Invoke();
@@ -355,7 +388,7 @@ public class Enemy : RecycleObject, IBattler, IHealth
 
         Handles.DrawWireArc(transform.position, transform.up, q1 * forward, sightHalfRange * 2, farSightRange, 2.0f);
 
-        Handles.DrawWireDisc(transform.position, transform.up, nearSightRange);
+        Handles.DrawWireDisc(transform.position, transform.up, nearSightRange);             //근거리 시야범위
     }
 
     public void Test_DropItem(int testCount) 

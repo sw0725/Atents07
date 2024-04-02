@@ -275,21 +275,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6273148033215702073, guid: 749f7bbbca23f2d4c9c1880d95f639f8,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6273148033215702073, guid: 749f7bbbca23f2d4c9c1880d95f639f8,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 6273148033215702073, guid: 749f7bbbca23f2d4c9c1880d95f639f8,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -741,10 +726,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 663984411}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5dc8c1de8e6a8846ac0a3161bd2d491, type: 3}
+  m_Script: {fileID: 11500000, guid: c89fea91ed4a0474bb18e3380d9620f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   seed: -1
+  damege: 10
 --- !u!224 &718682409 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3756558240752798030, guid: 9a184a310a20f514ca99c374b528b919,
@@ -1213,7 +1199,7 @@ PrefabInstance:
     - target: {fileID: 2404422438727375740, guid: d5f639d41c97e894c8847053b0fa1d8d,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3472108114262692162, guid: d5f639d41c97e894c8847053b0fa1d8d,
         type: 3}

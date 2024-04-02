@@ -10,7 +10,7 @@ public class Factory : Singltrun<Factory>
     ItemPool itemPool;
     HitEffectPool hitPool;
     EnemyPool enemyPool;
-
+    DamegeTextPool damegePool;
     protected override void OnInitialize()
     {
         base.OnInitialize();
@@ -23,6 +23,9 @@ public class Factory : Singltrun<Factory>
 
         enemyPool = GetComponentInChildren<EnemyPool>();
         if (enemyPool != null) enemyPool.Initialize();
+
+        damegePool = GetComponentInChildren<DamegeTextPool>();
+        if (damegePool != null) damegePool.Initialize();
     }
 
     public Enemy GetEnemy() 
@@ -87,5 +90,10 @@ public class Factory : Singltrun<Factory>
             items[i] = MakeItem(code, position, useNoise);
         }
         return items;
+    }
+
+    public GameObject GetDamegeText(int damege, Vector3? position)
+    {
+        return damegePool.GetObject(damege, position);
     }
 }

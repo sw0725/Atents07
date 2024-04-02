@@ -1,3 +1,4 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -74,6 +75,8 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     }      //part = 확인할 종류 에 해당하는 인트값을 가진 인덱스를반환
     public float AttackPower => attackPower;
     public float DefencePower => defencePower;
+    public float baseAttackPower = 5.0f;
+    public float baseDefencePower = 1.0f;
 
     float mp = 150.0f;
     float maxMP = 150.0f;
@@ -81,8 +84,6 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     float maxHP = 100.0f;
     float currentSpeed = 0.0f;
     float coolTime = 0.0f;
-    float baseAttackPower = 5.0f;
-    float baseDefencePower = 1.0f;
     float attackPower = 5.0f;
     float defencePower = 1.0f;
 
@@ -97,6 +98,7 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     Action<bool> onWeaponBladeEnable;
     Inventory inventory;
     InvenSlot[] partsSlot;                  //장비 아이템의 부위별 장비 상태(장착한 아이템이 있는 슬롯을 가짐, null일시 장비 없음)
+    CinemachineVirtualCamera deadCam;
 
     readonly int speed_Hash = Animator.StringToHash("Speed");
     readonly int attack_Hash = Animator.StringToHash("Attack");
@@ -123,6 +125,8 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
             }
         }
     }
+
+    public Action<int> onHit { get; set; }
 
     Vector3 inputDir = Vector3.zero;    //점프없음 - y=0
     Quaternion targetRotation = Quaternion.identity;    //바라볼 방향
@@ -156,10 +160,13 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
         inputController.onItemPickUp += OnItemPickUpInput;
                                     //이넘에서 지원하는 함수, 해당타입의 이넘을 넘긴다.
         partsSlot = new InvenSlot[Enum.GetValues(typeof(EquipType)).Length];
+        deadCam = GetComponentInChildren<CinemachineVirtualCamera>();
     }
 
     private void Start()
     {
+        attackPower = baseAttackPower;
+        defencePower = baseDefencePower;
         inventory = new Inventory(this);        //만들어질때 게임메니져 필요해서 무조건 스타트부터
         if (GameManager.Instance.InventoryUI != null) 
         {
@@ -267,8 +274,10 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
 
     public void Die()
     {
+        //animator.SetTrigger("Die");
+        deadCam.Follow = null;
+        deadCam.Priority = 20;
         onDie?.Invoke();
-        Debug.Log("Die");
     }
 
     public void HealthRegernerate(float totalRegen, float duration)
@@ -423,7 +432,9 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     {
         if (IsAlive) 
         {
-            HP -= MathF.Max(0, (damage - DefencePower)); //0이하로는 떨어지지 않게(회복되니까)
+            float final = MathF.Max(0, (damage - DefencePower)); //0이하로는 떨어지지 않게(회복되니까)
+            HP -= final;
+            onHit?.Invoke(Mathf.RoundToInt(final));
         }
     }
 
