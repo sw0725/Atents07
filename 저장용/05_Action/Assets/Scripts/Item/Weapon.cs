@@ -47,7 +47,7 @@ public class Weapon : MonoBehaviour
 
                 Vector3 impactPoint = transform.position + transform.up * 0.8f;     //칼 피벗에서 y축으로 0.8위쪽을 기준점으로 잡음
                 Vector3 effectPoint = other.ClosestPoint(impactPoint);              //콜라이더와 부딫혔을때 기준점과 가장 가까운곳을 선정
-                Factory.Instance.GetHitEffect(effectPoint);                         //해당 자리에 이펙트 소환
+                Factory.Instance.GetPlayerHitEffect(effectPoint);                         //해당 자리에 이펙트 소환
             }
         }
     }

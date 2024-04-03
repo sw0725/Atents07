@@ -10,12 +10,18 @@ public class PlayerInputController : MonoBehaviour
     public Action onMoveModeChange;
     public Action onAttack;
     public Action onItemPickUp;
+    public Action onLockOn;
+    public Action onSkillStart;
+    public Action onSkillEnd;
 
     PlayerInputAction inputAction;
 
     private void Awake()
     {
         inputAction = new PlayerInputAction();
+
+        Player player = GetComponent<Player>();
+        player.onDie += inputAction.Player.Disable;
     }
 
     private void OnEnable()
@@ -26,6 +32,9 @@ public class PlayerInputController : MonoBehaviour
         inputAction.Player.MoveModeChange.performed += OnMoveModeChage;
         inputAction.Player.Attack.performed += OnAttack;
         inputAction.Player.PickUp.performed += OnPickUp;
+        inputAction.Player.LockOn.performed += OnLockOn;
+        inputAction.Player.Skill.performed += OnSkillStart;
+        inputAction.Player.Skill.canceled += OnSkillEnd;
     }
 
     private void OnDisable()
@@ -35,6 +44,9 @@ public class PlayerInputController : MonoBehaviour
         inputAction.Player.MoveModeChange.performed -= OnMoveModeChage;
         inputAction.Player.Attack.performed -= OnAttack;
         inputAction.Player.PickUp.performed -= OnPickUp;
+        inputAction.Player.LockOn.performed -= OnLockOn;
+        inputAction.Player.Skill.performed -= OnSkillStart;
+        inputAction.Player.Skill.canceled -= OnSkillEnd;
         inputAction.Player.Disable();
     }
 
@@ -57,5 +69,18 @@ public class PlayerInputController : MonoBehaviour
     private void OnPickUp(InputAction.CallbackContext _)
     {
         onItemPickUp?.Invoke();
+    }
+
+    private void OnLockOn(InputAction.CallbackContext context)
+    {
+        onLockOn?.Invoke();
+    }
+    private void OnSkillStart(InputAction.CallbackContext context)
+    {
+        onSkillStart?.Invoke();
+    }
+    private void OnSkillEnd(InputAction.CallbackContext context)
+    {
+        onSkillEnd?.Invoke();
     }
 }

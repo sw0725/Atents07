@@ -141,6 +141,7 @@ public class Enemy : RecycleObject, IBattler, IHealth
     Rigidbody rb;
     ParticleSystem dieEffect;
     EnemyHealthBar healthBar;
+    Transform hitPosition;
 
     private void Awake()
     {
@@ -175,6 +176,8 @@ public class Enemy : RecycleObject, IBattler, IHealth
                 }
             } 
         };
+
+        hitPosition = transform.GetChild(5);
     }
 
     protected override void OnEnable()
@@ -188,10 +191,25 @@ public class Enemy : RecycleObject, IBattler, IHealth
 
         rb.isKinematic = true;
         rb.drag = Mathf.Infinity;
+
+        Player player = GameManager.Instance.Player;
+        if (player != null) 
+        {
+            player.onDie += PlayerDie;
+        }
     }                                       
 
     protected override void OnDisable()
     {
+        if (GameManager.Instance != null) 
+        {
+            Player player = GameManager.Instance.Player;
+            if (player != null)
+            {
+                player.onDie -= PlayerDie;
+            }
+        }
+
         bodycollider.enabled = true;
         healthBar.gameObject.SetActive(true);
         agent.enabled = true;
@@ -234,8 +252,11 @@ public class Enemy : RecycleObject, IBattler, IHealth
     }
     void Update_Chase() 
     {
-        agent.SetDestination(chaseTarget.position);
-        if (!SerchPlayer())
+        if (SerchPlayer())
+        {
+            agent.SetDestination(chaseTarget.position);
+        }
+        else 
         {
             State = EnemyState.Wait;
         }
@@ -261,21 +282,25 @@ public class Enemy : RecycleObject, IBattler, IHealth
         Collider[] colliders = Physics.OverlapSphere(transform.position, farSightRange, LayerMask.GetMask("Player")); //배열은 반환되므로 그 길이로 있는지 없는지 판단
         if(colliders.Length > 0)
         {
-            Vector3 playerPos = colliders[0].transform.position;
-            Vector3 toPlayerDir = playerPos - transform.position;
-            if (toPlayerDir.sqrMagnitude < nearSightRange * nearSightRange)    //근접범위 안
+            Player player = colliders[0].GetComponent<Player>();
+            if (player != null && player.IsAlive) 
             {
-                chaseTarget = colliders[0].transform;
-                result = true;
-            }
-            else
-            {
-                if(IsInSightAngle(toPlayerDir))     //시야각 안
+                Vector3 playerPos = colliders[0].transform.position;
+                Vector3 toPlayerDir = playerPos - transform.position;
+                if (toPlayerDir.sqrMagnitude < nearSightRange * nearSightRange)    //근접범위 안
                 {
-                    if(IsSightClear(toPlayerDir))   //방해물없다
+                    chaseTarget = colliders[0].transform;
+                    result = true;
+                }
+                else
+                {
+                    if (IsInSightAngle(toPlayerDir))     //시야각 안
                     {
-                        chaseTarget = colliders[0].transform;
-                        result = true;
+                        if (IsSightClear(toPlayerDir))   //방해물없다
+                        {
+                            chaseTarget = colliders[0].transform;
+                            result = true;
+                        }
                     }
                 }
             }
@@ -307,6 +332,7 @@ public class Enemy : RecycleObject, IBattler, IHealth
     {
         animator.SetTrigger("Attack");
         target.Defence(AttackPower);
+        Factory.Instance.GetEnemyHitEffect(hitPosition.position + UnityEngine.Random.insideUnitSphere * 0.1f);
         attackCoolTime = attackSpeed;
     }
 
@@ -327,6 +353,7 @@ public class Enemy : RecycleObject, IBattler, IHealth
         State = EnemyState.Dead;
         StartCoroutine(DeadSquence());
         onDie?.Invoke();
+        onDie = null;
     }
 
     IEnumerator DeadSquence()                   //사망연출용
@@ -369,6 +396,11 @@ public class Enemy : RecycleObject, IBattler, IHealth
 
     public void HealthRegernerateByTick(float tickRegen, float tickInterval, uint totalTickCount)
     {
+    }
+
+    void PlayerDie() 
+    {
+        State = EnemyState.Wait;
     }
 
 #if UNITY_EDITOR

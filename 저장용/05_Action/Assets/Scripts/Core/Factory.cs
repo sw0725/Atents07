@@ -8,18 +8,24 @@ public class Factory : Singltrun<Factory>
     public float noisePower = 0.5f;     //노이즈 반지름
 
     ItemPool itemPool;
-    HitEffectPool hitPool;
+    HitEffectPool enemyhitPool;
+    HitEffectPool playerhitPool;
     EnemyPool enemyPool;
     DamegeTextPool damegePool;
     protected override void OnInitialize()
     {
         base.OnInitialize();
 
+        Transform c = transform.GetChild(0);
+        enemyhitPool = c.GetComponent<HitEffectPool>();
+        if (enemyhitPool != null) enemyhitPool.Initialize();
+
+        c = transform.GetChild(1);
+        playerhitPool = c.GetComponent<HitEffectPool>();
+        if (playerhitPool != null) playerhitPool.Initialize();
+
         itemPool = GetComponentInChildren<ItemPool>();
         if (itemPool != null) itemPool.Initialize();
-
-        hitPool = GetComponentInChildren<HitEffectPool>();
-        if (hitPool != null) hitPool.Initialize();
 
         enemyPool = GetComponentInChildren<EnemyPool>();
         if (enemyPool != null) enemyPool.Initialize();
@@ -43,9 +49,14 @@ public class Factory : Singltrun<Factory>
         return enemyPool.GetObject(index, position, angle * Vector3.forward);
     }
 
-    public GameObject GetHitEffect(Vector3? position)
+    public GameObject GetEnemyHitEffect(Vector3? position)
     {
-        return hitPool.GetObject(position).gameObject;
+        return enemyhitPool.GetObject(position).gameObject;
+    }
+
+    public GameObject GetPlayerHitEffect(Vector3? position)
+    {
+        return playerhitPool.GetObject(position).gameObject;
     }
 
     public GameObject MakeItem(ItemCode code) 

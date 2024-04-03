@@ -24,19 +24,19 @@ public class RandomIdleSelector : StateMachineBehaviour
         {
             float num = Random.value;
 
-            if (num < 0.05f)        //5ÆÛ
+            if (num < 0.01f)        //1ÆÛ
             {
                 select = 4;
             }
-            else if (num < 0.10f)
+            else if (num < 0.02f)
             {
                 select = 3;
             }
-            else if (num < 0.15f)
+            else if (num < 0.03f)
             {
                 select = 2;
             }
-            else if (num < 0.20f)
+            else if (num < 0.04f)
             {
                 select = 1;
             }

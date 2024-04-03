@@ -374,6 +374,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackArea: {fileID: 7577105318956405711}
+--- !u!1 &2972709560975966153
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5320739406715006124}
+  m_Layer: 0
+  m_Name: HitPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5320739406715006124
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2972709560975966153}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6720470515132946928}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3301611657512927346
 GameObject:
   m_ObjectHideFlags: 0
@@ -642,7 +673,7 @@ GameObject:
   - component: {fileID: 5999060754452768531}
   - component: {fileID: 782387621825036028}
   - component: {fileID: 5120823966489684426}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Slime
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -667,6 +698,7 @@ Transform:
   - {fileID: 2075463764860625038}
   - {fileID: 8615263899667689721}
   - {fileID: 7261002673325304921}
+  - {fileID: 5320739406715006124}
   - {fileID: 7109329936489447755}
   - {fileID: 8571012712862608005}
   m_Father: {fileID: 0}
@@ -732,7 +764,7 @@ MonoBehaviour:
   sightHalfRange: 50
   nearSightRange: 1.5
   waypoints: {fileID: 0}
-  attackPower: 10
+  attackPower: 30
   attackSpeed: 1
   defencePower: 3
   maxHP: 100

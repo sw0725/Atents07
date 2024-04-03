@@ -86,6 +86,7 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     float coolTime = 0.0f;
     float attackPower = 5.0f;
     float defencePower = 1.0f;
+    float lockOnRange = 5.0f;
 
     int money = 0;
 
@@ -99,6 +100,35 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     Inventory inventory;
     InvenSlot[] partsSlot;                  //장비 아이템의 부위별 장비 상태(장착한 아이템이 있는 슬롯을 가짐, null일시 장비 없음)
     CinemachineVirtualCamera deadCam;
+    PlayerSkillArea skillArea;
+    Transform lockOnTarget;
+    Transform LockOnTarget
+    {
+        get => lockOnTarget;
+        set 
+        {
+            if (lockOnTarget != value) 
+            {
+                lockOnTarget = value;
+                if(lockOnTarget != null) 
+                {
+                    lockOnEffect.SetParent(lockOnTarget);
+                    lockOnEffect.localPosition = Vector3.zero;
+                    lockOnEffect.gameObject.SetActive(true);
+
+                    Enemy enemy = lockOnTarget.GetComponent<Enemy>();
+                    enemy.onDie += () => LockOnTarget = null;
+                }
+                else 
+                {
+                    lockOnEffect.gameObject.SetActive(false);
+                    lockOnEffect.SetParent(this.transform);
+                    lockOnEffect.localPosition = Vector3.zero;
+                }
+            }
+        }
+    }
+    Transform lockOnEffect;
 
     readonly int speed_Hash = Animator.StringToHash("Speed");
     readonly int attack_Hash = Animator.StringToHash("Attack");
@@ -151,6 +181,8 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
         shiledParent = shiledParent.GetChild(0);
         shiledParent = shiledParent.GetChild(2);
 
+        lockOnEffect = transform.GetChild(3);
+
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         inputController = GetComponent<PlayerInputController>();
@@ -158,9 +190,14 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
         inputController.onMoveModeChange += OnMoveModeChangeInput;
         inputController.onAttack += OnAttackInput;
         inputController.onItemPickUp += OnItemPickUpInput;
+        inputController.onLockOn += OnLockOnInput;
+
+        inputController.onSkillStart += OnSkillStart;
+        inputController.onSkillEnd += OnSkillEnd;
                                     //이넘에서 지원하는 함수, 해당타입의 이넘을 넘긴다.
         partsSlot = new InvenSlot[Enum.GetValues(typeof(EquipType)).Length];
         deadCam = GetComponentInChildren<CinemachineVirtualCamera>();
+        skillArea = GetComponentInChildren<PlayerSkillArea>(true);
     }
 
     private void Start()
@@ -177,9 +214,13 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
 
     private void Update()
     {
-        characterController.Move(Time.deltaTime * currentSpeed * inputDir);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
         coolTime -= Time.deltaTime;
+        characterController.Move(Time.deltaTime * currentSpeed * inputDir);
+        if(LockOnTarget != null) 
+        {
+            targetRotation = Quaternion.LookRotation(LockOnTarget.transform.position - transform.position);
+        }
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * turnSpeed);
     }
 
     private void OnAttackInput()
@@ -274,7 +315,7 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
 
     public void Die()
     {
-        //animator.SetTrigger("Die");
+        animator.SetTrigger("Die");
         deadCam.Follow = null;
         deadCam.Priority = 20;
         onDie?.Invoke();
@@ -432,10 +473,43 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     {
         if (IsAlive) 
         {
+            animator.SetTrigger("Hit");
+            WeaponBladeDisable();                                 //공격중 맞았을때
+
             float final = MathF.Max(0, (damage - DefencePower)); //0이하로는 떨어지지 않게(회복되니까)
             HP -= final;
             onHit?.Invoke(Mathf.RoundToInt(final));
         }
+    }
+
+    private void OnLockOnInput()
+    {
+        Collider[] enemys = Physics.OverlapSphere(transform.position, lockOnRange, LayerMask.GetMask("AttackTarget"));
+
+        Transform nearest = null;
+        float nearestDistance = float.MaxValue;
+        foreach (Collider enemy in enemys)
+        {
+            Vector3 dir = enemy.transform.position - transform.position;
+            float distanseSqr = dir.sqrMagnitude;
+            if (distanseSqr < nearestDistance)
+            {
+                nearest = enemy.transform;
+                nearestDistance = distanseSqr;
+            }
+        }
+
+        LockOnTarget = nearest;
+    }
+
+    private void OnSkillEnd()
+    {
+        skillArea.Deactivate();
+    }
+
+    private void OnSkillStart()
+    {
+        skillArea.Activate(AttackPower);
     }
 
 #if UNITY_EDITOR
@@ -443,6 +517,9 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
     {
         Handles.color = Color.blue;
         Handles.DrawWireDisc(transform.position, Vector3.up, ItemPickUpRange, 2.0f);
+        
+        Handles.color = Color.red;
+        Handles.DrawWireDisc(transform.position, Vector3.up, lockOnRange, 2.0f);
     }
 #endif
 }
