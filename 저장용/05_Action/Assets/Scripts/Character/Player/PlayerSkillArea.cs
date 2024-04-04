@@ -6,29 +6,68 @@ public class PlayerSkillArea : MonoBehaviour
 {
     public float skillTick = 0.5f;      //n초당 뎀
     public float skillPower = 0.2f;     //틱당 n뎀(증폭)
+    public float manaCost = 30.0f;
+    public bool IsActivate => gameObject.activeSelf;
 
     float finalPower;
+    float coolTime = 0.0f;
+
+    List<Enemy> enemies = new List<Enemy>(4);
+    IMana playerMana;
+
+    private void Awake()
+    {
+        playerMana = GetComponentInParent<IMana>();
+    }
 
     public void Activate(float power) 
     {
+        coolTime = 0.0f;
         finalPower = power * (1 + skillPower);
 
         gameObject.SetActive(true);
-        //정해진 틱마다 트리거안의 모든 적에게 데미지 칼 이펙트, 지속적 mp감소, 스킬 애니메 시작
     }
 
     public void Deactivate() 
-    {//이펙트 끈다, 스킬애니메 종료
+    {
         gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        
+        if (other.CompareTag("Enemy"))
+        {
+            Enemy enemy = other.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemies.Add(enemy);
+            }
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        
+        if (other.CompareTag("Enemy"))
+        {
+            Enemy enemy = other.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemies.Remove(enemy);
+            }
+        }
+    }
+
+    private void Update()
+    {
+        coolTime -= Time.deltaTime;
+        if (coolTime < 0) 
+        {
+            foreach (Enemy enemy in enemies) 
+            {
+                enemy.Defence(finalPower);
+            }
+            coolTime = skillTick;
+        }
+        playerMana.MP -= manaCost * Time.deltaTime;
     }
 }

@@ -55,6 +55,10 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
         {
             if (IsAlive)
             {
+                if (value < 0.0f) 
+                {
+                    OnSkillEnd();
+                }
                 mp = Mathf.Clamp(value, 0, MaxMP);
                 onManaCange?.Invoke(mp / MaxMP);
             }
@@ -132,6 +136,8 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
 
     readonly int speed_Hash = Animator.StringToHash("Speed");
     readonly int attack_Hash = Animator.StringToHash("Attack");
+    readonly int SkillStart_Hash = Animator.StringToHash("SkillStart");
+    readonly int SkillEnd_Hash = Animator.StringToHash("SkillEnd");
     const float AnimatorStopSpeed = 0.0f;
     const float AnimatorWalkSpeed = 0.3f;
     const float AnimatorRunSpeed = 1.0f;
@@ -148,10 +154,13 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
         get => currentSpeedMode;
         set
         {
-            currentSpeedMode = value;
-            if (currentSpeed > 0.0f)
+            if (!skillArea.IsActivate) 
             {
-                MoveSpeedChange(currentSpeedMode);
+                currentSpeedMode = value;
+                if (currentSpeed > 0.0f)
+                {
+                    MoveSpeedChange(currentSpeedMode);
+                }
             }
         }
     }
@@ -504,12 +513,20 @@ public class Player : MonoBehaviour, IHealth, IMana, IEquipTarget, IBattler
 
     private void OnSkillEnd()
     {
+        animator.SetBool(SkillEnd_Hash, true);
         skillArea.Deactivate();
+        ShowWeaponEffect(false);
     }
 
     private void OnSkillStart()
     {
-        skillArea.Activate(AttackPower);
+        if ((currentSpeedMode == MoveMode.Walk) && MP > 0)
+        {
+            ShowWeaponEffect(true);
+            animator.SetBool(SkillEnd_Hash, false);
+            animator.SetTrigger(SkillStart_Hash);
+            skillArea.Activate(AttackPower);
+        }
     }
 
 #if UNITY_EDITOR

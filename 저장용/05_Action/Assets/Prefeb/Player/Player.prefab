@@ -709,7 +709,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -727,6 +727,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de2a93dd0b5b2d94e916c23de8a5084f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skillTick: 0.5
+  skillPower: 0.2
+  manaCost: 30
 --- !u!1 &2840840599655386961
 GameObject:
   m_ObjectHideFlags: 0
@@ -2335,7 +2338,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8323758226143537458}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5847103, y: 0.000000019740355, z: -0.000000014228043, w: 0.8112422}
+  m_LocalRotation: {x: 0.5847103, y: -0.000000019740359, z: 0.0000000142280445, w: 0.8112422}
   m_LocalPosition: {x: 0, y: 15, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
