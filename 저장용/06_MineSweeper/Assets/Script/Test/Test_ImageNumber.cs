@@ -7,13 +7,10 @@ public class Test_ImageNumber : TestBase
 {
     [Range(-99, 999)]
     public int testNumber = 0;
+    public ImageNumber imageNumber;
 
-    ImageNumber imageNumber;
-
-    private void Start()
-    {
-        imageNumber = FindAnyObjectByType<ImageNumber>();
-    }
+    public int flagCount = 5;
+    public GameManager.GameState gameState;
 
     protected override void OnTest1(InputAction.CallbackContext context)
     {
@@ -23,5 +20,15 @@ public class Test_ImageNumber : TestBase
     protected override void OnTest2(InputAction.CallbackContext context)
     {
         imageNumber.Number = Random.Range(-99, 999);
+    }
+
+    protected override void OnTest3(InputAction.CallbackContext context)
+    {
+        GameManager.Instance.Test_SetFlagCount(flagCount);
+    }
+
+    protected override void OnTest4(InputAction.CallbackContext context)
+    {
+        GameManager.Instance.Test_StateChange(gameState);
     }
 }

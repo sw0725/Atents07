@@ -66,5 +66,14 @@ public class GameManager : Singltrun<GameManager>
     //  ===========================================
 
 #if UNITY_EDITOR
+    public void Test_SetFlagCount(int flagCount) 
+    {
+        FlagCount = flagCount;
+    }
+
+    public void Test_StateChange(GameState state) 
+    {
+        State = state;
+    }
 #endif
 }

@@ -25,7 +25,7 @@ public class ImageNumber : MonoBehaviour
             }
         }
     }
-    int number = 0;
+    int number = -1;
 
     private void Awake()
     {
