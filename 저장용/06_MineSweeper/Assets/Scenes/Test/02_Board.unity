@@ -372,10 +372,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Board
       objectReference: {fileID: 0}
-    - target: {fileID: 3859815097719488659, guid: 56a0cf348dcf0cb49a86a1cb2a7ce7e6, type: 3}
-      propertyPath: cellPrefeb
-      value: 
-      objectReference: {fileID: 2067918396271930611, guid: 4c37f3ed3cfaece4888f6bf5bdf95211, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

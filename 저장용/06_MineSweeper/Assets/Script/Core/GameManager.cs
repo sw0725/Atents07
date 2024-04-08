@@ -47,6 +47,15 @@ public class GameManager : Singltrun<GameManager>
         }
     }
 
+    //  焊靛积己====================================
+
+    public int mineCount = 10;
+    public int boardWidth = 8;
+    public int boardHeight = 8;
+    
+    public Board Board => board;
+    Board board;
+
     //  标惯 包访===================================
     public int FlagCount 
     {
@@ -62,8 +71,25 @@ public class GameManager : Singltrun<GameManager>
     }
     public Action<int> onFlagCountChange;
 
+    public void IncreaseFlagCount() 
+    {
+        FlagCount++;
+    }
+
+    public void DecreaseFlagCount()
+    {
+        FlagCount--;
+    }
+
     int flagCount = 0;
     //  ===========================================
+
+    protected override void OnInitialize()
+    {
+        board = FindAnyObjectByType<Board>();
+        board.Initialize(boardWidth, boardHeight, mineCount);
+        FlagCount = mineCount;
+    }
 
 #if UNITY_EDITOR
     public void Test_SetFlagCount(int flagCount) 

@@ -24,6 +24,12 @@ public class Test_TestBoard : TestBase
 
     protected override void OnTest2(InputAction.CallbackContext context)
     {
-        base.OnTest2(context);
+        board.Test_BoardReset();
+        board.Test_OpenAllCover();
+    }
+
+    protected override void OnTest3(InputAction.CallbackContext context)
+    {
+        base.OnTest3(context);
     }
 }

@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 5484636220192622493}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 788.76416, y: 536.1908, z: 0.9180628}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44,3 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14ca526b2c962c2498299751f9592dec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mineCount: 10
+  boardWidth: 8
+  boardHeight: 8

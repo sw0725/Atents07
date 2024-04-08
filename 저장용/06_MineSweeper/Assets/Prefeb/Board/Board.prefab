@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9deb3f465fb8d6f4ebf19496fe7c6d50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellPrefeb: {fileID: 0}
+  cellPrefeb: {fileID: 2067918396271930611, guid: 4c37f3ed3cfaece4888f6bf5bdf95211, type: 3}
   openCellImage:
   - {fileID: -822849729, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
   - {fileID: -961398500, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
@@ -58,7 +58,7 @@ MonoBehaviour:
   - {fileID: 1004159996, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
   - {fileID: 1997299882, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
   - {fileID: 144745687, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
-  CloseCellImage:
+  closeCellImage:
   - {fileID: -371367898, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
   - {fileID: -822849729, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
   - {fileID: -818895812, guid: c0b9b71a94060ef4ab9f0af9615520aa, type: 3}
