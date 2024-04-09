@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14ca526b2c962c2498299751f9592dec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mineCount: 10
+  mineCount: 3
   boardWidth: 8
   boardHeight: 8

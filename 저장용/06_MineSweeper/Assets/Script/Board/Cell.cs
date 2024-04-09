@@ -34,17 +34,20 @@ public class Cell : MonoBehaviour
     }
     Board parentBoard = null;
 
+    public Action onExplosion;
     public Action onFlagUse;
     public Action onFlagReturn;
     public bool IsFlag => CoverState == CellCoverState.Flag;
 
     List<Cell> neighbors;
+    List<Cell> pressedCells;            //ÀÌ¼¿¿¡ÀÇÇØ ´­·ÁÁø ¼¿µé
 
     SpriteRenderer cover;
     SpriteRenderer inside;
 
     int aroundMineCount;
     bool isOpen = false;
+    bool IsPlaying => Board.IsPlaying;
 
     enum CellCoverState 
     {
@@ -83,6 +86,8 @@ public class Cell : MonoBehaviour
         cover = c.GetComponent<SpriteRenderer>();
         c = transform.GetChild(1);
         inside = c.GetComponent<SpriteRenderer>();
+
+        pressedCells = new List<Cell>(8);
     }
 
     public void InitialIze() 
@@ -96,6 +101,9 @@ public class Cell : MonoBehaviour
         aroundMineCount = 0;
         isOpen = false;
 
+        pressedCells.Clear();
+
+        CoverState = CellCoverState.None;
         cover.sprite = Board[CloseCellType.Close];
         inside.sprite = Board[OpenCellType.Empty];
         cover.gameObject.SetActive(true);
@@ -123,48 +131,85 @@ public class Cell : MonoBehaviour
 
     public void CellRightPress() 
     {
-        switch (CoverState)
+        if (IsPlaying && !isOpen) 
         {
-            case CellCoverState.None:
-                CoverState = CellCoverState.Flag;
-                break;
-            case CellCoverState.Flag:
-                CoverState = CellCoverState.Question;
-                break;
-            case CellCoverState.Question:
-                CoverState = CellCoverState.None;
-                break;
+            switch (CoverState)
+            {
+                case CellCoverState.None:
+                    CoverState = CellCoverState.Flag;
+                    break;
+                case CellCoverState.Flag:
+                    CoverState = CellCoverState.Question;
+                    break;
+                case CellCoverState.Question:
+                    CoverState = CellCoverState.None;
+                    break;
+            }
         }
     }
 
     public void LeftPress() 
     {
-        if (isOpen) 
+        if (IsPlaying) 
         {
-            foreach (var cell in neighbors)
+            pressedCells.Clear();
+            if (isOpen)
             {
-                cell.LeftPress();
+                foreach (var cell in neighbors)
+                {
+                    if (!cell.isOpen && !cell.IsFlag)
+                    {
+                        pressedCells.Add(cell);
+                        cell.LeftPress();
+                    }
+                }
             }
-        }
-        else 
-        {
-            switch (CoverState)
+            else
             {
-                case CellCoverState.None:
-                    cover.sprite = Board[CloseCellType.ClosePress];
-                    break;
-                case CellCoverState.Question:
-                    cover.sprite = Board[CloseCellType.QuestionPress];
-                    break;
-                default:
-                    break;
+                switch (CoverState)
+                {
+                    case CellCoverState.None:
+                        cover.sprite = Board[CloseCellType.ClosePress];
+                        break;
+                    case CellCoverState.Question:
+                        cover.sprite = Board[CloseCellType.QuestionPress];
+                        break;
+                    default:
+                        break;
+                }
+                pressedCells.Add(this);
             }
         }
     }
 
     public void LeftRelease() 
     {
-        Open();
+        if (IsPlaying) 
+        {
+            if (isOpen)
+            {
+                int flagCount = 0;
+                foreach (var cell in neighbors)
+                {
+                    if (cell.IsFlag) flagCount++;
+                }
+                if (aroundMineCount == flagCount)
+                {
+                    foreach (var cell in pressedCells)
+                    {
+                        cell.Open();
+                    }
+                }
+                else
+                {
+                    RestoreCovers();
+                }
+            }
+            else
+            {
+                Open();
+            }
+        }
     }
 
     void Open() 
@@ -173,65 +218,54 @@ public class Cell : MonoBehaviour
         {
             isOpen = true;
             cover.gameObject.SetActive(false);
-            int flagcount = 0;
-            if (aroundMineCount <= 0)
+            if (hasMine) 
+            {
+                inside.sprite = Board[OpenCellType.Mine_Explosion];
+                onExplosion?.Invoke();
+            }
+            else if (aroundMineCount <= 0)
             {
                 foreach (var cell in neighbors)
                 {
                     cell.Open();
                 }
             }
-            else if (hasMine) 
-            {
-                Debug.Log("Claer");
-            }
-            foreach (var cell in neighbors)
-            {
-                if (cell.IsFlag) flagcount++;
-            }
-            if (flagcount == aroundMineCount)
-            {
-                foreach (var cell in neighbors)
-                {
-                    if (!cell.IsFlag)
-                    {
-                        cell.Open();
-                    }
-                }
-            }
-            else 
-            {
-                foreach (var cell in neighbors)
-                {
-                    cell.RestoreCover();
-                }
-            }
         }
     }
 
-    public void RestoreCover() 
+    void RestoreCover() 
     {
-        if (isOpen)
+        switch (CoverState)
         {
-            foreach (var cell in neighbors)
-            {
-                cell.RestoreCover();
-            }
+            case CellCoverState.None:
+                cover.sprite = Board[CloseCellType.Close];
+                break;
+            case CellCoverState.Question:
+                cover.sprite = Board[CloseCellType.Question];
+                break;
+            default:
+                break;
         }
-        else 
+    }
+
+    public void RestoreCovers() 
+    {
+        foreach (var cell in pressedCells) 
         {
-            switch (CoverState)
-            {
-                case CellCoverState.None:
-                    cover.sprite = Board[CloseCellType.Close];
-                    break;
-                case CellCoverState.Question:
-                    cover.sprite = Board[CloseCellType.Question];
-                    break;
-                default:
-                    break;
-            }
+            cell.RestoreCover();
         }
+        pressedCells.Clear();
+    }
+
+    public void FlagMistate() 
+    {
+        cover.gameObject.SetActive(false);
+        inside.sprite = Board[OpenCellType.Mine_Mistake];
+    }
+
+    public void MineNotFound()
+    {
+        cover.gameObject.SetActive(false);
     }
 
 #if UNITY_EDITOR
@@ -239,5 +273,7 @@ public class Cell : MonoBehaviour
     {
         cover.gameObject.SetActive(false);
     }
+
+    public bool IsOpen => isOpen;
 #endif
 }

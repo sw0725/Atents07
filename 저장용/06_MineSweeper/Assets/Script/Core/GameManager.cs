@@ -31,6 +31,7 @@ public class GameManager : Singltrun<GameManager>
                 switch (state) 
                 {
                     case GameState.Ready:
+                        FlagCount = mineCount;
                         onGameReady?.Invoke();
                         break;
                     case GameState.Play:
@@ -45,6 +46,25 @@ public class GameManager : Singltrun<GameManager>
                 }
             }
         }
+    }
+
+    public bool IsPlay => state == GameState.Play;
+
+    public void GameStart() 
+    {
+        if(State == GameState.Ready)    State = GameState.Play;
+    }
+    public void GameReset() 
+    {
+        State = GameState.Ready;
+    }
+    public void GameOver() 
+    {
+        State = GameState.GameOver;
+    }
+    public void GameClear() 
+    {
+        State = GameState.GameClear;
     }
 
     //  보드생성====================================

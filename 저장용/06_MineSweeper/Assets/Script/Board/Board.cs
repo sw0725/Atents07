@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,9 +13,10 @@ public class Board : MonoBehaviour
     public Sprite[] closeCellImage;
     public Sprite this[CloseCellType type] => closeCellImage[(int)type];
 
-    int width = 16;
-    int height = 16;
-    int mineCount = 10;
+    public bool IsPlaying => gameManager.IsPlay;
+
+    public Action onBoardLeftPress;
+    public Action onBoardLeftRelease;
 
     Cell[] cells;
     Cell currentCell = null;
@@ -25,7 +27,7 @@ public class Board : MonoBehaviour
         {
             if (currentCell != value) 
             {
-                currentCell?.RestoreCover();
+                currentCell?.RestoreCovers();
                 currentCell = value;
                 currentCell?.LeftPress();
             }
@@ -33,6 +35,10 @@ public class Board : MonoBehaviour
     }
     PlayerInputAction action;
     GameManager gameManager;
+
+    int width = 16;
+    int height = 16;
+    int mineCount = 10;
 
     const float Distance = 1.0f;
 
@@ -83,6 +89,7 @@ public class Board : MonoBehaviour
 
                 cell.onFlagUse += gameManager.DecreaseFlagCount;
                 cell.onFlagReturn += gameManager.IncreaseFlagCount;
+                cell.onExplosion += gameManager.GameOver;
 
                 cellObj.name = $"Cell_{id}_({x},{y})";
                 cells[id] = cell;
@@ -93,6 +100,11 @@ public class Board : MonoBehaviour
         {
             cell.InitialIze();
         }
+
+        gameManager.onGameReady += ResetBoard;
+        gameManager.onGameOver += OnGameOver;
+        gameManager.onGameClear += OnGameClear;
+        gameManager.onGamePlay += OnGamePlay;
 
         ResetBoard();
     }
@@ -167,7 +179,11 @@ public class Board : MonoBehaviour
     {
         Vector2 screen = Mouse.current.position.ReadValue();
         Cell cell = GetCell(screen);
-        cell?.CellRightPress();
+        if (cell != null)
+        {
+            gameManager.GameStart();
+            cell?.CellRightPress();
+        }
     }
 
     private void OnLeftRelease(InputAction.CallbackContext context)
@@ -175,13 +191,27 @@ public class Board : MonoBehaviour
         Vector2 screen = Mouse.current.position.ReadValue();
         Cell cell = GetCell(screen);
         cell?.LeftRelease();
+
+        if (gameManager.IsPlay)
+        {
+            onBoardLeftRelease?.Invoke();
+        }
     }
 
     private void OnLeftPress(InputAction.CallbackContext context)
     {
         Vector2 screen = Mouse.current.position.ReadValue();
         Cell cell = GetCell(screen);
-        cell?.LeftPress();
+        if (cell != null) 
+        {
+            gameManager.GameStart();
+            cell?.LeftPress();
+
+            if (gameManager.IsPlay) 
+            {
+                onBoardLeftPress?.Invoke();
+            }
+        }
     }
 
     //  기타 유틸리티=============================================
@@ -197,7 +227,7 @@ public class Board : MonoBehaviour
         int loopCount = result.Length-1;
         for (int i = 0; i < loopCount; i++) 
         {
-            int rand = Random.Range(0, result.Length -i );
+            int rand = UnityEngine.Random.Range(0, result.Length -i );
             int lastIndex = loopCount - i;
             (result[lastIndex], result[rand]) = (result[rand], result[lastIndex]);
         }
@@ -224,6 +254,33 @@ public class Board : MonoBehaviour
         return result;
     }
 
+    //  게임메니져 연결==================================================
+
+    private void OnGamePlay()
+    {
+    }
+
+    private void OnGameClear()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    private void OnGameOver()
+    {
+        foreach (Cell cell in cells) 
+        {
+            if (cell.IsFlag && !cell.HasMine)
+            {
+                cell.FlagMistate();
+            }
+            else if (!cell.IsFlag && cell.HasMine) 
+            {
+                cell.MineNotFound();
+            }
+        }
+    }
+
+
 #if UNITY_EDITOR
     public void Test_OpenAllCover()
     {
@@ -236,6 +293,29 @@ public class Board : MonoBehaviour
     public void Test_BoardReset() 
     {
         ResetBoard();
+    }
+
+    public void test() 
+    {
+        bool clear = false;
+        if (gameManager.FlagCount == 0) 
+        {
+            clear = true;
+            foreach (Cell cell in cells) 
+            {
+                if (!cell.IsFlag) 
+                {
+                    if (!cell.IsOpen) 
+                    {
+                        clear = false;
+                    }
+                }
+            }
+        }
+        if (clear) 
+        {
+            gameManager.GameClear();
+        }
     }
 #endif
 }
