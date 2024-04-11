@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : Singltrun<GameManager>
@@ -32,9 +33,15 @@ public class GameManager : Singltrun<GameManager>
                 {
                     case GameState.Ready:
                         FlagCount = mineCount;
+                        playerName = string.Empty;
                         onGameReady?.Invoke();
                         break;
                     case GameState.Play:
+                        ActionCount = 0;
+                        if (playerName == string.Empty) 
+                        {
+                            playerName = $"Player{(uint)DateTime.Now.GetHashCode()}";
+                        }
                         onGamePlay?.Invoke();
                         break;
                     case GameState.GameClear:
@@ -102,13 +109,48 @@ public class GameManager : Singltrun<GameManager>
     }
 
     int flagCount = 0;
-    //  ===========================================
+    //  행동관련======================================
+
+    public int ActionCount 
+    {
+        get => actionCount;
+        private set 
+        {
+            if (actionCount != value) 
+            {
+                actionCount = value;
+                onActionCountChange?.Invoke(actionCount);
+            }
+        }
+    }
+    public Action<int> onActionCountChange;
+    int actionCount = -1;
+
+    public void PlayerActionEnd() 
+    {
+        ActionCount++;
+    }
+
+    //  플레이어 정보=================================
+
+    string playerName = string.Empty;
+    PlayerNameInputField inputField;
+
+    public void SetPlayerName(string name) 
+    {
+        playerName = name;
+    }
+
+    //  =============================================
 
     protected override void OnInitialize()
     {
         board = FindAnyObjectByType<Board>();
         board.Initialize(boardWidth, boardHeight, mineCount);
         FlagCount = mineCount;
+
+        inputField = FindAnyObjectByType<PlayerNameInputField>();
+        inputField.onPlayerNameSet += (name) => playerName = name;
     }
 
 #if UNITY_EDITOR
@@ -121,5 +163,6 @@ public class GameManager : Singltrun<GameManager>
     {
         State = state;
     }
+
 #endif
 }

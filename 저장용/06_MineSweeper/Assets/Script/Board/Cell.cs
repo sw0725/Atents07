@@ -37,6 +37,8 @@ public class Cell : MonoBehaviour
     public Action onExplosion;
     public Action onFlagUse;
     public Action onFlagReturn;
+    public Action onCellOpen;
+    public Action onCellAction;
     public bool IsFlag => CoverState == CellCoverState.Flag;
 
     List<Cell> neighbors;
@@ -137,9 +139,11 @@ public class Cell : MonoBehaviour
             {
                 case CellCoverState.None:
                     CoverState = CellCoverState.Flag;
+                    onCellAction?.Invoke();
                     break;
                 case CellCoverState.Flag:
                     CoverState = CellCoverState.Question;
+                    onCellAction?.Invoke();
                     break;
                 case CellCoverState.Question:
                     CoverState = CellCoverState.None;
@@ -195,6 +199,7 @@ public class Cell : MonoBehaviour
                 }
                 if (aroundMineCount == flagCount)
                 {
+                    onCellAction?.Invoke();
                     foreach (var cell in pressedCells)
                     {
                         cell.Open();
@@ -207,6 +212,7 @@ public class Cell : MonoBehaviour
             }
             else
             {
+                onCellAction?.Invoke();
                 Open();
             }
         }
@@ -218,6 +224,7 @@ public class Cell : MonoBehaviour
         {
             isOpen = true;
             cover.gameObject.SetActive(false);
+            onCellOpen?.Invoke();
             if (hasMine) 
             {
                 inside.sprite = Board[OpenCellType.Mine_Explosion];
@@ -268,12 +275,18 @@ public class Cell : MonoBehaviour
         cover.gameObject.SetActive(false);
     }
 
+    public void OnGameClear() 
+    {
+        if (!isOpen && HasMine && !IsFlag) 
+        {
+            CoverState = CellCoverState.Flag;
+        }
+    }
+
 #if UNITY_EDITOR
     public void Test_OpenCover() 
     {
         cover.gameObject.SetActive(false);
     }
-
-    public bool IsOpen => isOpen;
 #endif
 }

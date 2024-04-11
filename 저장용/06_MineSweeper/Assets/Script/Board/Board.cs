@@ -18,6 +18,14 @@ public class Board : MonoBehaviour
     public Action onBoardLeftPress;
     public Action onBoardLeftRelease;
 
+    public int FoundMineCount => mineCount - notFoundMineCount;
+    public int NotFoundMineCount => notFoundMineCount;
+    int notFoundMineCount = 0;
+    int width = 16;
+    int height = 16;
+    int mineCount = 10;
+    int closeCellCount;
+
     Cell[] cells;
     Cell currentCell = null;
     Cell CurrentCell 
@@ -35,10 +43,6 @@ public class Board : MonoBehaviour
     }
     PlayerInputAction action;
     GameManager gameManager;
-
-    int width = 16;
-    int height = 16;
-    int mineCount = 10;
 
     const float Distance = 1.0f;
 
@@ -90,6 +94,15 @@ public class Board : MonoBehaviour
                 cell.onFlagUse += gameManager.DecreaseFlagCount;
                 cell.onFlagReturn += gameManager.IncreaseFlagCount;
                 cell.onExplosion += gameManager.GameOver;
+                cell.onCellOpen += () => 
+                {
+                    closeCellCount--;
+                    if (closeCellCount == mineCount) 
+                    {
+                        gameManager.GameClear();
+                    }
+                };
+                cell.onCellAction += gameManager.PlayerActionEnd;
 
                 cellObj.name = $"Cell_{id}_({x},{y})";
                 cells[id] = cell;
@@ -104,7 +117,6 @@ public class Board : MonoBehaviour
         gameManager.onGameReady += ResetBoard;
         gameManager.onGameOver += OnGameOver;
         gameManager.onGameClear += OnGameClear;
-        gameManager.onGamePlay += OnGamePlay;
 
         ResetBoard();
     }
@@ -120,6 +132,8 @@ public class Board : MonoBehaviour
         {
             cells[suffleResult[i]].SetMine();
         }
+
+        closeCellCount = cells.Length;
     }
 
     //  셀확인용=============================================
@@ -256,30 +270,34 @@ public class Board : MonoBehaviour
 
     //  게임메니져 연결==================================================
 
-    private void OnGamePlay()
-    {
-    }
-
-    private void OnGameClear()
-    {
-        throw new System.NotImplementedException();
-    }
-
     private void OnGameOver()
     {
+        notFoundMineCount = 0;
         foreach (Cell cell in cells) 
         {
             if (cell.IsFlag && !cell.HasMine)
             {
                 cell.FlagMistate();
             }
-            else if (!cell.IsFlag && cell.HasMine) 
+            else if (!cell.IsFlag && cell.HasMine)
             {
                 cell.MineNotFound();
+                notFoundMineCount++;
             }
         }
     }
 
+    private void OnGameClear()
+    {
+        notFoundMineCount = 0;
+        if (gameManager.FlagCount != 0)
+        {
+            foreach (Cell cell in cells)
+            {
+                cell.OnGameClear();
+            }
+        }
+    }
 
 #if UNITY_EDITOR
     public void Test_OpenAllCover()
@@ -293,29 +311,6 @@ public class Board : MonoBehaviour
     public void Test_BoardReset() 
     {
         ResetBoard();
-    }
-
-    public void test() 
-    {
-        bool clear = false;
-        if (gameManager.FlagCount == 0) 
-        {
-            clear = true;
-            foreach (Cell cell in cells) 
-            {
-                if (!cell.IsFlag) 
-                {
-                    if (!cell.IsOpen) 
-                    {
-                        clear = false;
-                    }
-                }
-            }
-        }
-        if (clear) 
-        {
-            gameManager.GameClear();
-        }
     }
 #endif
 }
