@@ -33,14 +33,14 @@ public class GameManager : Singltrun<GameManager>
                 {
                     case GameState.Ready:
                         FlagCount = mineCount;
-                        playerName = string.Empty;
+                        PlayerName = string.Empty;
                         onGameReady?.Invoke();
                         break;
                     case GameState.Play:
                         ActionCount = 0;
-                        if (playerName == string.Empty) 
+                        if (PlayerName == string.Empty) 
                         {
-                            playerName = $"Player{(uint)DateTime.Now.GetHashCode()}";
+                            PlayerName = $"Player{(uint)DateTime.Now.GetHashCode()}";
                         }
                         onGamePlay?.Invoke();
                         break;
@@ -133,24 +133,31 @@ public class GameManager : Singltrun<GameManager>
 
     //  플레이어 정보=================================
 
-    string playerName = string.Empty;
     PlayerNameInputField inputField;
 
-    public void SetPlayerName(string name) 
+    string PlayerName 
     {
-        playerName = name;
+        get => inputField?.GetPlayerName();
+        set => inputField?.SetPlayerName(value);
     }
 
+    //  랭킹관련=============================================
+
+    RankDataManager rankDataManager;
+
+    public RankDataManager RankDataManager => rankDataManager;
+    
     //  =============================================
 
     protected override void OnInitialize()
     {
+        rankDataManager = GetComponent<RankDataManager>();
+
         board = FindAnyObjectByType<Board>();
         board.Initialize(boardWidth, boardHeight, mineCount);
         FlagCount = mineCount;
 
         inputField = FindAnyObjectByType<PlayerNameInputField>();
-        inputField.onPlayerNameSet += (name) => playerName = name;
     }
 
 #if UNITY_EDITOR
