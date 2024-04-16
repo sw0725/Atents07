@@ -40,7 +40,7 @@ public class GameManager : Singltrun<GameManager>
                         ActionCount = 0;
                         if (PlayerName == string.Empty) 
                         {
-                            PlayerName = $"Player{(uint)DateTime.Now.GetHashCode()}";
+                            PlayerName = $"Player{(uint)(DateTime.Now.GetHashCode() % 10000000)}";
                         }
                         onGamePlay?.Invoke();
                         break;
@@ -124,21 +124,27 @@ public class GameManager : Singltrun<GameManager>
         }
     }
     public Action<int> onActionCountChange;
-    int actionCount = -1;
+    int actionCount = 0;
 
     public void PlayerActionEnd() 
     {
         ActionCount++;
     }
 
+    //  시간관련=====================================
+
+    Timer timer;
+
+    public float PlayTime => timer.ElapsedTime;
+
     //  플레이어 정보=================================
 
     PlayerNameInputField inputField;
 
-    string PlayerName 
+    public string PlayerName 
     {
         get => inputField?.GetPlayerName();
-        set => inputField?.SetPlayerName(value);
+        private set => inputField?.SetPlayerName(value);
     }
 
     //  랭킹관련=============================================
@@ -156,6 +162,7 @@ public class GameManager : Singltrun<GameManager>
         board = FindAnyObjectByType<Board>();
         board.Initialize(boardWidth, boardHeight, mineCount);
         FlagCount = mineCount;
+        timer = FindAnyObjectByType<Timer>();
 
         inputField = FindAnyObjectByType<PlayerNameInputField>();
     }
