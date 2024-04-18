@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.UIElements;
 
 public class NetPlayer : NetworkBehaviour
 {
@@ -15,6 +13,7 @@ public class NetPlayer : NetworkBehaviour
 
     NetworkVariable<float> netMoveDir = new NetworkVariable<float>(0.0f);          //네트워크에서 공유되는 변수(값타입만 가능)
     NetworkVariable<float> netRotate = new NetworkVariable<float>(0.0f);
+    NetworkVariable<FixedString512Bytes> chatString = new NetworkVariable<FixedString512Bytes>();
 
     PlayerInputAction action;
     CharacterController controller;
@@ -28,8 +27,7 @@ public class NetPlayer : NetworkBehaviour
         None
     }
     AnimationState state = AnimationState.None;
-
-    NetworkVariable<AnimationState> netAnimationState;
+    NetworkVariable<AnimationState> netAnimationState = new NetworkVariable<AnimationState>();
 
     private void Awake()
     {
@@ -38,6 +36,7 @@ public class NetPlayer : NetworkBehaviour
         animator = GetComponent<Animator>();
 
         netAnimationState.OnValueChanged += onAnimationStateChange;
+        chatString.OnValueChanged += OnChatRecive;
     }
 
     private void OnEnable()
@@ -100,11 +99,11 @@ public class NetPlayer : NetworkBehaviour
         }
         if (state != netAnimationState.Value) 
         {
-            if (NetworkManager.Singleton.IsServer)
+            if (IsServer)
             {
                 netAnimationState.Value = state;
             }
-            else 
+            else if(IsOwner) 
             {
                 UpdateAnimationStateServerRpc(state);
             }
@@ -152,5 +151,15 @@ public class NetPlayer : NetworkBehaviour
     private void onAnimationStateChange(AnimationState previousValue, AnimationState newValue)
     {
         animator.SetTrigger(newValue.ToString());
+    }
+
+    public void SendChat(string message) 
+    {
+
+    }
+
+    private void OnChatRecive(FixedString512Bytes previousValue, FixedString512Bytes newValue)
+    {
+        
     }
 }
