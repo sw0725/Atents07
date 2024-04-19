@@ -72,40 +72,43 @@ public class NetPlayer : NetworkBehaviour
         SetMoveInput(moveInput);
     }
 
-    void SetMoveInput(float moveInput) 
-    {
-        float moveDir = moveInput * moveSpeed;                        //접속한이후 내가 움직이는것을 다른 네트워크가 알아야 내 위치를 다른 네트워크에서도 수정하기에 이 값을 네트워크 공유변수로 설정한다.
-                                                                      //이런식으로 네트워크 상에서 움직이는 물체들은 NetworkObject 를 가져야만 한다.
-        if (NetworkManager.Singleton.IsServer)                        //다만 공유변수는 서버에서만 값을 쓸 수 있으므로
+    void SetMoveInput(float moveInput)
+    {                    
+        if (IsOwner)                                                  
         {
-            netMoveDir.Value = moveDir;
-        }
-        else if(IsOwner)
-        {
-            MoveRequestServerRpc(moveDir);                            //서버에 값변경 의뢰를 보내야 한다
-        }
-
-        if (moveDir > 0.001f)
-        {
-            state = AnimationState.Walk;
-        }
-        else if (moveDir < -0.001f)
-        {
-            state = AnimationState.BackWalk;
-        }
-        else
-        {
-            state = AnimationState.Idle;
-        }
-        if (state != netAnimationState.Value) 
-        {
-            if (IsServer)
+            float moveDir = moveInput * moveSpeed;                   //접속한이후 내가 움직이는것을 다른 네트워크가 알아야 내 위치를 다른 네트워크에서도 수정하기에 이 값을 네트워크 공유변수로 설정한다.
+                                                                     //이런식으로 네트워크 상에서 움직이는 물체들은 NetworkObject 를 가져야만 한다.
+            if (NetworkManager.Singleton.IsServer)                   //다만 공유변수는 서버에서만 값을 쓸 수 있으므로
             {
-                netAnimationState.Value = state;
+                netMoveDir.Value = moveDir;
             }
-            else if(IsOwner) 
+            else
             {
-                UpdateAnimationStateServerRpc(state);
+                MoveRequestServerRpc(moveDir);                            //서버에 값변경 의뢰를 보내야 한다
+            }
+
+            if (moveDir > 0.001f)
+            {
+                state = AnimationState.Walk;
+            }
+            else if (moveDir < -0.001f)
+            {
+                state = AnimationState.BackWalk;
+            }
+            else
+            {
+                state = AnimationState.Idle;
+            }
+            if (state != netAnimationState.Value)
+            {
+                if (IsServer)
+                {
+                    netAnimationState.Value = state;
+                }
+                else
+                {
+                    UpdateAnimationStateServerRpc(state);
+                }
             }
         }
     }
@@ -130,15 +133,18 @@ public class NetPlayer : NetworkBehaviour
 
     void SetRotateInput(float rotateInput) 
     {
-        float rotate = rotateInput * rotateSpeed;
+        if (IsOwner)
+        {
+            float rotate = rotateInput * rotateSpeed;
 
-        if (NetworkManager.Singleton.IsServer)
-        {
-            netRotate.Value = rotate;
-        }
-        else if(IsOwner)
-        {
-            RotateRequestServerRpc(rotate);
+            if (IsServer)
+            {
+                netRotate.Value = rotate;
+            }
+            else 
+            {
+                RotateRequestServerRpc(rotate);
+            }
         }
     }
 
@@ -155,11 +161,24 @@ public class NetPlayer : NetworkBehaviour
 
     public void SendChat(string message) 
     {
-
+        if (IsServer) 
+        {
+            chatString.Value = message;
+        }
+        else 
+        {
+            ChatRequestServerRpc(message);
+        }
     }
 
     private void OnChatRecive(FixedString512Bytes previousValue, FixedString512Bytes newValue)
     {
-        
+        GameManager.Instance.Log(newValue.ToString());
+    }
+
+    [ServerRpc]
+    void ChatRequestServerRpc(FixedString512Bytes messege)
+    {
+        chatString.Value = messege;
     }
 }

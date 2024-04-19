@@ -14,7 +14,7 @@ public class Logger : MonoBehaviour
     TMP_InputField inputField;
     Queue<string> logLines = new Queue<string>(MaxLineCount +1);
 
-    const int MaxLineCount = 20;
+    const int MaxLineCount = 20;        
 
     private void Awake()
     {
@@ -22,7 +22,22 @@ public class Logger : MonoBehaviour
         inputField = c.GetComponent<TMP_InputField>();
         inputField.onSubmit.AddListener((text) =>                 //입력이 완료(엔터)되었을때 실행, endEdit:입력이 끝났을때(엔터 or 포커스종료) 실행
         {
-            Log(text);
+            if (text[0].Equals("/"))
+            {
+                ConsoleCommand(text);
+            }
+            else 
+            {
+                if (GameManager.Instance.Player != null)
+                {
+                    GameManager.Instance.Player.SendChat(text);
+                }
+                else
+                {
+                    Log(text);
+                }
+            }
+
             inputField.text = string.Empty;
             inputField.ActivateInputField();                     //입력완료 후 포커스 다시 활성화, Select() : 활성화시 비활성화 / 비활성화시 활성화
         });                                 
@@ -127,5 +142,42 @@ public class Logger : MonoBehaviour
             result = false;
         }
         return result;
+    }
+
+    void ConsoleCommand(string command) 
+    {
+        //첫자는/, 명령어 구분, /setname sdsa UserName => sdsa, /setcolor 1,0,0 색상 => 발간색
+        int space = command.IndexOf(' ');
+        string commandToken = command.Substring(0, space);      //인덱스부터 문자앞 까지의 문자열 반환
+        commandToken = commandToken.ToLower();
+        string dataToken = command.Substring(space + 1);        //문자다음칸부터 끝까지
+
+        GameManager gameManager = GameManager.Instance;
+        switch (commandToken) 
+        {
+            case "/setname":
+                gameManager.UserName = dataToken;
+                break;
+            case "/setcolor":
+                break;
+        }
+
+        //if (command.Contains("setname"))
+        //{
+        //    string name = "";
+        //    for (int start = 9; start < command.Length; start++) 
+        //    {
+        //        name += command[start];
+        //    }
+        //    GameManager.Instance.UserName = name;
+        //}
+        //else if (command.Contains("setcolor")) 
+        //{
+        //    string colorCode = command.Replace(@"[^0-9]", "");
+        //    float R = colorCode[0];
+        //    float G = colorCode[1];
+        //    float B = colorCode[2];
+        //    GameManager.Instance.UserColor = new Color(R, G, B);
+        //}
     }
 }

@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TestNetController : MonoBehaviour
 {
+    TextMeshProUGUI playerInGame;
+    TextMeshProUGUI userName;
+
     private void Start()
     {
         Transform c = transform.GetChild(0);
@@ -42,5 +46,20 @@ public class TestNetController : MonoBehaviour
         {
             NetworkManager.Singleton.Shutdown();    //자신의 연결 종료
         });
+
+        c = transform.GetChild(3);
+        c = c.GetChild(1);
+        playerInGame = c.GetComponent<TextMeshProUGUI>();
+
+        GameManager gameManager = GameManager.Instance;
+        gameManager.onPlayersInGameChange += (count) => playerInGame.text = count.ToString();
+
+        c = transform.GetChild(4);
+        c = c.GetChild(1);
+        userName = c.GetComponent<TextMeshProUGUI>();
+        gameManager.onUserNameChange += (name) =>
+        {
+            userName.text = name.ToString();
+        };
     }
 }
