@@ -10,6 +10,9 @@ public class TestNetController : MonoBehaviour
     TextMeshProUGUI playerInGame;
     TextMeshProUGUI userName;
 
+    const string BlankUserName = "¡à¡à¡à¡à¡à¡à¡à¡à";
+    const string BlankPlayersInGame = "-";
+
     private void Start()
     {
         Transform c = transform.GetChild(0);
@@ -59,7 +62,13 @@ public class TestNetController : MonoBehaviour
         userName = c.GetComponent<TextMeshProUGUI>();
         gameManager.onUserNameChange += (name) =>
         {
-            userName.text = name.ToString();
+            userName.text = gameManager.UserName;
+        };
+
+        gameManager.onPlayerDisconnected += () =>
+        {
+            userName.text = BlankUserName;
+            playerInGame.text = BlankPlayersInGame;
         };
     }
 }

@@ -1,3 +1,4 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using UnityEngine;
 public class GameManager : NetSingltrun<GameManager>
 {
     public NetPlayer Player => player;
+    NetPlayer player;
 
     public Action<int> onPlayersInGameChange;
     NetworkVariable<int> playersInGame = new NetworkVariable<int>(0);
@@ -21,7 +23,8 @@ public class GameManager : NetSingltrun<GameManager>
         }
     }
     public Action<string> onUserNameChange;
-    string userName = "디폴트";
+    string userName = DefaultName;
+    const string DefaultName = "Player";
 
     public Color UserColor 
     {
@@ -35,13 +38,20 @@ public class GameManager : NetSingltrun<GameManager>
     public Action<Color> onUserColorChange;
     Color userColor = Color.clear;
 
-    Logger logger;
-    NetPlayer player;
+    public NetPlayerDecorator Decorator => decorator;
     NetPlayerDecorator decorator;
+
+    public Action onPlayerDisconnected;
+
+    public CinemachineVirtualCamera VCam => virtualCamera;
+    CinemachineVirtualCamera virtualCamera;
+
+    Logger logger;
 
     protected override void OnInitialize()
     {
         logger = FindAnyObjectByType<Logger>();
+        virtualCamera = FindAnyObjectByType<CinemachineVirtualCamera>();
 
         NetworkManager.OnClientConnectedCallback += onClientConnect;        //클라이언트가 접속 할때마다 실행(서버에서는항상 실행, 클라이언트는 자기것만 실행)
         NetworkManager.OnClientDisconnectCallback += OnClientDisconnect;    //클라이언트가 접속 해제할때마다 실행(서버에서는항상 실행, 클라이언트는 자기것만 실행)
@@ -58,7 +68,17 @@ public class GameManager : NetSingltrun<GameManager>
             player.gameObject.name = $"Player_{id}";
 
             decorator = netObj.GetComponent<NetPlayerDecorator>();
-            decorator.SetName(UserName);
+            if(UserName != DefaultName) 
+            {
+                Decorator.SetName($"{UserName}_{id}");
+                UserName = UserName;
+            }
+            else
+            {
+                Decorator.SetName($"{DefaultName}_{id}");
+                UserName = UserName;
+            }
+            if(UserColor != Color.clear) decorator.SetColor(UserColor);
 
             foreach(var other in NetworkManager.SpawnManager.SpawnedObjectsList)        //섭장이 늦게 들갔을때
             {
@@ -66,6 +86,11 @@ public class GameManager : NetSingltrun<GameManager>
                 if (otherPlayer != null && otherPlayer != player)
                 {
                     otherPlayer.gameObject.name = $"OtherPlayer_{other.OwnerClientId}";
+                }
+                NetPlayerDecorator netPlayerDecorator = other.GetComponent<NetPlayerDecorator>() ;
+                if(netPlayerDecorator != null && netPlayerDecorator != Decorator) 
+                {
+                    netPlayerDecorator.RefreshNamePlate();
                 }
             }
         }
@@ -84,11 +109,8 @@ public class GameManager : NetSingltrun<GameManager>
     }
     private void OnClientDisconnect(ulong id)
     {
-        NetworkObject netObj = NetworkManager.SpawnManager.GetPlayerNetworkObject(id);
-        if(netObj.IsOwner) 
-        {
-            player = null;
-        }
+        //NetworkObject netObj = NetworkManager.SpawnManager.GetPlayerNetworkObject(id);
+        //if(netObj.IsOwner)                                                                        //오너가 나가는 경우에는 디스커넥트보다 나가는게 빠르므로 실행안됨
 
         if (IsServer)
         {

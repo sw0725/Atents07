@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2621557820474461923}
   - component: {fileID: 8932888734980236644}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Armature_Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2386,6 +2386,7 @@ GameObject:
   - component: {fileID: 1646332080532448588}
   - component: {fileID: 3191471477548082680}
   - component: {fileID: -1155277659323912566}
+  - component: {fileID: -2154942169002104144}
   m_Layer: 8
   m_Name: NetPlayer
   m_TagString: Player
@@ -2493,6 +2494,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3.5
   rotateSpeed: 90
+--- !u!114 &-2154942169002104144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8154408430434472736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55bd502b5abcf5443891ac97e996b065, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8246689637145439019
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,12 +9,32 @@ public class NetPlayerDecorator : NetworkBehaviour
 {
     NetworkVariable<Color> bodyColor = new NetworkVariable<Color>();
     NetworkVariable<FixedString32Bytes> userName = new NetworkVariable<FixedString32Bytes>();
+    NetworkVariable<bool> netEffectState = new NetworkVariable<bool>(false);
+    public bool IsEffectOn
+    {
+        get => netEffectState.Value;
+        set
+        {
+            if (netEffectState.Value != value)
+            {
+                if (IsServer)
+                {
+                    netEffectState.Value = value;
+                }
+                else
+                {
+                    UpdateEffectStateServerRpc(value);
+                }
+            }
+        }
+    }
 
     Renderer playerRenderer;
     Material bodyMaterial;
     NamePlate namePlate;
 
     readonly int BaseColor_Hash = Shader.PropertyToID("_BaceColor");
+    readonly int EmissionIntensity_Hash = Shader.PropertyToID("_EmissionIntensity");
 
     private void Awake()
     {
@@ -25,11 +44,7 @@ public class NetPlayerDecorator : NetworkBehaviour
         bodyColor.OnValueChanged += OnBodyColorChange;
         namePlate = GetComponentInChildren<NamePlate>();
         userName.OnValueChanged += OnNameSet;
-    }
-
-    private void OnBodyColorChange(Color previousValue, Color newValue)
-    {
-        bodyMaterial.SetColor(BaseColor_Hash, newValue);
+        netEffectState.OnValueChanged += OnEffectStateChage;
     }
 
     public override void OnNetworkSpawn()
@@ -60,14 +75,58 @@ public class NetPlayerDecorator : NetworkBehaviour
     {
         namePlate.SetName(newValue.ToString());
     }
-    public void RefreshNamePlate(string name) 
+    public void RefreshNamePlate() 
     {
-        namePlate.SetName(name.ToString());
+        namePlate.SetName(userName.Value.ToString());
     }
 
     [ServerRpc]
     void UserNameRequestServerRpc(string name) 
     {
         userName.Value = name;
+    }
+
+    public void SetColor(Color color)
+    {
+        if (IsOwner)
+        {
+            if (IsServer)
+            {
+                bodyColor.Value = color;
+            }
+            else
+            {
+                UserColorRequestServerRpc(color);
+            }
+        }
+    }
+
+    [ServerRpc]
+    void UserColorRequestServerRpc(Color color)
+    {
+        bodyColor.Value = color;
+    }
+
+    private void OnBodyColorChange(Color previousValue, Color newValue)
+    {
+        bodyMaterial.SetColor(BaseColor_Hash, newValue);
+    }
+
+    private void OnEffectStateChage(bool previousValue, bool newValue)
+    {
+        if (newValue)
+        {
+            bodyMaterial.SetFloat(EmissionIntensity_Hash, 1.0f);
+        }
+        else
+        {
+            bodyMaterial.SetFloat(EmissionIntensity_Hash, 0.0f);
+        }
+    }
+
+    [ServerRpc]
+    void UpdateEffectStateServerRpc(bool isOn)
+    {
+        netEffectState.Value = isOn;
     }
 }

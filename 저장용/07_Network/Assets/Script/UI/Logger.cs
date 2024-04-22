@@ -22,9 +22,10 @@ public class Logger : MonoBehaviour
         inputField = c.GetComponent<TMP_InputField>();
         inputField.onSubmit.AddListener((text) =>                 //입력이 완료(엔터)되었을때 실행, endEdit:입력이 끝났을때(엔터 or 포커스종료) 실행
         {
-            if (text[0].Equals("/"))
+            if (text[0] == '/')                                     //문자열의 일부를 비교하는거라 이퀄스가 안먹힘
             {
                 ConsoleCommand(text);
+                Debug.Log("in");
             }
             else 
             {
@@ -157,27 +158,33 @@ public class Logger : MonoBehaviour
         {
             case "/setname":
                 gameManager.UserName = dataToken;
+                if (gameManager.Decorator != null) gameManager.Decorator.SetName(dataToken);
                 break;
             case "/setcolor":
+                string[] colorString = dataToken.Split(',', ' ');
+                float[] colorValues = new float[3] { 0, 0, 0 };
+
+                int count = 0;
+                foreach(string color in colorString) 
+                {
+                    if(color.Length == 0) continue;
+                    if (count > 2) break;
+
+                    if(!float.TryParse(color, out colorValues[count])) colorValues[count] = 0;
+                    count++;
+                }
+
+                for(int i = 0; i < colorValues.Length; i++) 
+                {
+                    colorValues[i] = Mathf.Clamp01(colorValues[i]);
+                }
+
+                Color resultColor = new Color(colorValues[0], colorValues[1], colorValues[2]);
+                if(gameManager.Decorator != null) gameManager.Decorator.SetColor(resultColor);
+                    
+                gameManager.UserColor = resultColor;
+
                 break;
         }
-
-        //if (command.Contains("setname"))
-        //{
-        //    string name = "";
-        //    for (int start = 9; start < command.Length; start++) 
-        //    {
-        //        name += command[start];
-        //    }
-        //    GameManager.Instance.UserName = name;
-        //}
-        //else if (command.Contains("setcolor")) 
-        //{
-        //    string colorCode = command.Replace(@"[^0-9]", "");
-        //    float R = colorCode[0];
-        //    float G = colorCode[1];
-        //    float B = colorCode[2];
-        //    GameManager.Instance.UserColor = new Color(R, G, B);
-        //}
     }
 }

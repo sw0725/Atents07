@@ -57,6 +57,23 @@ public class NetPlayer : NetworkBehaviour
         action.Player.Disable();
     }
 
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner) 
+        {
+            GameManager.Instance.VCam.Follow = transform.GetChild(0);
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsOwner) 
+        {
+            GameManager.Instance.onPlayerDisconnected?.Invoke();
+            GameManager.Instance.VCam.Follow = null;
+        }
+    }
+
     private void Update()
     {
         if (netMoveDir.Value != 0.0f) 
