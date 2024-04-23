@@ -10,6 +10,8 @@ public class NetPlayer : NetworkBehaviour
 {
     public float moveSpeed = 3.5f;
     public float rotateSpeed = 90.0f;
+    public GameObject bulletPrefab;
+    public GameObject OrbPrefab;
 
     NetworkVariable<float> netMoveDir = new NetworkVariable<float>(0.0f);          //네트워크에서 공유되는 변수(값타입만 가능)
     NetworkVariable<float> netRotate = new NetworkVariable<float>(0.0f);
@@ -18,6 +20,7 @@ public class NetPlayer : NetworkBehaviour
     PlayerInputAction action;
     CharacterController controller;
     Animator animator;
+    Transform fireTransform;
 
     enum AnimationState 
     {
@@ -37,6 +40,8 @@ public class NetPlayer : NetworkBehaviour
 
         netAnimationState.OnValueChanged += onAnimationStateChange;
         chatString.OnValueChanged += OnChatRecive;
+
+        fireTransform = transform.GetChild(4);
     }
 
     private void OnEnable()
@@ -46,6 +51,8 @@ public class NetPlayer : NetworkBehaviour
         action.Player.MoveForward.canceled += OnMoveInput;
         action.Player.Rotate.performed += OnRotateInput;
         action.Player.Rotate.canceled += OnRotateInput;
+        action.Player.Attack1.performed += OnAttack1;
+        action.Player.Attack2.performed += OnAttack2;
     }
 
     private void OnDisable()
@@ -54,6 +61,8 @@ public class NetPlayer : NetworkBehaviour
         action.Player.MoveForward.canceled -= OnMoveInput;
         action.Player.Rotate.performed -= OnRotateInput;
         action.Player.Rotate.canceled -= OnRotateInput;
+        action.Player.Attack1.performed -= OnAttack1;
+        action.Player.Attack2.performed -= OnAttack2;
         action.Player.Disable();
     }
 
@@ -197,5 +206,25 @@ public class NetPlayer : NetworkBehaviour
     void ChatRequestServerRpc(FixedString512Bytes messege)
     {
         chatString.Value = messege;
+    }
+
+    private void OnAttack2(InputAction.CallbackContext context)     //우 스킬
+    {
+        Attack2();
+    }
+
+    private void OnAttack1(InputAction.CallbackContext context)     //좌 총알
+    {
+        Attack1();
+    }
+
+    void Attack1() 
+    { 
+    
+    }
+
+    void Attack2()
+    {
+        GameObject orb = Instantiate(OrbPrefab, fireTransform.position, fireTransform.rotation);
     }
 }
