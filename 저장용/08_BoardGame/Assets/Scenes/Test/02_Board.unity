@@ -282,11 +282,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 504815185}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eb68fc09adb8904c8402ed30e80abb0, type: 3}
+  m_Script: {fileID: 11500000, guid: 5ffd689eb589aee408b9e03ff8b303e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   seed: -1
-  shipType: 1
+  Board: {fileID: 1949100730}
 --- !u!1 &1160234425
 GameObject:
   m_ObjectHideFlags: 0
@@ -404,6 +404,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9f8764c3ea981540b60df6cad72ebe4, type: 3}
+--- !u!114 &1949100730 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8106331453922478587, guid: 200e422a869a2a44e852f07c797ee992,
+    type: 3}
+  m_PrefabInstance: {fileID: 4437493581802193372}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d6f3b2a3a24ba045b1d65ba16194121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2424177670363675718
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -71,16 +71,16 @@ public class Ship : MonoBehaviour
     int hp = 0;
     bool IsAlive => hp > 0;
 
+    ShipDirection direction = ShipDirection.North;
     public ShipDirection Direction 
     {
         get => direction;
         set 
         {
             direction = value;
-            //modelRoot 방향 돌리기
+            modelRoot.rotation = Quaternion.Euler(0, (int)direction * 90.0f, 0);
         }
     }
-    ShipDirection direction = ShipDirection.North;
 
     public string ShipName => shipName;
     string shipName = string.Empty;
@@ -95,6 +95,8 @@ public class Ship : MonoBehaviour
     public Action<bool> onDeploy;                       //배치/해제
     public Action<Ship> onHit;                          //공격당함(ship: 자기자신)
     public Action<Ship> onSink;                         //침몰함(ship: 자기자신)
+
+    int shipDirCount;
 
     Transform modelRoot;
     Renderer shipRenderer;                              //마테리얼 바꿀것임
@@ -111,6 +113,8 @@ public class Ship : MonoBehaviour
 
         gameObject.name = $"{ShipType}_{Size}";
         gameObject.SetActive(false);
+
+        shipDirCount = ShipManager.Instance.ShipDirectionCount;
     }
 
     void ResetData()
@@ -122,22 +126,37 @@ public class Ship : MonoBehaviour
 
     public void SetMaterialType(bool isNormal = true)       //true = 배치후/불투명 false = 배치전/반투명
     {
-    
+        if (isNormal)                                                           //
+        {
+            shipRenderer.material = ShipManager.Instance.NormalShipMaterial;
+        }
+        else 
+        {
+            shipRenderer.material = ShipManager.Instance.DepolyShipMaterial;
+        }                                                                       //
     }
 
     public void Deploy(Vector2Int[] deployPos) 
     {
-    
+        isDeployed = true;
+        positions = deployPos;
     }
 
     public void UnDeploy() 
     {
-    
+        ResetData();
     }
 
     public void Rotate(bool isCw = true)                   //true = 시계
     {
-        
+        if(isCw) 
+        {
+            Direction = (ShipDirection)(((int)Direction + 1) % shipDirCount);
+        }
+        else
+        {
+            Direction = (ShipDirection)(((int)Direction + (shipDirCount - 1)) % shipDirCount);          //3%4 = 3 (3+4)%4 = 3 이므로 y + (-1 + x) % x = y-1 이다 이러는 이유는 자칫 음수로 빠지는것을 막기 위함 
+        }
     }
 
     public void RandomRotate() 

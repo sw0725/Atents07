@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 public class TestBase : MonoBehaviour
 {
-    TestInputAction action;
+    protected TestInputAction action;
     public int seed = -1;
     const int allRandom = -1;
 
@@ -20,7 +20,7 @@ public class TestBase : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         action.Test.Enable();
         action.Test.Test1.performed += OnTest1;
@@ -32,7 +32,7 @@ public class TestBase : MonoBehaviour
         action.Test.RClick.performed += OnRClick;
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
         action.Test.Test1.performed -= OnTest1;
         action.Test.Test2.performed -= OnTest2;
