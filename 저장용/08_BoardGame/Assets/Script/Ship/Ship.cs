@@ -126,18 +126,19 @@ public class Ship : MonoBehaviour
 
     public void SetMaterialType(bool isNormal = true)       //true = 배치후/불투명 false = 배치전/반투명
     {
-        if (isNormal)                                                           //
+        if (isNormal)                                                           
         {
             shipRenderer.material = ShipManager.Instance.NormalShipMaterial;
         }
         else 
         {
             shipRenderer.material = ShipManager.Instance.DepolyShipMaterial;
-        }                                                                       //
+        }                                                                       
     }
 
     public void Deploy(Vector2Int[] deployPos) 
     {
+        SetMaterialType(true);
         isDeployed = true;
         positions = deployPos;
     }
@@ -161,7 +162,11 @@ public class Ship : MonoBehaviour
 
     public void RandomRotate() 
     {
-        
+        int rotateCount = UnityEngine.Random.Range(0, shipDirCount);
+        for(int i = 0; i < rotateCount; i++) 
+        {
+            Rotate();    
+        }
     }
 
     public void OnHitted() 

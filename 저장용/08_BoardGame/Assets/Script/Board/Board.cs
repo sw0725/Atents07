@@ -41,12 +41,15 @@ public class Board : MonoBehaviour
 
     public void UndoShipDeployment(Ship ship)
     {
-        foreach(var pos in ship.Positions) 
+        if (ship.IsDeployed) 
         {
-            shipInfo[GridToIndex(pos).Value] = ShipType.None;
+            foreach(var pos in ship.Positions) 
+            {
+                shipInfo[GridToIndex(pos).Value] = ShipType.None;
+            }
+            ship.UnDeploy();
+            ship.gameObject.SetActive(false);
         }
-        ship.UnDeploy();
-        ship.gameObject.SetActive(false);
     }
 
     public bool IsShipDeploymentAvailable(Ship ship, Vector2Int grid, out Vector2Int[] resultPos) 
@@ -108,6 +111,14 @@ public class Board : MonoBehaviour
     public ShipType GetShipTypeOnBoard(Vector3 world)
     {
         return GetShipTypeOnBoard(WorldToGrid(world));
+    }
+
+    public void ResetBoard(Ship[] ships)
+    {
+        foreach(Ship ship in ships) 
+        {
+            UndoShipDeployment(ship);
+        }
     }
 
     //ÁÂÇ¥ º¯È¯===========================================================

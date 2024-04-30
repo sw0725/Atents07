@@ -8,24 +8,30 @@ using UnityEngine.InputSystem;
 public class Test_ShipDeploy : TestBase
 {
     public Board board;
-    public Ship ship;
+    Ship ship;
 
-    Ship[] ships;
+    protected Ship[] ships;
     Ship TargetShip 
     {
         get => ship;
         set
         {
-            ship = value;
-            if (ship != null)                               //
+            if(ship != null && !ship.IsDeployed) 
             {
-                ship.SetMaterialType(ship.IsDeployed);
-            }                                               //
-            ship?.gameObject.SetActive(true);
+                ship.gameObject.SetActive(false);
+            }
+            ship = value;
+            if (ship != null && !ship.IsDeployed)
+            {
+                ship.SetMaterialType(false);
+                ship.transform.position = board.GridToWorld(board.GetMouseGridPosition());
+                OnShipMovemant();
+                ship.gameObject.SetActive(true);
+            }
         }
     }
 
-    private void Start() 
+    protected virtual void Start() 
     {
         ships = new Ship[ShipManager.Instance.ShipTypeCount];
         ships[(int)ShipType.Carrier - 1] = ShipManager.Instance.MakeShip(ShipType.Carrier, transform);
@@ -77,9 +83,15 @@ public class Test_ShipDeploy : TestBase
         {
             Vector2Int grid = board.GetMouseGridPosition();
             Vector3 world = board.GridToWorld(grid);
-            ShipManager.Instance.SetDeployModeColor(board.IsShipDeploymentAvailable(ship, grid));//
             ship.transform.position = world;
+            OnShipMovemant();
         }
+    }
+
+    void OnShipMovemant()
+    {
+        bool isSuccess = board.IsShipDeploymentAvailable(TargetShip, TargetShip.transform.position);
+        ShipManager.Instance.SetDeployModeColor(isSuccess);
     }
 
     protected override void OnTest1(InputAction.CallbackContext context)
@@ -108,12 +120,11 @@ public class Test_ShipDeploy : TestBase
         if (TargetShip != null && board.ShipDeployment(TargetShip, board.GetMouseGridPosition()))
         {
             Debug.Log($"배치성공 {TargetShip.gameObject.name}");
-            TargetShip.SetMaterialType(true);//
             TargetShip = null;
         }
         else 
         {
-            Debug.Log("배치 실패");
+            //Debug.Log("배치 실패");
         }
     }
     protected override void OnRClick(InputAction.CallbackContext context)
@@ -127,4 +138,3 @@ public class Test_ShipDeploy : TestBase
         }
     }
 }
-//배치가능하면 녹색 불가능하면 적색 배치완료시 노말 선택변경시 기존꺼 비활성화
