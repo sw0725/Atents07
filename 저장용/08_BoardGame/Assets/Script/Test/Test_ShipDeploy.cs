@@ -11,7 +11,7 @@ public class Test_ShipDeploy : TestBase
     Ship ship;
 
     protected Ship[] ships;
-    Ship TargetShip 
+    protected Ship TargetShip 
     {
         get => ship;
         set

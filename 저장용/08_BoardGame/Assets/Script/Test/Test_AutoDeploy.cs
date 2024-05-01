@@ -21,7 +21,7 @@ public class Test_AutoDeploy : Test_ShipDeploy
         resetAndRandom.onClick.AddListener(AutoShipDeployment);
     }
 
-    void AutoShipDeployment()
+    protected void AutoShipDeployment()
     {
         int maxCapacity = Board.BoardSize * Board.BoardSize;
         List<int> high = new List<int>(maxCapacity);

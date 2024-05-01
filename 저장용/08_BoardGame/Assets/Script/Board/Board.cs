@@ -1,7 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,11 +8,27 @@ public class Board : MonoBehaviour
 {
     public const int BoardSize = 10;
 
+    public Dictionary<ShipType, Action> onShipAttacked;         //공격을받았을때 실행될델리게이트를 가지는 딕셔너리(검색편한 트리)
+
+    bool[] isAttacked;      //공격받은 위치정보 기본값 =false
     ShipType[] shipInfo;    //보드에 배치된 배 정보 빈칸은 none
+
+    BombSetter bombSetter;
 
     private void Awake()
     {
+        isAttacked = new bool[BoardSize * BoardSize];
         shipInfo = new ShipType[BoardSize * BoardSize];     //자동 none 세팅
+
+        bombSetter = transform.GetComponentInChildren<BombSetter>();
+
+        onShipAttacked = new Dictionary<ShipType, Action>();
+        onShipAttacked[ShipType.None] = null;                   //벨류값이 액션이니 onShipAttacked[ShipType.None].Invoke 로 그때그때의 다른 델리게이트를 실행할수 있다.
+        onShipAttacked[ShipType.Carrier] = null;
+        onShipAttacked[ShipType.BattleShip] = null;
+        onShipAttacked[ShipType.Destroyer] = null;
+        onShipAttacked[ShipType.Submarine] = null;
+        onShipAttacked[ShipType.PatrolBoat] = null;
     }
 
     //함선 배치===========================================================
@@ -119,6 +134,42 @@ public class Board : MonoBehaviour
         {
             UndoShipDeployment(ship);
         }
+        for(int i = 0; i < isAttacked.Length; i++) 
+        {
+            isAttacked[i] = false;
+        }
+        bombSetter.ResetBombMark();
+    }
+
+    //공격 관련===========================================================
+
+    public bool OnAttacked(Vector2Int grid)                 //true 보드 소유의 함선 피격
+    {
+        bool result = false;
+        int index = GridToIndex(grid).Value;                   //좌표검사를 안했기때문에 매개변수는 반드시 검증된 값이어야 한다 
+        isAttacked[index] = true;
+
+        ShipType target = shipInfo[index];
+        if(target != ShipType.None) 
+        {
+            result = true;
+            onShipAttacked[target]?.Invoke();
+        }
+
+        bombSetter.SetBombMark(GridToWorld(grid), result);
+        return result;
+    }
+
+    public bool IsAttackable(int index) 
+    {
+        return !isAttacked[index];
+    }
+    public bool IsAttackable(Vector2Int grid)
+    {
+        bool result = false;
+        int? index = GridToIndex(grid);
+        if(index.HasValue) result = IsAttackable(index.Value);
+        return result;
     }
 
     //좌표 변환===========================================================

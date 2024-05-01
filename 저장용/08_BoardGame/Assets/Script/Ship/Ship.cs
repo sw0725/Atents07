@@ -106,7 +106,7 @@ public class Ship : MonoBehaviour
         ShipType = shipType;
         HP = Size;
 
-        modelRoot = transform.GetChild(0);
+        modelRoot = transform.GetChild(1);
         shipRenderer = modelRoot.GetComponentInChildren<Renderer>();
 
         ResetData();
@@ -171,11 +171,21 @@ public class Ship : MonoBehaviour
 
     public void OnHitted() 
     {
-            
+        Debug.Log($"{name} ÇÇ°Ý");
+        onHit?.Invoke(this);
+        HP--;
     }
 
     void OnSinking() 
-    { 
-        
+    {
+        Debug.Log($"{name} Ä§¸ô");
+        onSink?.Invoke(this);
     }
+
+#if UNITY_EDITOR
+    public void Test_SinkBanner() 
+    {
+        onSink?.Invoke(this);
+    }
+#endif
 }
