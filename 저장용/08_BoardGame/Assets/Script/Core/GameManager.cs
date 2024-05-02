@@ -5,6 +5,12 @@ using UnityEngine;
 
 public class GameManager : Singltrun<GameManager>
 {
+    public UserPlayer User => user;
+    UserPlayer user;
+
+    public EnemyPlayer Enemy => enemy;
+    EnemyPlayer enemy;
+
     CinemachineImpulseSource cameraImpulseSource;
 
     protected override void OnpreInitialize()
@@ -12,6 +18,12 @@ public class GameManager : Singltrun<GameManager>
         base.OnpreInitialize();
 
         cameraImpulseSource = GetComponentInChildren<CinemachineImpulseSource>();
+    }
+
+    protected override void OnInitialize()
+    {
+        user = FindAnyObjectByType<UserPlayer>();
+        enemy = FindAnyObjectByType<EnemyPlayer>();
     }
 
     public void CameraShake(float force) 

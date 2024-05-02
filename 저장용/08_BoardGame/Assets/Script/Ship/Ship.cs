@@ -119,6 +119,7 @@ public class Ship : MonoBehaviour
 
     void ResetData()
     {
+        HP = Size;
         Direction = ShipDirection.North;
         isDeployed = false;
         positions = null;
@@ -141,11 +142,15 @@ public class Ship : MonoBehaviour
         SetMaterialType(true);
         isDeployed = true;
         positions = deployPos;
+
+        onDeploy?.Invoke(true);
     }
 
     public void UnDeploy() 
     {
         ResetData();
+
+        onDeploy?.Invoke(false);
     }
 
     public void Rotate(bool isCw = true)                   //true = ½Ã°è
