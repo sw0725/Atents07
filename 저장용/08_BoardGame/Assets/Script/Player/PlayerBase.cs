@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerBase : MonoBehaviour
@@ -9,11 +10,9 @@ public class PlayerBase : MonoBehaviour
     public Ship[] Ships => ships;
     protected Ship[] ships;
 
-    protected PlayerBase opponent;
-
-    protected ShipManager shipManager;
-
-    protected GameManager gameManager;
+    public GameObject criticalMarkPrefab;
+    Dictionary<uint, GameObject> criticalMark;
+    Transform criticalMarkParent;
 
     List<uint> normalAttackIndex;
     List<uint> criticalAttackIndex;     //우선순위 높은 공격지역
@@ -22,12 +21,20 @@ public class PlayerBase : MonoBehaviour
 
     bool opponentShipDestroyed = false;
 
+    protected PlayerBase opponent;
+
+    protected ShipManager shipManager;
+
+    protected GameManager gameManager;
+
     readonly Vector2Int Not_Success = -Vector2Int.one;
     readonly Vector2Int[] neighbors = { new(-1, 0), new(1, 0), new(0, 1), new(0, -1) };
 
     protected virtual void Awake()
     {
         board = GetComponentInChildren<Board>();
+        criticalMarkParent = transform.GetChild(1);
+        criticalMark = new Dictionary<uint, GameObject>(10);
     }
 
     protected virtual void Start()
@@ -362,16 +369,134 @@ public class PlayerBase : MonoBehaviour
         Attack(target);
     }
 
-    void AddCriticalFromTwoPoint(Vector2Int grid, Vector2Int lastSuccessPos) 
+    void AddCriticalFromTwoPoint(Vector2Int now, Vector2Int last) 
     {
+        if (IsSuccessLine(last, now, true)) //양끝을 크리추가
+        {
+            Vector2Int grid = now;
+            for(grid.x = now.x + 1; grid.x < Board.BoardSize; grid.x++) 
+            {
+                if (!Board.IsInBoard(grid)) break;
+                if (opponent.Board.IsAttackFailPosition(grid)) break;
+                if (opponent.Board.IsAttackable(grid)) 
+                {
+                    AddCritical((uint)Board.GridToIndex(grid).Value);
+                    break;
+                }
+            }
+            for(grid.x = now.x - 1; grid.x > -1; grid.x--) 
+            {
+                if (!Board.IsInBoard(grid)) break;
+                if (opponent.Board.IsAttackFailPosition(grid)) break;
+                if (opponent.Board.IsAttackable(grid))
+                {
+                    AddCritical((uint)Board.GridToIndex(grid).Value);
+                    break;
+                }
+            }
+        }
+        else if (IsSuccessLine(last, now, false))
+        {
+            Vector2Int grid = now;
+            for (grid.y = now.y + 1; grid.y < Board.BoardSize; grid.y++)
+            {
+                if (!Board.IsInBoard(grid)) break;
+                if (opponent.Board.IsAttackFailPosition(grid)) break;
+                if (opponent.Board.IsAttackable(grid))
+                {
+                    AddCritical((uint)Board.GridToIndex(grid).Value);
+                    break;
+                }
+            }
+            for (grid.y = now.y - 1; grid.y > -1; grid.y--)
+            {
+                if (!Board.IsInBoard(grid)) break;
+                if (opponent.Board.IsAttackFailPosition(grid)) break;
+                if (opponent.Board.IsAttackable(grid))
+                {
+                    AddCritical((uint)Board.GridToIndex(grid).Value);
+                    break;
+                }
+            }
+        }
+        else                                //같은줄이 아님 = 다른배
+        {
+            AddCriticalFromNeighbors(now);
+        }
     }
+
+    bool IsSuccessLine(Vector2Int start, Vector2Int end, bool isHorizontal) 
+    {
+        bool result = true;
+
+        Vector2Int pos = start;
+        int dir = 1;
+        if (isHorizontal) 
+        {
+            if(start.y == end.y)                //float 은 == 로 비교하지 마라
+            {
+                if(start.x > end.x) 
+                {
+                    dir = -1;
+                }
+
+                start.x *= dir;                 //역방향일 경우 방향 뒤집기
+                end.x *= dir;
+                end.x++;                        //end의 x까지 확인 위함
+
+                for(int i = start.x; i < end.x; i++) 
+                {
+                    pos.x = i * dir;            //뒤집은것 다시 뒤집기
+                    if (opponent.Board.IsAttackFailPosition(pos)) 
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+            else 
+            {
+                result = false;
+            }
+        }
+        else 
+        {
+            if (start.x == end.x)                //float 은 == 로 비교하지 마라
+            {
+                if (start.y > end.y)
+                {
+                    dir = -1;
+                }
+
+                start.y *= dir;                 //역방향일 경우 방향 뒤집기
+                end.y *= dir;
+                end.y++;                        //end의 y까지 확인 위함
+
+                for (int i = start.y; i < end.y; i++)
+                {
+                    pos.y = i * dir;            //뒤집은것 다시 뒤집기
+                    if (opponent.Board.IsAttackFailPosition(pos))
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                result = false;
+            }
+        }
+        return result;
+    }
+
     void AddCriticalFromNeighbors(Vector2Int grid)
     {
         Util.Shuffle(neighbors);
         foreach(var neighbor in neighbors) 
         {
             Vector2Int pos = grid + neighbor;
-            if (board.IsAttackable(pos)) 
+            if (opponent.Board.IsAttackable(pos)) 
             {
                 AddCritical((uint)board.GridToIndex(pos).Value);
             }
@@ -383,11 +508,25 @@ public class PlayerBase : MonoBehaviour
         if (!criticalAttackIndex.Contains(index)) 
         {
             criticalAttackIndex.Insert(0, index);   //새로 발견된 지역이 더 가능성이 높다
+
+            GameObject obj = Instantiate(criticalMarkPrefab, criticalMarkParent);
+            obj.transform.position = opponent.Board.IndexToWorld(index);
+            Vector2Int grid = opponent.Board.IndexToGrid(index);
+            obj.name = $"Critical_({grid.x}, {grid.y})";
+            criticalMark[index] = obj;
         }
     }
 
     void RemoveAllCriticalPos() 
     {
+        while(criticalMarkParent.childCount > 0) 
+        {
+            Transform c = criticalMarkParent.GetChild(0);
+            c.SetParent(null);
+            Destroy(c.gameObject);
+        }
+        criticalMark.Clear();                       //딕셔너리 초기화
+
         criticalAttackIndex.Clear();
         lastSuccessAttackPos = Not_Success;
     }
@@ -396,6 +535,13 @@ public class PlayerBase : MonoBehaviour
         if (criticalAttackIndex.Contains(index)) 
         {
             criticalAttackIndex.Remove(index);
+
+            if (criticalMark.ContainsKey(index))    //없는키값에 액세스시 터짐
+            {
+                Destroy(criticalMark[index]);       //게임오브제 지우고
+                criticalMark[index] = null;         //값 초기화
+                criticalMark.Remove(index);         //키값 제거
+            }
         }
     }
 
@@ -415,4 +561,22 @@ public class PlayerBase : MonoBehaviour
         Board.ResetBoard(Ships);
     }
     //테스트 =========================================
+
+#if UNITY_EDITOR
+    public void Test_IsSuccessLine(Vector2Int grid) 
+    {
+        if(IsSuccessLine(grid, lastSuccessAttackPos, true)) 
+        {
+            Debug.Log("수평공격 성공");
+        }
+        else if (IsSuccessLine(grid, lastSuccessAttackPos, false))
+        {
+            Debug.Log("수직공격 성공");
+        }
+        else 
+        {
+            Debug.Log("한 줄 아님");
+        }
+    }
+#endif
 }

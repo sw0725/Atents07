@@ -172,6 +172,18 @@ public class Board : MonoBehaviour
         return result;
     }
 
+    public bool IsAttackSuccessPosition(Vector2Int grid) 
+    {
+        int? index = GridToIndex(grid);
+        return index != null && isAttacked[index.Value] && shipInfo[index.Value] != ShipType.None;
+    }
+
+    public bool IsAttackFailPosition(Vector2Int grid)   //공격안한 위치를 제외하기 위해 따로 함수를 사용한다.
+    {
+        int? index = GridToIndex(grid);
+        return index != null && isAttacked[index.Value] && shipInfo[index.Value] == ShipType.None;
+    }
+
     //좌표 변환===========================================================
 
     public Vector2Int IndexToGrid(uint index) 

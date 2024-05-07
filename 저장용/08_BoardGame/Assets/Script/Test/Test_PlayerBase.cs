@@ -57,5 +57,13 @@ public class Test_PlayerBase : TestBase
             UserPlayer userPlayer = user as UserPlayer;
             userPlayer.UndoShipDeploy(type);
         }
+
+        Vector2Int enemygrid = enemy.Board.GetMouseGridPosition();
+        user.Test_IsSuccessLine(enemygrid);
+    }
+
+    protected override void OnTest1(InputAction.CallbackContext context)
+    {
+        user.AutoAttack();
     }
 }
