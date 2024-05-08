@@ -11,6 +11,11 @@ public class GameManager : Singltrun<GameManager>
     public EnemyPlayer Enemy => enemy;
     EnemyPlayer enemy;
 
+    public TurnManager TurnManager => turnManager;
+    TurnManager turnManager;
+
+    public bool IsTestMode = false;
+
     CinemachineImpulseSource cameraImpulseSource;
 
     protected override void OnpreInitialize()
@@ -24,6 +29,9 @@ public class GameManager : Singltrun<GameManager>
     {
         user = FindAnyObjectByType<UserPlayer>();
         enemy = FindAnyObjectByType<EnemyPlayer>();
+
+        turnManager = GetComponent<TurnManager>();
+        turnManager.OnInitialize(user, enemy);
     }
 
     public void CameraShake(float force) 

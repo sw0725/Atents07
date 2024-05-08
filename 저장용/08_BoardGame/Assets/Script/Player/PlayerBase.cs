@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerBase : MonoBehaviour
@@ -9,6 +9,10 @@ public class PlayerBase : MonoBehaviour
     protected Board board;
     public Ship[] Ships => ships;
     protected Ship[] ships;
+
+    public Action onActionEnd;
+    public Action<PlayerBase> onDefeat;
+    bool isActionDone = false;
 
     public GameObject criticalMarkPrefab;
     Dictionary<uint, GameObject> criticalMark;
@@ -24,8 +28,8 @@ public class PlayerBase : MonoBehaviour
     protected PlayerBase opponent;
 
     protected ShipManager shipManager;
-
     protected GameManager gameManager;
+    protected TurnManager turnManager;
 
     readonly Vector2Int Not_Success = -Vector2Int.one;
     readonly Vector2Int[] neighbors = { new(-1, 0), new(1, 0), new(0, 1), new(0, -1) };
@@ -41,6 +45,7 @@ public class PlayerBase : MonoBehaviour
     {
         shipManager = ShipManager.Instance;
         gameManager = GameManager.Instance;
+        turnManager = gameManager.TurnManager;
         Initialize();
     }
 
@@ -73,11 +78,14 @@ public class PlayerBase : MonoBehaviour
 
         criticalAttackIndex = new List<uint>(10);
         lastSuccessAttackPos = Not_Success;
+
+        turnManager.onTurnStart += OnPlayerTurnStart;
+        turnManager.onTurnEnd += OnPlayerTurnEnd;
     }
 
     //함선 배치 =====================================
 
-    public void AutoShipDeployment(bool isShipShips) //isShipShips = 베치후함선표시?
+    public void AutoShipDeployment(bool isShipShow) //isShipShips = 베치후함선표시?
     {
         int maxCapacity = Board.BoardSize * Board.BoardSize;
         List<int> high = new List<int>(maxCapacity);
@@ -185,7 +193,7 @@ public class PlayerBase : MonoBehaviour
                 }
 
                 board.ShipDeployment(ship, grid);   //실배치
-                ship.gameObject.SetActive(isShipShips);
+                ship.gameObject.SetActive(isShipShow);
 
                 List<int> tempList = new List<int>(shipPos.Length);
                 foreach (var pos in shipPos)
@@ -307,7 +315,7 @@ public class PlayerBase : MonoBehaviour
     public void Attack(Vector2Int attackGrid) 
     {
         Board opponentBoard = opponent.Board;
-        if(opponentBoard.IsInBoard(attackGrid) && opponentBoard.IsAttackable(attackGrid)) 
+        if(!isActionDone && opponentBoard.IsInBoard(attackGrid) && opponentBoard.IsAttackable(attackGrid)) 
         {
             bool result = opponentBoard.OnAttacked(attackGrid);
             if (result) 
@@ -333,12 +341,15 @@ public class PlayerBase : MonoBehaviour
             }
             else 
             {
-                lastSuccessAttackPos = Not_Success;
+                //lastSuccessAttackPos = Not_Success;               //성공 -> 실패 -> 성공 순서시 두번째 순서에서 주변 모두를 추가하는 문제 수정을 위함
             }
 
             uint attackIndex = (uint)board.GridToIndex(attackGrid).Value;
             RemoveCriticalPos(attackIndex);
             normalAttackIndex.Remove(attackIndex);
+
+            isActionDone = true;
+            onActionEnd?.Invoke();
         }
     }
 
@@ -373,8 +384,23 @@ public class PlayerBase : MonoBehaviour
     {
         if (IsSuccessLine(last, now, true)) //양끝을 크리추가
         {
-            Vector2Int grid = now;
-            for(grid.x = now.x + 1; grid.x < Board.BoardSize; grid.x++) 
+            Vector2Int grid;
+            List<uint> deleteTarget = new List<uint>(16);
+            foreach(var index in criticalAttackIndex)           //같은 줄(y)이 아니라면 제거
+            {
+                grid = Board.IndexToGrid(index);
+                if(grid.y != now.y) 
+                {
+                    deleteTarget.Add(index);
+                }
+            }
+            foreach (var index in deleteTarget)
+            {
+                RemoveCriticalPos(index);
+            }
+
+            grid = now;
+            for (grid.x = now.x + 1; grid.x < Board.BoardSize; grid.x++) 
             {
                 if (!Board.IsInBoard(grid)) break;
                 if (opponent.Board.IsAttackFailPosition(grid)) break;
@@ -397,7 +423,22 @@ public class PlayerBase : MonoBehaviour
         }
         else if (IsSuccessLine(last, now, false))
         {
-            Vector2Int grid = now;
+            Vector2Int grid;
+            List<uint> deleteTarget = new List<uint>(16);
+            foreach (var index in criticalAttackIndex)           //같은 줄(x)이 아니라면 제거
+            {
+                grid = Board.IndexToGrid(index);
+                if (grid.x != now.x)
+                {
+                    deleteTarget.Add(index);
+                }
+            }
+            foreach (var index in deleteTarget)
+            {
+                RemoveCriticalPos(index);
+            }
+
+            grid = now;
             for (grid.y = now.y + 1; grid.y < Board.BoardSize; grid.y++)
             {
                 if (!Board.IsInBoard(grid)) break;
@@ -505,15 +546,18 @@ public class PlayerBase : MonoBehaviour
 
     void AddCritical(uint index) 
     {
-        if (!criticalAttackIndex.Contains(index)) 
+        if (!criticalAttackIndex.Contains(index))
         {
             criticalAttackIndex.Insert(0, index);   //새로 발견된 지역이 더 가능성이 높다
 
-            GameObject obj = Instantiate(criticalMarkPrefab, criticalMarkParent);
-            obj.transform.position = opponent.Board.IndexToWorld(index);
-            Vector2Int grid = opponent.Board.IndexToGrid(index);
-            obj.name = $"Critical_({grid.x}, {grid.y})";
-            criticalMark[index] = obj;
+            if (GameManager.Instance.IsTestMode)
+            {
+                GameObject obj = Instantiate(criticalMarkPrefab, criticalMarkParent);
+                obj.transform.position = opponent.Board.IndexToWorld(index);
+                Vector2Int grid = opponent.Board.IndexToGrid(index);
+                obj.name = $"Critical_({grid.x}, {grid.y})";
+                criticalMark[index] = obj;
+            }
         }
     }
 
@@ -536,16 +580,30 @@ public class PlayerBase : MonoBehaviour
         {
             criticalAttackIndex.Remove(index);
 
-            if (criticalMark.ContainsKey(index))    //없는키값에 액세스시 터짐
-            {
-                Destroy(criticalMark[index]);       //게임오브제 지우고
-                criticalMark[index] = null;         //값 초기화
-                criticalMark.Remove(index);         //키값 제거
-            }
+        }
+        if (criticalMark.ContainsKey(index))    //없는키값에 액세스시 터짐
+        {
+            Destroy(criticalMark[index]);       //게임오브제 지우고
+            criticalMark[index] = null;         //값 초기화
+            criticalMark.Remove(index);         //키값 제거
         }
     }
 
     //턴 관리용 =====================================
+
+    protected virtual void OnPlayerTurnStart(int _) 
+    {
+        isActionDone = false;
+    }
+
+    protected virtual void OnPlayerTurnEnd()
+    {
+        if(!isActionDone) 
+        {
+            AutoAttack();
+        }
+    }
+
     //침몰 패배 =====================================
 
     void OnShipDestroy(Ship ship) 

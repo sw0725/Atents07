@@ -21,10 +21,12 @@ public class Test_PlayerBase : TestBase
         reset.onClick.AddListener( user.Clear );
         reset.onClick.AddListener ( enemy.Clear );
 
+        bool isShow = GameManager.Instance.IsTestMode;
+
         random.onClick.AddListener(() => 
         {
             user.AutoShipDeployment(true);
-            enemy.AutoShipDeployment(true);
+            enemy.AutoShipDeployment(isShow);
         });
 
         resetAndRandom.onClick.AddListener(() =>
@@ -33,11 +35,11 @@ public class Test_PlayerBase : TestBase
             user.AutoShipDeployment(true);
 
             enemy.Clear();
-            enemy.AutoShipDeployment(true);
+            enemy.AutoShipDeployment(isShow);
         });
 
         user.AutoShipDeployment(true);
-        enemy.AutoShipDeployment(true);
+        enemy.AutoShipDeployment(isShow);
     }
 
     protected override void OnLClick(InputAction.CallbackContext context)//°ø

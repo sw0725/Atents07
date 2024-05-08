@@ -176,14 +176,12 @@ public class Ship : MonoBehaviour
 
     public void OnHitted() 
     {
-        Debug.Log($"{name} ÇÇ°Ý");
         onHit?.Invoke(this);
         HP--;
     }
 
     void OnSinking() 
     {
-        Debug.Log($"{name} Ä§¸ô");
         onSink?.Invoke(this);
     }
 
