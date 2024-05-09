@@ -12,6 +12,7 @@ public class PlayerBase : MonoBehaviour
 
     public Action onActionEnd;
     public Action<PlayerBase> onDefeat;
+    int remainShipCount;
     bool isActionDone = false;
 
     public GameObject criticalMarkPrefab;
@@ -64,7 +65,9 @@ public class PlayerBase : MonoBehaviour
 
             board.onShipAttacked[shipType] += ships[i].OnHitted;
         }
-        
+        remainShipCount = count;
+
+
         Board.ResetBoard(ships);
 
         int fullSize = Board.BoardSize * Board.BoardSize;
@@ -610,6 +613,18 @@ public class PlayerBase : MonoBehaviour
     {
         opponent.opponentShipDestroyed = true;          //내 함선이 침몰시 상대에게 알림
         opponent.lastSuccessAttackPos = Not_Success;
+
+        remainShipCount--;
+        if(remainShipCount < 1) 
+        {
+            OnDefeat();
+        }
+    }
+
+    protected virtual void OnDefeat() 
+    {
+        Debug.Log($"{gameObject.name}패배");
+        onDefeat?.Invoke(this); 
     }
 
     //기타 =========================================

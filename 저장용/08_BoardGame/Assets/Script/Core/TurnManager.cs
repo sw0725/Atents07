@@ -44,13 +44,13 @@ public class TurnManager : MonoBehaviour
         if(user != null)
         {
             user.onActionEnd += PlayerTurnEnd;
-            user.onDefeat += TurnStop;
+            user.onDefeat += TurnManagerStop;
         }
 
         if(enemy != null)
         {
             enemy.onActionEnd += PlayerTurnEnd;
-            enemy.onDefeat += TurnStop;
+            enemy.onDefeat += TurnManagerStop;
         }
 
         OnTurnStart();
@@ -103,7 +103,7 @@ public class TurnManager : MonoBehaviour
         }
     }
 
-    void TurnStop(PlayerBase _) 
+    void TurnManagerStop(PlayerBase _) 
     {
         isTurnEnable = false;
     }
