@@ -30,7 +30,7 @@ public class PlayerBase : MonoBehaviour
 
     protected ShipManager shipManager;
     protected GameManager gameManager;
-    protected TurnManager turnManager;
+    protected TurnControler turnManager;
 
     readonly Vector2Int Not_Success = -Vector2Int.one;
     readonly Vector2Int[] neighbors = { new(-1, 0), new(1, 0), new(0, 1), new(0, -1) };
@@ -633,6 +633,12 @@ public class PlayerBase : MonoBehaviour
         opponentShipDestroyed = false;
         Board.ResetBoard(Ships);
     }
+
+    public Ship GetShip(ShipType shipType) 
+    {
+        return (shipType != ShipType.None) ? Ships[(int)shipType - 1] : null;
+    }
+
     //Å×½ºÆ® =========================================
 
 #if UNITY_EDITOR

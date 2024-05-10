@@ -6,8 +6,10 @@ using UnityEngine.UI;
 
 public class DeployToggle : MonoBehaviour
 {
+    public ShipType shipType = ShipType.None;
     public Action<DeployToggle> onSelect;
 
+    UserPlayer player;
     Image image;
     GameObject deployEnd;
 
@@ -32,10 +34,12 @@ public class DeployToggle : MonoBehaviour
                     case DeployState.NotSelect:
                         image.color = Color.white;
                         deployEnd.SetActive(false);
+                        player.UndoShipDeploy(shipType);
                         break;
                     case DeployState.Select:
                         image.color = selectColor;
                         deployEnd.SetActive(false);
+                        player.SelectShipToDeploy(shipType);
                         onSelect?.Invoke(this);
                         break; 
                     case DeployState.Deployed:
@@ -56,6 +60,27 @@ public class DeployToggle : MonoBehaviour
 
         Button button = GetComponent<Button>();
         button.onClick.AddListener(OnClick);
+    }
+
+    private void Start()
+    {
+        player = GameManager.Instance.User;
+
+        Ship targetShip = player.GetShip(shipType);
+        if(targetShip != null) 
+        {
+            targetShip.onDeploy += (isDeploy) =>
+            {
+                if (isDeploy)
+                {
+                    State = DeployState.Deployed;
+                }
+                else
+                {
+                    State = DeployState.NotSelect;
+                }
+            };
+        }
     }
 
     private void OnClick()

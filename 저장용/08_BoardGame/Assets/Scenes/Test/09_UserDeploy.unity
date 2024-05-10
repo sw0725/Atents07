@@ -585,6 +585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140ade2823522864d96bad71ea49f41e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shipType: 3
 --- !u!1 &452076629
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,6 +939,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140ade2823522864d96bad71ea49f41e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shipType: 1
 --- !u!1 &762953668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1844,6 +1846,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140ade2823522864d96bad71ea49f41e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shipType: 5
 --- !u!1 &1276040237
 GameObject:
   m_ObjectHideFlags: 0
@@ -2112,6 +2115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140ade2823522864d96bad71ea49f41e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shipType: 4
 --- !u!1001 &1437689102
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2823,6 +2827,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140ade2823522864d96bad71ea49f41e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shipType: 2
 --- !u!1 &1830871015
 GameObject:
   m_ObjectHideFlags: 0
