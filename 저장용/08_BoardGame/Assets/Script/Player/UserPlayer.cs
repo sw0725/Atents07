@@ -27,6 +27,23 @@ public class UserPlayer : PlayerBase
         }
     }
 
+    public bool IsAllDeployed 
+    {
+        get 
+        {
+            bool result = true;
+            foreach (var ship in Ships) 
+            {
+                if (!ship.IsDeployed)
+                {
+                    result = false;
+                    break;
+                }
+            }
+            return result;
+        }
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -110,7 +127,8 @@ public class UserPlayer : PlayerBase
         }
         else if (gameManager.GameState == GameState.Battle)
         {
-
+            Vector2Int grid = opponent.Board.GetMouseGridPosition();
+            Attack(grid);
         }
     }
 

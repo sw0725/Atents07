@@ -176,8 +176,11 @@ public class Ship : MonoBehaviour
 
     public void OnHitted() 
     {
-        onHit?.Invoke(this);
         HP--;
+        if (IsAlive) 
+        {
+            onHit?.Invoke(this);
+        }
     }
 
     void OnSinking() 
