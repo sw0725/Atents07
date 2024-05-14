@@ -11,7 +11,8 @@ public class PlayerBase : MonoBehaviour
     protected Ship[] ships;
 
     public Action onActionEnd;
-    public Action<PlayerBase> onDefeat;
+    public Action<bool> onAttackFail;
+    public Action onDefeat;
     int remainShipCount;
     bool isActionDone = false;
 
@@ -344,7 +345,7 @@ public class PlayerBase : MonoBehaviour
             }
             else 
             {
-                //lastSuccessAttackPos = Not_Success;               //성공 -> 실패 -> 성공 순서시 두번째 순서에서 주변 모두를 추가하는 문제 수정을 위함
+                onAttackFail?.Invoke(this is UserPlayer);
             }
 
             uint attackIndex = (uint)board.GridToIndex(attackGrid).Value;
@@ -624,7 +625,7 @@ public class PlayerBase : MonoBehaviour
     protected virtual void OnDefeat() 
     {
         Debug.Log($"{gameObject.name}패배");
-        onDefeat?.Invoke(this); 
+        onDefeat?.Invoke(); 
     }
 
     //기타 =========================================

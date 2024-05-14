@@ -103,7 +103,7 @@ public class TurnControler : MonoBehaviour
         }
     }
 
-    void TurnManagerStop(PlayerBase _) 
+    void TurnManagerStop() 
     {
         isTurnEnable = false;
     }
