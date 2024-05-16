@@ -16,6 +16,12 @@ public class PlayerBase : MonoBehaviour
     int remainShipCount;
     bool isActionDone = false;
 
+    public int SuccessAttackCount => successAttackCount;
+    int successAttackCount;
+    public int FailAttackCount => failAttackCount;
+    int failAttackCount;
+    public int TotalAttackCount => failAttackCount + successAttackCount;
+
     public GameObject criticalMarkPrefab;
     Dictionary<uint, GameObject> criticalMark;
     Transform criticalMarkParent;
@@ -85,6 +91,9 @@ public class PlayerBase : MonoBehaviour
 
         turnManager.onTurnStart += OnPlayerTurnStart;
         turnManager.onTurnEnd += OnPlayerTurnEnd;
+
+        successAttackCount = 0;
+        failAttackCount = 0;
     }
 
     //함선 배치 =====================================
@@ -324,6 +333,7 @@ public class PlayerBase : MonoBehaviour
             bool result = opponentBoard.OnAttacked(attackGrid);
             if (result) 
             {
+                successAttackCount++;
                 if (opponentShipDestroyed) //침몰
                 {
                     RemoveAllCriticalPos();
@@ -345,6 +355,7 @@ public class PlayerBase : MonoBehaviour
             }
             else 
             {
+                failAttackCount++;
                 onAttackFail?.Invoke(this is UserPlayer);
             }
 

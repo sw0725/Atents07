@@ -49,6 +49,10 @@ public class Logger : MonoBehaviour
 
         user.onDefeat += ()=> Defeat(true);
         enemy.onDefeat += ()=> Defeat(false);
+
+        Clear();
+
+        TurnStart(1);       //서순문제로 인함
     }
 
     void Log(string text) 
@@ -71,7 +75,7 @@ public class Logger : MonoBehaviour
     void Clear() 
     {
         Lines.Clear();
-        log.text = "";
+        log.text = string.Empty;
     }
 
     void TurnStart(int number) 
