@@ -103,7 +103,7 @@ public class TurnControler : MonoBehaviour
         }
     }
 
-    void TurnManagerStop() 
+    public void TurnManagerStop() 
     {
         isTurnEnable = false;
     }

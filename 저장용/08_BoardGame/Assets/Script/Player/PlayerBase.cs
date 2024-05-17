@@ -565,7 +565,7 @@ public class PlayerBase : MonoBehaviour
         {
             criticalAttackIndex.Insert(0, index);   //새로 발견된 지역이 더 가능성이 높다
 
-            if (GameManager.Instance.IsTestMode)
+            if (gameManager.IsTestMode)
             {
                 GameObject obj = Instantiate(criticalMarkPrefab, criticalMarkParent);
                 obj.transform.position = opponent.Board.IndexToWorld(index);

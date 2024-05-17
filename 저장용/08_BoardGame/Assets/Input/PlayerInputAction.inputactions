@@ -90,6 +90,67 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "Title",
+            "id": "2b544b49-cfd1-45c0-bdac-9798e6dc9ab4",
+            "actions": [
+                {
+                    "name": "Anyting",
+                    "type": "Button",
+                    "id": "6e8bc7c2-1471-453c-9b74-35dcc60425ff",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "7d5dc5b3-14ef-4a65-babb-6dde66a6516a",
+                    "path": "<Keyboard>/anyKey",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Anyting",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4f988492-b2c2-4959-aa49-33f319da4c7f",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Anyting",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "99bf8201-58ad-4c36-8c24-cee766489455",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Anyting",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b5dc498-8704-483c-8f37-8850ca63b5b3",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Anyting",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

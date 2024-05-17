@@ -10,7 +10,7 @@ public class Test_UserDeploy : TestBase
     private void Start()
     {
         GameManager.Instance.GameState = GameState.ShipDeploy;
-        GameManager.Instance.User.Test_BindInputSys();
+        GameManager.Instance.User.BindInputSys();
     }
 
     protected override void OnTest1(InputAction.CallbackContext context)

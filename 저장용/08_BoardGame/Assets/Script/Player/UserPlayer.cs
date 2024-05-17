@@ -49,9 +49,6 @@ public class UserPlayer : PlayerBase
         base.Start();
 
         opponent = gameManager.Enemy;
-        gameManager.InputControler.onMouseClick += OnMouseClick;
-        gameManager.InputControler.onMouseMove += OnMouseMove;
-        gameManager.InputControler.onMouseWheel += OnMouseWheel;
     }
 
     public void SelectShipToDeploy(ShipType shipType) 
@@ -131,13 +128,10 @@ public class UserPlayer : PlayerBase
             Attack(grid);
         }
     }
-
-#if UNITY_EDITOR
-    public void Test_BindInputSys()
+    public void BindInputSys()
     {
         gameManager.InputControler.onMouseClick += OnMouseClick;
         gameManager.InputControler.onMouseMove += OnMouseMove;
         gameManager.InputControler.onMouseWheel += OnMouseWheel;
     }
-#endif
 }

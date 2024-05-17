@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class FinishDeployButton : MonoBehaviour
@@ -9,11 +10,14 @@ public class FinishDeployButton : MonoBehaviour
     Button button;
     UserPlayer player;
 
+    GameManager gameManager;
+
     private void Start()
     {
         button = GetComponent<Button>();
         button.onClick.AddListener(OnClick);
 
+        gameManager = GameManager.Instance;
         player = GameManager.Instance.User;
         foreach(var ship in player.Ships) 
         {
@@ -36,5 +40,10 @@ public class FinishDeployButton : MonoBehaviour
     private void OnClick()
     {
         Debug.Log("전투씬 전환");
+
+        if (gameManager.SaveShipDeployData()) 
+        {
+            SceneManager.LoadScene(2);
+        }
     }
 }

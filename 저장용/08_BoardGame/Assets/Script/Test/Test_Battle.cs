@@ -19,7 +19,7 @@ public class Test_Battle : TestBase
         enemy.AutoShipDeployment(true);
 
         gameManager.GameState = GameState.Battle;
-        user.Test_BindInputSys();
+        user.BindInputSys();
 
         gameManager.TurnManager.onTurnStart += (_) => user.AutoAttack();
         user.AutoAttack();

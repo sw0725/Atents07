@@ -20,7 +20,7 @@ public class Test_BattleShipLog : TestBase
         enemy.AutoShipDeployment(true);
 
         gameManager.GameState = GameState.Battle;
-        user.Test_BindInputSys();
+        user.BindInputSys();
     }
 
     protected override void OnTest1(InputAction.CallbackContext context)

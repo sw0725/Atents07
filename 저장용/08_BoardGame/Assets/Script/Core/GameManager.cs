@@ -78,4 +78,42 @@ public class GameManager : Singltrun<GameManager>
     {
         cameraImpulseSource.GenerateImpulseWithVelocity(force * UnityEngine.Random.insideUnitCircle.normalized);
     }
+
+    //저장 ================================================================
+
+    ShipDeployData[] shipDeployDatas;
+
+    public bool SaveShipDeployData()//배열에 정보 입력
+    {
+        bool result = false;
+        if (user.IsAllDeployed) 
+        {
+            shipDeployDatas = new ShipDeployData[user.Ships.Length];
+            for(int i =0; i < shipDeployDatas.Length; i++) 
+            {
+                Ship ship = user.Ships[i];
+                shipDeployDatas[i] = new ShipDeployData(ship.Direction, ship.Positions[0]);
+            }
+            result = true;
+        }
+        return result;
+    }
+
+    public bool LoadShipDeployData() //정보대로 배치
+    {
+        bool result = false;
+        if(shipDeployDatas != null) 
+        {
+            user.UndoAllShipDeployment();
+            for(int i =0; i<shipDeployDatas.Length; i++) 
+            {
+                Ship ship = user.Ships[i];
+                ship.Direction = shipDeployDatas[i].Direction;
+                user.Board.ShipDeployment(ship, shipDeployDatas[i].Position);
+                ship.gameObject.SetActive(true);
+            }
+            result = true;
+        }
+        return result;
+    }
 }

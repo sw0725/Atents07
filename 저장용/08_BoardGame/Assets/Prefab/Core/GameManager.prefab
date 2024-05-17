@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Follow: {fileID: 0}
   m_Lens:
     FieldOfView: 60
-    OrthographicSize: 8.5
+    OrthographicSize: 7
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -206,6 +206,7 @@ GameObject:
   - component: {fileID: 764764491922571120}
   - component: {fileID: 7540901051397919960}
   - component: {fileID: 6390279757282911187}
+  - component: {fileID: 8575011995149060796}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -241,7 +242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ac4757491968d74d8411884033d31c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsTestMode: 1
+  IsTestMode: 0
 --- !u!114 &7540901051397919960
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,7 +256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turnDuration: 5
-  timeOutEnable: 0
+  timeOutEnable: 1
 --- !u!114 &6390279757282911187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -279,3 +280,15 @@ MonoBehaviour:
   shipMaterials:
   - {fileID: 2100000, guid: 45ede2b2cfdb1c241afcc84963f61af5, type: 2}
   - {fileID: 2100000, guid: 2af0a06015fa940449f1273c2e27aacc, type: 2}
+--- !u!114 &8575011995149060796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8120956602289527011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73d565b81f976ef479797954eae25a17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
