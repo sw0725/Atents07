@@ -1,3 +1,6 @@
+using Cinemachine;
+using System;
+using System.Collections;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -20,8 +23,17 @@ namespace StarterAssets
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
 
+		public Action<bool> onZoom;
+
+		CinemachineVirtualCamera followCamera;
+
+        private void Start()
+        {
+			followCamera = GameManager.Instance.FollowCamera;
+        }
+
 #if ENABLE_INPUT_SYSTEM
-		public void OnMove(InputAction.CallbackContext context)
+        public void OnMove(InputAction.CallbackContext context)
 		{
 			MoveInput(context.ReadValue<Vector2>());
 		}
@@ -42,11 +54,59 @@ namespace StarterAssets
 		public void OnSprint(InputAction.CallbackContext context)
 		{
 			SprintInput(context.ReadValue<float>() > 0.1f);
-		}
+        }
+
+        public void OnZoom(InputAction.CallbackContext context)
+        {
+			bool isPress = !context.canceled;
+
+            StopAllCoroutines();
+			StartCoroutine(Zoom(isPress));
+			onZoom?.Invoke(isPress);
+        }
+
+		IEnumerator Zoom(bool zoomIn)
+        {
+            const float zoomFOV = 20.0f;
+            const float normalFOV = 40.0f;
+            const float zoomTime = 0.25f;
+			float speed = (normalFOV - zoomFOV) / zoomTime;
+
+            float fov = followCamera.m_Lens.FieldOfView;
+
+			if (zoomIn)
+            {
+                while (fov > zoomFOV)
+                {
+                    fov -= Time.deltaTime * speed;
+                    followCamera.m_Lens.FieldOfView = fov;
+                    yield return null;
+                }
+                followCamera.m_Lens.FieldOfView = zoomFOV;
+            }
+			else
+            {
+                while (fov < normalFOV)
+                {
+                    fov += Time.deltaTime * speed;
+                    followCamera.m_Lens.FieldOfView = fov;
+                    yield return null;
+                }
+                followCamera.m_Lens.FieldOfView = normalFOV;
+            }
+        }
+
+        public void OnFire(InputAction.CallbackContext context)
+        {
+        }
+
+        public void OnReload(InputAction.CallbackContext context)
+        {
+        }
 #endif
 
 
-		public void MoveInput(Vector2 newMoveDirection)
+        public void MoveInput(Vector2 newMoveDirection)
 		{
 			move = newMoveDirection;
 		} 
