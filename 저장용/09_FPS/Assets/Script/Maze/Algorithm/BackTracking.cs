@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 
 public class BackTrackingCell : Cell
@@ -17,17 +16,43 @@ public class BackTracking : Maze
 {
     protected override void OnSpecificAlgorithmExcute()         //재귀적 백트래킹 알고리즘(Recurcive BackTracking)
     {
+        for (int y = 0; y < height; y++) 
+        {
+            for (int x = 0; x < width; x++) 
+            {
+                cells[GridToIndex(x, y)] = new BackTrackingCell(x, y);      //셀 생성
+            }
+        }
 
+        int index = Random.Range(0, cells.Length);
+        BackTrackingCell start = (BackTrackingCell)cells[index];
+        start.visited = true;
+
+        MakeRecursive(start.X, start.Y);
     }
 
-    void MakeRecursive(int x, int y) 
+    void MakeRecursive(int x, int y)                            //재귀처리용 함수  //스택메모리에 함수가 쌓이는데 이 콜스택은 한계가 있어 과다크기는 터지기 마련이다.
     {
-    
-    }
+        BackTrackingCell current = (BackTrackingCell)cells[GridToIndex(x, y)];
 
-    //미로에서 랜덤한 지점을 미로에 임시로 추가(시작점)
-    //마지막에 미로에 추가한 지점에서 갈수 있는방향중 하나를 선택해서 랜덤하게 이동한다.
-    //이동한곳은 미로에 임시 추가되고 이전 지점과의 통로가 연결된다.
-    //이동할 곳이 없을 경우 이전단계의 셀로 돌아간다.
-    //시작지점까지돌아가면 알고리즘 종료
+        Vector2Int[] dirs = { new(0, 1), new(1, 0), new(0, -1), new(-1, 0) };
+        Util.Shuffle(dirs);
+
+        foreach(Vector2Int dir in dirs) 
+        {
+            Vector2Int newPos = new(x + dir.x, y + dir.y);
+
+            if (IsInGrid(newPos)) 
+            {
+                BackTrackingCell neighbor = (BackTrackingCell)cells[GridToIndex(newPos)];
+                if(!neighbor.visited) 
+                {
+                    neighbor.visited = true;
+                    ConnectPath(current, neighbor);
+
+                    MakeRecursive(neighbor.X, neighbor.Y);
+                }
+            }
+        }
+    }
 }

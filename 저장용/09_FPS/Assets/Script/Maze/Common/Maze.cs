@@ -35,29 +35,49 @@ public class Maze
 
     protected void ConnectPath(Cell from, Cell to) 
     {
-        //A,B¼¿ »çÀÌº® Á¦°Å
+        Vector2Int dir = new(to.X - from.X, to.Y - from.Y);
+        if (dir.x > 0)//µ¿
+        {
+            from.MakePath(Direction.East);
+            to.MakePath(Direction.West);
+        }
+        else if (dir.x < 0)//¼­
+        {
+            from.MakePath(Direction.West);
+            to.MakePath(Direction.East);
+        }
+        else if (dir.y > 0)//³²
+        {
+            from.MakePath(Direction.South);
+            to.MakePath(Direction.North);
+        }
+        else if (dir.y < 0)//ºÏ
+        {
+            from.MakePath(Direction.North);
+            to.MakePath(Direction.South);
+        }
     }
 
-    protected bool IsInGrid(Vector2Int grid) 
+    protected bool IsInGrid(Vector2Int grid)
     {
-        return true;
+        return grid.x >= 0 && grid.y >= 0 && grid.x < Width && grid.y < Height;
     }
 
     protected bool IsInGrid(int x, int y)
     {
-        return true;
+        return x >= 0 && y >= 0 && x < Width && y < Height;
     }
 
     protected Vector2Int IndexToGrid(int index)
     {
-        return Vector2Int.zero;
+        return new(index % width, index/width);
     }
     protected int GridToIndex(int x, int y)
     {
-        return -1;
+        return x + y * width;
     }
     protected int GridToIndex(Vector2Int grid)
     {
-        return GridToIndex(grid.x, grid.y);
+        return grid.x + grid.y * width;
     }
 }

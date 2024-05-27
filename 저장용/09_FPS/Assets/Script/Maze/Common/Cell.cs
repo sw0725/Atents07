@@ -34,16 +34,16 @@ public class Cell
 
     public void MakePath(Direction direction) //길 추가
     {
-        
+        path |= (byte)direction;
     }
 
     public bool IsPath(Direction direction) //해당 방향이 길인가
     {
-        return path != 0;
+        return (path & (byte)direction) != 0;
     }
 
-    public bool IsWall(Direction direction) 
+    public bool IsWall(Direction direction)
     {
-        return (path == 0);
+        return (path & (byte)direction) == 0;
     }
 }
