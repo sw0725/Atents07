@@ -13,55 +13,123 @@ public class EllerCell : Cell
 }
 public class Eller : Maze
 {
+    [Range(0f, 1f)]
+    public float mergeChance = 0.7f;
+    [Range(0f, 1f)] 
+    public float southOpenChance = 0.5f;
+    int serial = 0;
+
+    const float LastMergeChance = 1.1f;
+
     protected override void OnSpecificAlgorithmExcute()
     {
-        for (int y = 0; y < height; y++)
+        int h = height - 1;
+        EllerCell[] prevLine = null;
+
+        for (int y =0; y < h; y++) 
         {
-            for (int x = 0; x < width; x++)
+            EllerCell[] line = MakeLine(prevLine);
+
+            MergeAdjacent(line, mergeChance);
+            RemoveSouthWall(line);
+            WriteLine(line);
+
+            prevLine = line;
+        }
+
+        EllerCell[] lastLine = MakeLine(prevLine);
+        MergeAdjacent(lastLine, LastMergeChance);
+        WriteLine(lastLine);
+    }
+
+    EllerCell[] MakeLine(EllerCell[] prev) 
+    {
+        int row = (prev != null) ? (prev[0].Y + 1) : 0;
+
+        EllerCell[] line = new EllerCell[Width];
+        for(int x = 0; x < width; x++) 
+        {
+            line[x] = new EllerCell(x, row);
+
+            if (prev != null && prev[x].IsPath(Direction.South))    //윗줄이있고 위줄에서 남쪽벽이 없다
             {
-                cells[GridToIndex(x, y)] = new BackTrackingCell(x, y);      //셀 생성
+                line[x].setGroup = prev[x].setGroup;
+                line[x].MakePath(Direction.North);
+            }
+            else                                                    //윗줄이 없거나 윗줄에서 남쪽벽이있다.
+            {
+                line[x].setGroup = serial;
+                serial++;
             }
         }
-        FirstLine();
-        LineAssamble(0);
+        return line;
     }
 
-    void FirstLine() 
+    void MergeAdjacent(EllerCell[] line, float chance) 
     {
-        for (int x = 0; x < width; x++)
+        int count = 1;  //한줄이 모두 같은 집합에 속하지 않도록 함 
+        int w = width - 1;
+        for(int x = 0; x < w; x++) 
         {
-            EllerCell cell = (EllerCell)cells[GridToIndex(x, 0)];
-            cell.setGroup = x;
-        }
-    }
-
-    void LineAssamble(int y)
-    {
-        EllerCell[] cels = new EllerCell[width];
-        for (int x = 0; x < width; x++)
-        {
-            cels[x] = (EllerCell)cells[GridToIndex(x, y)];
-        }
-        for (int x = 0; x < width-1; x++)
-        {
-            if (cels[x].setGroup != cels[x + 1].setGroup) 
+            if (count < w && line[x].setGroup != line[x + 1].setGroup && Random.value < chance) 
             {
-                if (Random.Range(0, 1) > 0.5f) 
+                line[x].MakePath(Direction.East);
+                line[x+1].MakePath(Direction.West);
+
+                int targetGroup = line[x + 1].setGroup;
+                line[x+1].setGroup = line[x].setGroup;
+
+                for (int i = x + 2; i < width; i++) 
                 {
-                    //벽제거
-                    cels[x + 1].setGroup = cels[x].setGroup;
+                    if (line[i].setGroup == targetGroup) 
+                    {
+                        line[i].setGroup = line[x].setGroup;
+                    }
+                }
+
+                count++;
+            }
+        }
+    }
+
+    void RemoveSouthWall (EllerCell[] line)
+    {
+        Dictionary<int, List<int>> setListDic = new Dictionary<int, List<int>>();   //키 = 집합번호, 값 =  해당 집합에 속한 셀의 x좌표 
+        for (int x = 0; x < Width; x++) 
+        {
+            int key = line[x].setGroup;
+            if (!setListDic.ContainsKey(key)) 
+            {
+                setListDic[key] = new List<int>();
+            }
+            setListDic[key].Add(x);
+        }
+
+        foreach (int key in setListDic.Keys) 
+        {
+            int[] array = setListDic[key].ToArray();
+            Util.Shuffle(array);
+
+            int index = array[0];
+            line[index].MakePath(Direction.South);
+
+            int length = array.Length;
+            for (int i = 1; i < length; i++) 
+            {
+                if (Random.value < southOpenChance) 
+                {
+                    line[array[i]].MakePath(Direction.South);
                 }
             }
         }
     }
+
+    void WriteLine(EllerCell[] line) //Maze.cells에 저장
+    {
+        int index = GridToIndex(0, line[0].Y);
+        for (int x = 0; x < width; x++) 
+        {
+            cells[index + x] = line[x];
+        }
+    }
 }
-///한줄 만들기
-///위 줄을 참조해서한줄 만들기(위셀에 벽없으면 위쪽셀과 같은 집합에 포함,벽 있으면 새 집합
-///첫줄은 가로길이만큼 셀 작성, 각각 고유집합에 포함
-///옆칸끼리 합치기
-///서로 집합이 다르면 랜덤하게 벽제거, 같은 집합으로, 같은 집합일시 패스(같은줄의 같은 종류의 셀이 한번에 바뀜
-///아래벽 제거하기
-///같은 집합당 최소 하나이상의 벽이 제거됨
-///한줄완료->1번
-///마지막 줄 정리
-///생성까진 동일 합칠때 세트가 다르면 무조건 합침
