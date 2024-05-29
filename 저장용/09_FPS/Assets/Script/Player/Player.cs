@@ -8,6 +8,8 @@ public class Player : MonoBehaviour
     StarterAssetsInputs starterAssets;
     GameObject GunCamera;
 
+    public Transform FireTransform => transform.GetChild(0);
+
     private void Awake()
     {
         starterAssets = GetComponent<StarterAssetsInputs>();

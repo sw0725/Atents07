@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6906017231161863230}
   - component: {fileID: 8316799792985691166}
   - component: {fileID: 1663235255573242279}
+  - component: {fileID: 3352682193949152020}
   m_Layer: 0
   m_Name: BulletHoleEffect
   m_TagString: Untagged
@@ -111,3 +112,15 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &3352682193949152020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3430358384871125848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d3e42399cc52314583b31f4ba8c88c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
