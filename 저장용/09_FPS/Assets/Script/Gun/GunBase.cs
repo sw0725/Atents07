@@ -44,15 +44,15 @@ public class GunBase : MonoBehaviour
         isFireReady = true;
     }
 
-    void Fire()
+    public void Fire(bool isFireStart = true)
     {
         if (isFireReady && BulletCount > 0)
         {
-            FireProcess();
+            FireProcess(isFireStart);
         }
     }
 
-    protected virtual void FireProcess()
+    protected virtual void FireProcess(bool isFireStart = true)         //발사입력이 들어옴 = true
     {
         isFireReady = false;
         MuzzleEffectOn();
@@ -73,7 +73,12 @@ public class GunBase : MonoBehaviour
 
     protected void HitProcess() //총이부딪힌 곳에 따른 처리
     {
-        
+        Ray ray = new(fireTransform.position, GetFireDirection());
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, range)) 
+        {
+            Vector3 reflect = Vector3.Reflect(ray.direction, hitInfo.normal);
+            Factory.Instance.GetBulletHole(hitInfo.point, hitInfo.normal, reflect);     //노말벡터 : 특정면의 겉면에 수직인 벡터, 평면 벡터의 외적으로 구할 수 있다
+        }
     }
 
     protected void FireRecoil() 
@@ -109,6 +114,15 @@ public class GunBase : MonoBehaviour
             Gizmos.color = Color.white;
             Gizmos.DrawLine(fireTransform.position, fireTransform.position + fireTransform.forward * range);
         }
+    }
+
+    public void TestFire (bool isFireStart = true)
+    {
+        if( fireTransform == null )
+        {
+            Equip();
+        }
+        Fire(isFireStart);
     }
 #endif
 }

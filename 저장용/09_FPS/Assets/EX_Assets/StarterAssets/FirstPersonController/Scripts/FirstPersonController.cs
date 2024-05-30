@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -53,6 +54,9 @@ namespace StarterAssets
 
 		// cinemachine
 		private float _cinemachineTargetPitch;
+
+		public AnimationCurve fireUp;
+		public AnimationCurve fireDown;
 
 		// player
 		private float _speed;
@@ -264,5 +268,28 @@ namespace StarterAssets
 			// when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
 			Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
 		}
+
+		public void FireRecoil(float recoil) 
+		{
+			StartCoroutine(FireRecoilCoroutine(recoil));
+		}
+
+		IEnumerator FireRecoilCoroutine(float recoil) 
+		{
+			float timer = 0.0f;
+			while (timer > 1.0f) 
+			{
+				timer += Time.deltaTime;
+                _cinemachineTargetPitch += RotationSpeed * fireUp.Evaluate(timer);
+                yield return null;
+            }
+            timer = 0.0f;
+            while (timer > 1.0f)
+            {
+                timer += Time.deltaTime;
+                _cinemachineTargetPitch += RotationSpeed * fireDown.Evaluate(timer);
+                yield return null;
+            }
+        }
 	}
 }

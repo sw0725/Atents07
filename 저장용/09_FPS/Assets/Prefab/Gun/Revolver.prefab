@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2766020693857955480}
-  m_Layer: 0
+  - component: {fileID: 348240925299410698}
+  m_Layer: 6
   m_Name: Revolver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -33,6 +34,24 @@ Transform:
   - {fileID: 3860398977492459996}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &348240925299410698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599216583602966674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79e17e209bae3144a907c4fe15d14088, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  range: 100
+  clipSize: 6
+  damege: 10
+  fireRate: 1
+  spread: 1
+  recoil: 3
 --- !u!1001 &435648234825423010
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -95,6 +114,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MuzzleEffect
+      objectReference: {fileID: 0}
+    - target: {fileID: 7912361895415766256, guid: 18cbb414511fce74fb9c8abcfb92943c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -169,6 +193,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Model_Revolver
+      objectReference: {fileID: 0}
+    - target: {fileID: 7686864560652274102, guid: 47ad4eaa3915e8b4d95296d06d071044,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
