@@ -21,6 +21,7 @@ public class Revolver : GunBase
     {
         if (!isReloading) 
         {
+            StopAllCoroutines();    //FireProcess 실행시키는 코루틴으로 isFireReady가 true되는것 방지
             isReloading = true;
             isFireReady = false;
             StartCoroutine(Reloading());

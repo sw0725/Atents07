@@ -25,7 +25,13 @@ namespace StarterAssets
 
 		public Action<bool> onZoom;
 
+		Player player;
 		CinemachineVirtualCamera followCamera;
+
+        private void Awake()
+        {
+            player = GetComponent<Player>();
+        }
 
         private void Start()
         {
@@ -98,10 +104,15 @@ namespace StarterAssets
 
         public void OnFire(InputAction.CallbackContext context)
         {
+			player.GunFire(!context.canceled);
         }
 
         public void OnReload(InputAction.CallbackContext context)
         {
+			if (context.performed) 
+			{
+				player.GunReload();
+			}
         }
 #endif
 

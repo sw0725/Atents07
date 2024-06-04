@@ -136,19 +136,19 @@ namespace StarterAssets
 		private void CameraRotation()
 		{
 			// if there is an input
-			if (_input.look.sqrMagnitude >= _threshold)
+			//if (_input.look.sqrMagnitude >= _threshold)												//임계값 이상으로 움직일 때만 처리
 			{
 				//Don't multiply mouse input by Time.deltaTime
-				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
-				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;           //마우스를 사용할때는 그대로, 그 외 입력장치는 델타 타임을 곱해서
+                                                                                                    //_cinemachineTargetPitch: 카메라의 x축 회전(위아래)	{Yaw(y축)Pitch(x축)Roll(z축)}
+                _cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;		//마우스 위아래 움직임과 회전 속도에 따라 x축 회전량 결정
+				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;			//마우스 좌우 움직임과 회전속도에 따라 y축 회전량 결정
 
 				// clamp our pitch rotation
-				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
+				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);//최대 최소 못벗어나게
 
 				// Update Cinemachine camera target pitch
-				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
+				CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);//계산된 값기반으로 회전 생성
 
 				// rotate the player left and right
 				transform.Rotate(Vector3.up * _rotationVelocity);
@@ -276,18 +276,31 @@ namespace StarterAssets
 
 		IEnumerator FireRecoilCoroutine(float recoil) 
 		{
-			float timer = 0.0f;
-			while (timer > 1.0f) 
-			{
-				timer += Time.deltaTime;
-                _cinemachineTargetPitch += RotationSpeed * fireUp.Evaluate(timer);
-                yield return null;
-            }
-            timer = 0.0f;
-            while (timer > 1.0f)
+			float curveProcess = 0.0f;
+			float upTime = 0.05f;
+			float upMultiplier = 1 / upTime;
+
+			while (curveProcess < 1)     //커브 값은 0~1 사이이다
             {
-                timer += Time.deltaTime;
-                _cinemachineTargetPitch += RotationSpeed * fireDown.Evaluate(timer);
+				float angle = -fireUp.Evaluate(curveProcess) * recoil;
+				_cinemachineTargetPitch += angle;
+
+				curveProcess += (Time.deltaTime * upMultiplier);
+
+				yield return null;
+			}
+
+			curveProcess = 0.0f;
+			float downTime = 0.2f;
+            float downMultiplier = 1 / downTime;
+
+            while (curveProcess < 1)     //커브 값은 0~1 사이이다
+            {															//와일문의 실행 횟수가 다운이 더 많아서 발생하는 오차 보정 
+                float angle = fireDown.Evaluate(curveProcess) * recoil * (recoil * upTime);
+                _cinemachineTargetPitch += angle;
+
+                curveProcess += (Time.deltaTime * downMultiplier);
+
                 yield return null;
             }
         }

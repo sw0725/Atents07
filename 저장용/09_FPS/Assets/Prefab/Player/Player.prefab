@@ -234,6 +234,54 @@ MonoBehaviour:
   CinemachineCameraTarget: {fileID: 6046677533351514904}
   TopClamp: 89
   BottomClamp: -89
+  fireUp:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  fireDown:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &3777039216210676842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,12 +533,12 @@ PrefabInstance:
     - target: {fileID: 666580552980540056, guid: dbe18826f80107844958913cef4ce910,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9967085
       objectReference: {fileID: 0}
     - target: {fileID: 666580552980540056, guid: dbe18826f80107844958913cef4ce910,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.081068665
       objectReference: {fileID: 0}
     - target: {fileID: 666580552980540056, guid: dbe18826f80107844958913cef4ce910,
         type: 3}
@@ -505,7 +553,7 @@ PrefabInstance:
     - target: {fileID: 666580552980540056, guid: dbe18826f80107844958913cef4ce910,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -9.3
       objectReference: {fileID: 0}
     - target: {fileID: 666580552980540056, guid: dbe18826f80107844958913cef4ce910,
         type: 3}
@@ -521,6 +569,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: AssaultRifle
+      objectReference: {fileID: 0}
+    - target: {fileID: 5157595831597646752, guid: dbe18826f80107844958913cef4ce910,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5416670807043385752, guid: dbe18826f80107844958913cef4ce910,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -541,6 +599,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1293060481483448848}
     m_Modifications:
+    - target: {fileID: 518525943260266536, guid: 82fdd2de5aacf47478fbb505cd01e031,
+        type: 3}
+      propertyPath: m_OcclusionCulling
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 518525943260266536, guid: 82fdd2de5aacf47478fbb505cd01e031,
         type: 3}
       propertyPath: m_CullingMask.m_Bits
@@ -631,7 +694,7 @@ PrefabInstance:
     - target: {fileID: 1599216583602966674, guid: 5e2bfc57d0341634c817ede516580a5a,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2766020693857955480, guid: 5e2bfc57d0341634c817ede516580a5a,
         type: 3}
@@ -686,7 +749,7 @@ PrefabInstance:
     - target: {fileID: 7732074103312680849, guid: 5e2bfc57d0341634c817ede516580a5a,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -716,6 +779,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 287610103579558029, guid: eab1ad57d6d65b94ea04e21f653db7ef,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1334806527129735543, guid: eab1ad57d6d65b94ea04e21f653db7ef,
         type: 3}
@@ -765,6 +833,11 @@ PrefabInstance:
     - target: {fileID: 1334806527129735543, guid: eab1ad57d6d65b94ea04e21f653db7ef,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5411599941193152908, guid: eab1ad57d6d65b94ea04e21f653db7ef,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8636260918234790082, guid: eab1ad57d6d65b94ea04e21f653db7ef,
