@@ -14,7 +14,6 @@ public class Player : MonoBehaviour
     GunBase[] guns;
 
     GunBase activeGun;
-    GunBase defaultGun;
 
     private void Awake()
     {
@@ -24,7 +23,6 @@ public class Player : MonoBehaviour
 
         Transform c = transform.GetChild(3);
         guns = c.GetComponentsInChildren<GunBase>(true);
-        defaultGun = guns[0];
     }
 
     private void Start()
@@ -36,9 +34,10 @@ public class Player : MonoBehaviour
         {
             gun.onFire += controller.FireRecoil;
             gun.onFire += (expand) => crosshair.Expend(expand * 10);
+            gun.onAmmoDepleted += () => GunChange(GunType.Revolver);
         }
 
-        activeGun = defaultGun;
+        activeGun = guns[0];
         activeGun.Equip();
         onGunChange?.Invoke(activeGun);
     }
@@ -50,8 +49,8 @@ public class Player : MonoBehaviour
 
     public void GunChange(GunType gun) 
     {
-        activeGun.gameObject.SetActive(false);
         activeGun.UnEquip();
+        activeGun.gameObject.SetActive(false);
 
         activeGun = guns[(int)gun];
         activeGun.Equip();

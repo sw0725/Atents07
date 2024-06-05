@@ -678,8 +678,8 @@ MonoBehaviour:
   direction: 13
   cellVisualizer: {fileID: 1081088902}
   backTracking: {fileID: 1143915410}
-  width: 10
-  height: 10
+  width: 20
+  height: 20
   eller: {fileID: 634301632}
   wilson: {fileID: 1612982922}
 --- !u!4 &1861578647

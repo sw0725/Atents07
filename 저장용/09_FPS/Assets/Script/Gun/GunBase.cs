@@ -21,6 +21,7 @@ public class GunBase : MonoBehaviour
     public float recoil;
 
     public Action<int> onBulletCountChange; //남은 총알 갯수
+    public Action onAmmoDepleted; //남은 총알 갯수
     public Action<float> onFire;            //반동
 
     protected Transform fireTransform;        //플레이어 카메라 위치
@@ -32,6 +33,11 @@ public class GunBase : MonoBehaviour
         {
             bulletCount = value;
             onBulletCountChange?.Invoke(bulletCount);
+
+            if(bulletCount < 1) 
+            {
+                onAmmoDepleted?.Invoke();
+            }
         }
     }
     int bulletCount;
@@ -63,8 +69,8 @@ public class GunBase : MonoBehaviour
     {
         isFireReady = false;
         MuzzleEffectOn();
-        BulletCount--;
         StartCoroutine(FireReady());
+        BulletCount--;
     }
 
     IEnumerator FireReady () 

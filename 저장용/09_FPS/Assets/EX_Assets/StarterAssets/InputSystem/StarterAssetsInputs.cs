@@ -104,7 +104,14 @@ namespace StarterAssets
 
         public void OnFire(InputAction.CallbackContext context)
         {
-			player.GunFire(!context.canceled);
+			if (context.performed) 
+			{
+				player.GunFire(true);
+			}
+			else if (context.canceled) 
+			{
+				player.GunFire(false);
+			}	
         }
 
         public void OnReload(InputAction.CallbackContext context)
