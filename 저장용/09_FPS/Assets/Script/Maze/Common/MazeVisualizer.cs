@@ -8,7 +8,7 @@ public class MazeVisualizer : MonoBehaviour
 
     public void Draw(Maze maze) 
     {
-        float size = CellVisualizer.cellSize;
+        float size = CellVisualizer.CellSize;
         foreach(var cell in maze.Cells) 
         {
             GameObject obj = Instantiate(cellPrefab, transform);
@@ -30,11 +30,18 @@ public class MazeVisualizer : MonoBehaviour
         }
     }
 
-    public Vector3 GridToWorld(int x, int y)
+    public static Vector3 GridToWorld(int x, int y)
     {
-        float size = CellVisualizer.cellSize;
+        float size = CellVisualizer.CellSize;
         float sizeHalf = size * 0.5f;
 
         return new(size * x + sizeHalf, size * -y - sizeHalf);//
+    }
+
+    public static Vector2Int WorldToGrid(Vector3 world) 
+    {
+        float size = CellVisualizer.CellSize;
+        Vector2Int result = new((int)(world.x / size), (int)(-world.z / size));
+        return result;
     }
 }

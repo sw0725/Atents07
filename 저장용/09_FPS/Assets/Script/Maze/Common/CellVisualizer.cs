@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CellVisualizer : MonoBehaviour
 {
-    public const float cellSize = 10.0f;
+    public const float CellSize = 10.0f;
 
     GameObject[] walls;
 
