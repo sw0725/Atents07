@@ -86,8 +86,9 @@ public class Enemy : MonoBehaviour
     //탐색=======================================
 
     public float findTime = 5.0f;
-
     public float findTimeElapsed = 0.0f;
+
+    Transform chaseTarget = null;
 
     //기타=======================================
 
@@ -106,6 +107,8 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        SphereCollider sphere = GetComponent<SphereCollider>();
+        sphere.radius = sightRange;
     }
 
     private void OnEnable()
@@ -115,12 +118,18 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        
+        if (other.CompareTag("Player")) 
+        {
+            chaseTarget = other.transform;
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        
+        if (other.CompareTag("Player"))
+        {
+            chaseTarget = null;
+        }
     }
 
     private void Update()
@@ -130,7 +139,11 @@ public class Enemy : MonoBehaviour
 
     private void Update_Wander()
     {
-        if(!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) 
+        if (FindPlayer()) 
+        {
+            State = BehaviorState.Chase;
+        }
+        else if(!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) 
         {
             agent.SetDestination(GetRandomDestination());
         }
@@ -138,7 +151,14 @@ public class Enemy : MonoBehaviour
 
     private void Update_Chase()
     {
-
+        if (IsPlayerInSight(out Vector3 pos))
+        {
+            agent.SetDestination(pos);
+        }
+        else if(!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+        {
+            State = BehaviorState.Find;
+        }
     }
 
     private void Update_Find()
@@ -166,6 +186,8 @@ public class Enemy : MonoBehaviour
                 agent.SetDestination(GetRandomDestination());
                 break;
             case BehaviorState.Chase:
+                onUpdate = Update_Chase;
+                agent.speed = runSpeed;
                 break;
             case BehaviorState.Find:
                 break;
@@ -180,10 +202,6 @@ public class Enemy : MonoBehaviour
     {
         switch (state) 
         {
-            case BehaviorState.Wander:
-                break; 
-            case BehaviorState.Chase:
-                break;
             case BehaviorState.Find: 
                 break;
             case BehaviorState.Attack:
@@ -191,6 +209,8 @@ public class Enemy : MonoBehaviour
             case BehaviorState.Dead:
                 gameObject.SetActive(true);
                 HP = MaxHP;
+                break;
+            default:
                 break;
         }
     }
@@ -218,13 +238,36 @@ public class Enemy : MonoBehaviour
 
     bool FindPlayer()           //플레이어 탐색 시도 true = 찾음
     {
-        return false;
+        bool result = false;
+        if(chaseTarget != null) 
+        {
+            result = IsPlayerInSight(out _);
+        }
+        return result;
     }
 
     bool IsPlayerInSight(out Vector3 pos) //플레이어가 시야범위안에 있는가
     {
+        bool result = false;
         pos = Vector3.zero;
-        return false;
+        if (chaseTarget != null) 
+        {
+            Vector3 dir = chaseTarget.position - transform.position;
+            Ray ray = new Ray(transform.position + Vector3.up * 1.9f, dir);
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, sightRange, LayerMask.GetMask("Player", "Wall")))
+            {
+                if (hitInfo.transform == chaseTarget)
+                {
+                    float angle = Vector3.Angle(transform.forward, dir);    //무조건 양수값(작은각으로 반환)
+                    if(angle * 2 < sightAngle)                              // = angle < sightAngle/2
+                    {
+                        pos = chaseTarget.position;
+                        result = true;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     IEnumerator LookAround() 
@@ -248,6 +291,11 @@ public class Enemy : MonoBehaviour
     private void OnDrawGizmos()
     {
         //사야각 그리기 상태별로 다른색
+    }
+
+    public Vector3 Test_GetRandomPosition() 
+    {
+        return GetRandomDestination();
     }
 
 #endif
