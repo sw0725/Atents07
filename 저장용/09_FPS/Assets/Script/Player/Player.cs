@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public Transform FireTransform => transform.GetChild(0);
 
     public Action<GunBase> onGunChange;
+    public Action onDie;
 
     StarterAssetsInputs starterAssets;
     FirstPersonController controller;
@@ -34,7 +35,13 @@ public class Player : MonoBehaviour
         {
             gun.onFire += controller.FireRecoil;
             gun.onFire += (expand) => crosshair.Expend(expand * 10);
-            gun.onAmmoDepleted += () => GunChange(GunType.Revolver);
+            gun.onAmmoDepleted += () => 
+            {
+                if (!(activeGun is Revolver))   //a is b a가 b타입일때 true
+                {
+                    GunChange(GunType.Revolver);
+                }       
+            };
         }
 
         activeGun = guns[0];
@@ -79,5 +86,10 @@ public class Player : MonoBehaviour
         {
             gun.onBulletCountChange += callback;
         }
+    }
+
+    public void onAttacked(Enemy enemy) 
+    {
+        
     }
 }

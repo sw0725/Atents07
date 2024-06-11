@@ -563,6 +563,7 @@ MonoBehaviour:
   seed: -1
   enemy: {fileID: 8356331278350285191}
   respawn: {fileID: 888598600}
+  behaviorState: 0
 --- !u!1001 &746329221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1435,7 +1436,7 @@ PrefabInstance:
     - target: {fileID: 9005220659476430821, guid: 2d3a85ecde41a8246a79669975912b74,
         type: 3}
       propertyPath: m_CullingMask.m_Bits
-      value: 279
+      value: 791
       objectReference: {fileID: 0}
     - target: {fileID: 9005220659476430823, guid: 2d3a85ecde41a8246a79669975912b74,
         type: 3}

@@ -8,6 +8,8 @@ public class Test12_Enemy : TestBase
     public Enemy enemy;
     public Transform respawn;
 
+    public Enemy.BehaviorState behaviorState = Enemy.BehaviorState.Wander;
+
     private void Start()
     {
         enemy.Respawn(respawn.position);
@@ -15,8 +17,8 @@ public class Test12_Enemy : TestBase
 
     protected override void OnTest1(InputAction.CallbackContext context)
     {
-        base.OnTest1(context);
+        enemy.Test_StateChange(behaviorState);
     }
 }
 
-//적의 상태 구현, 기즈모 그리기
+//배회 녹색, 추적 주황, 탐색 파랑, 공격 빨강, 사망 검정

@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 311482326339213146}
   - component: {fileID: 5857702235974393948}
   - component: {fileID: 9177729771288930351}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Arm_R
-  m_TagString: Untagged
+  m_TagString: Arm
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -117,9 +117,9 @@ GameObject:
   - component: {fileID: 7900077399881630451}
   - component: {fileID: 448908858785428849}
   - component: {fileID: 8106633311700010546}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Body
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -219,7 +219,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7171081771894872222}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -409,7 +409,7 @@ GameObject:
   - component: {fileID: 3848594930331236057}
   - component: {fileID: 6662233418486846126}
   - component: {fileID: 980276793837366808}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -518,6 +518,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hp: 30
   MaxHP: 30
+  stateEyeColors:
+  - {r: 0, g: 3.9322586, b: 0.03418211, a: 0}
+  - {r: 5.2003465, g: 4.086608, b: 0, a: 0}
+  - {r: 0, g: 0.14163822, b: 6.9428716, a: 0}
+  - {r: 4.524723, g: 0.0000003775723, b: 0, a: 0}
+  - {r: 0, g: 0, b: 0, a: 0}
   walkSpeed: 2
   runSpeed: 7
   sightAngle: 90
@@ -538,7 +544,7 @@ GameObject:
   - component: {fileID: 6309994957636549488}
   - component: {fileID: 144743397264844422}
   - component: {fileID: 148875036317480711}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Eye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -643,9 +649,9 @@ GameObject:
   - component: {fileID: 3538375561940962151}
   - component: {fileID: 2299320363265747483}
   - component: {fileID: 4761737663087054139}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Leg_R
-  m_TagString: Untagged
+  m_TagString: Leg
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -748,9 +754,9 @@ GameObject:
   - component: {fileID: 1741518563898839965}
   - component: {fileID: 4927376949430137223}
   - component: {fileID: 7620016993524741892}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Leg_L
-  m_TagString: Untagged
+  m_TagString: Leg
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -853,9 +859,9 @@ GameObject:
   - component: {fileID: 3350850487938699284}
   - component: {fileID: 6539230309290156681}
   - component: {fileID: 4898190127377232611}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Head
-  m_TagString: Untagged
+  m_TagString: Head
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -959,9 +965,9 @@ GameObject:
   - component: {fileID: 3921293391261565549}
   - component: {fileID: 7160870972407408568}
   - component: {fileID: 5757851593922655487}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Arm_L
-  m_TagString: Untagged
+  m_TagString: Arm
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

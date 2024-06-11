@@ -52,4 +52,22 @@ public class Factory : Singltrun<Factory>
         item.transform.position = pos;
         return item;
     }
+
+    public ItemBase GetDropItem(Enemy.ItemTable table, Vector3 position) 
+    {
+        ItemBase item = null;
+        switch (table) 
+        {
+            case Enemy.ItemTable.AssaultRifle:
+                item = GetAssaultRifle(position);
+                break;
+            case Enemy.ItemTable.ShotGun:
+                item = GetShotGun(position);
+                break;
+            default:
+                item = GetHealPack(position);
+                break;
+        }
+        return item;
+    }
 }

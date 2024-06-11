@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX;
+using static UnityEditor.FilePathAttribute;
 
 public enum GunType : byte 
 {
@@ -87,10 +88,36 @@ public class GunBase : MonoBehaviour
     protected void HitProcess() //총이부딪힌 곳에 따른 처리
     {
         Ray ray = new(fireTransform.position, GetFireDirection());
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, range)) 
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, range, ~LayerMask.GetMask("Default"))) //디폴트 레이어 빼고 전부 체크 비트연산에서 ! = ~ 
         {
-            Vector3 reflect = Vector3.Reflect(ray.direction, hitInfo.normal);
-            Factory.Instance.GetBulletHole(hitInfo.point, hitInfo.normal, reflect);     //노말벡터 : 특정면의 겉면에 수직인 벡터, 평면 벡터의 외적으로 구할 수 있다
+            if (!hitInfo.collider.isTrigger) 
+            {
+                if (!hitInfo.collider.isTrigger && hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Enemy"))           //GetMarsk = 레이어 여러개가능, 해당 비트 반환 // NameToLayer = 레이어 하나만, 레이어 번호 반환
+                {
+                    Enemy target = hitInfo.collider.GetComponentInParent<Enemy>();
+                    if (hitInfo.collider.CompareTag("Head"))
+                    {
+                        target.OnAttacked(HitLocation.Head, damege);
+                    }
+                    else if (hitInfo.collider.CompareTag("Arm"))
+                    {
+                        target.OnAttacked(HitLocation.Arm, damege);
+                    }
+                    else if (hitInfo.collider.CompareTag("Leg"))
+                    {
+                        target.OnAttacked(HitLocation.Leg, damege);
+                    }
+                    else if (hitInfo.collider.CompareTag("Body"))
+                    {
+                        target.OnAttacked(HitLocation.Body, damege);
+                    }
+                }
+                else
+                {
+                    Vector3 reflect = Vector3.Reflect(ray.direction, hitInfo.normal);
+                    Factory.Instance.GetBulletHole(hitInfo.point, hitInfo.normal, reflect);     //노말벡터 : 특정면의 겉면에 수직인 벡터, 평면 벡터의 외적으로 구할 수 있다
+                }
+            }
         }
     }
 

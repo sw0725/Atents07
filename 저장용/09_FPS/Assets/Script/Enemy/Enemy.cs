@@ -61,6 +61,13 @@ public class Enemy : MonoBehaviour
 
     Action onUpdate = null;
 
+    [ColorUsage(false, true)]   //알파값과 hdr값 사용 여부
+    public Color[] stateEyeColors;
+
+    Material eyeColor;
+
+    readonly int EyeColorID = Shader.PropertyToID("_BaceColor");
+
     //이동======================================
 
     public float walkSpeed = 2.0f;
@@ -94,7 +101,7 @@ public class Enemy : MonoBehaviour
 
     NavMeshAgent agent;
 
-    enum ItemTable : byte
+    public enum ItemTable : byte
     {
         Heal,
         AssaultRifle,
@@ -109,6 +116,25 @@ public class Enemy : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         SphereCollider sphere = GetComponent<SphereCollider>();
         sphere.radius = sightRange;
+
+        Transform c = transform.GetChild(1);
+        AttackSensor attackSensor = c.GetComponent<AttackSensor>();
+        attackSensor.onSensorTriggered += (target) => 
+        {
+            if(attackTarget == null)
+            {
+                attackTarget = target.GetComponent<Player>();
+                attackTarget.onDie += ReturnWander;
+                State = BehaviorState.Attack;
+            }
+        };
+
+        c =transform.GetChild(0);
+        c = c.GetChild(0);
+        c = c.GetChild(0);
+        Renderer rand = c.GetComponent<Renderer>();
+        eyeColor = rand.material;
+        eyeColor.SetColor(EyeColorID, stateEyeColors[(int)BehaviorState.Wander]);
     }
 
     private void OnEnable()
@@ -163,12 +189,26 @@ public class Enemy : MonoBehaviour
 
     private void Update_Find()
     {
-
+        findTimeElapsed += Time.deltaTime;
+        if (findTimeElapsed > findTime)
+        {
+            State = BehaviorState.Wander;
+        } 
+        else if (FindPlayer()) 
+        {
+            State = BehaviorState.Chase;
+        }
     }
 
     private void Update_Attack()
     {
-
+        agent.SetDestination(attackTarget.transform.position);
+        attackElapsed += Time.deltaTime;
+        if(attackElapsed > attackInterval) 
+        {
+            Attack();
+            attackElapsed = 0.0f;
+        }
     }
 
     private void Update_Dead()
@@ -178,22 +218,35 @@ public class Enemy : MonoBehaviour
 
     void OnStateEnter(BehaviorState state)
     {
+        eyeColor.SetColor(EyeColorID, stateEyeColors[(int)state]);
         switch (state)
         {
             case BehaviorState.Wander:
                 onUpdate = Update_Wander;
-                agent.speed = walkSpeed;
+                agent.speed = walkSpeed * (1 - speedPenalty);
                 agent.SetDestination(GetRandomDestination());
                 break;
             case BehaviorState.Chase:
                 onUpdate = Update_Chase;
-                agent.speed = runSpeed;
+                agent.speed = runSpeed * (1 - speedPenalty);
                 break;
             case BehaviorState.Find:
+                onUpdate = Update_Find;
+                findTimeElapsed = 0.0f;
+                agent.speed = walkSpeed * (1 - speedPenalty);
+                agent.angularSpeed = 360.0f;
+                StartCoroutine(LookAround());
                 break;
             case BehaviorState.Attack:
+                onUpdate= Update_Attack;
                 break;
             case BehaviorState.Dead:
+                DropItem();
+                onUpdate= Update_Dead;
+                agent.speed = 0.0f;
+                agent.velocity = Vector3.zero;
+                onDie?.Invoke(this);                //부활 요청
+                gameObject.SetActive(false);
                 break;
         }
     }
@@ -202,13 +255,19 @@ public class Enemy : MonoBehaviour
     {
         switch (state) 
         {
-            case BehaviorState.Find: 
+            case BehaviorState.Find:
+                agent.angularSpeed = 120.0f;
+                StopAllCoroutines();
                 break;
             case BehaviorState.Attack:
+                attackTarget.onDie -= ReturnWander;
+                attackTarget = null;
                 break;
             case BehaviorState.Dead:
                 gameObject.SetActive(true);
                 HP = MaxHP;
+                speedPenalty = 0.0f;
+                attackPowerPenalty = 0.0f;
                 break;
             default:
                 break;
@@ -228,12 +287,46 @@ public class Enemy : MonoBehaviour
 
     void Attack() 
     {
-    
+        Debug.Log("attack to player");
+        attackTarget.onAttacked(this);
     }
 
     public void OnAttacked(HitLocation hit, float damege) 
     {
-        //즉시 추적
+        HP -= damege;
+        switch (hit) 
+        {
+            case HitLocation.Body:
+                Debug.Log("Body Hit");
+                break;
+            case HitLocation.Head:
+                HP -= damege;
+                Debug.Log("Head Hit");
+                break;
+            case HitLocation.Arm:
+                attackPowerPenalty += 0.1f;
+                Debug.Log("Arm Hit");
+                break;
+            case HitLocation.Leg:
+                speedPenalty += 0.3f;
+                Debug.Log("Leg Hit");
+                break;
+        }
+
+        if(State == BehaviorState.Wander || State == BehaviorState.Find) 
+        {
+            State = BehaviorState.Chase;
+            agent.SetDestination(GameManager.Instance.Player.transform.position);
+        }
+        else 
+        {
+            agent.speed = runSpeed * (1 - speedPenalty);    
+        }
+    }
+
+    void ReturnWander() 
+    {
+        State = BehaviorState.Wander;
     }
 
     bool FindPlayer()           //플레이어 탐색 시도 true = 찾음
@@ -272,7 +365,27 @@ public class Enemy : MonoBehaviour
 
     IEnumerator LookAround() 
     {
-        yield return null;
+        Vector3[] positions =
+        {
+            transform.position + transform.forward * 1.5f,
+            transform.position - transform.forward * 1.5f,
+            transform.position + transform.right * 1.5f,
+            transform.position - transform.right * 1.5f,
+        };
+
+        int index = 0;
+        int prev = 0;
+        int length = positions.Length;
+        while (true) 
+        {
+            do
+            {
+                index = UnityEngine.Random.Range(0, length);
+            } while (index == prev);
+            agent.SetDestination(positions[index]);
+            prev = index;
+            yield return new WaitForSeconds(1);
+        }
     }
 
     public void Respawn(Vector3 spawnPos) 
@@ -283,7 +396,24 @@ public class Enemy : MonoBehaviour
 
     void DropItem(ItemTable table = ItemTable.Random) 
     {
-        
+        ItemTable select = table;
+        if (table == ItemTable.Random) 
+        {
+            float rand = UnityEngine.Random.value;
+            if (rand < 0.8f) 
+            {
+                select = ItemTable.Heal;
+            }
+            else if (rand < 0.9f)
+            {
+                select = ItemTable.AssaultRifle;
+            }
+            else
+            {
+                select = ItemTable.ShotGun;
+            }
+        }
+        Factory.Instance.GetDropItem(select, transform.position);
     }
 
 #if UNITY_EDITOR
@@ -298,5 +428,17 @@ public class Enemy : MonoBehaviour
         return GetRandomDestination();
     }
 
+    public void Test_StateChange(BehaviorState state) 
+    {
+        State = state;
+        agent.speed = 0;
+        agent.velocity = Vector3.zero;
+    }
+
+    public void Test_EnemyStop() 
+    {
+        agent.speed = 0.0f;
+        agent.velocity = Vector3.zero;
+    }
 #endif
 }
