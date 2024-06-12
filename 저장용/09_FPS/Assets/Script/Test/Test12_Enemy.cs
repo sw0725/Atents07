@@ -19,6 +19,11 @@ public class Test12_Enemy : TestBase
     {
         enemy.Test_StateChange(behaviorState);
     }
+
+    protected override void OnTest2(InputAction.CallbackContext context)
+    {
+        Enemy enemy = FindAnyObjectByType<Enemy>();
+        enemy.OnAttacked(HitLocation.Body, 1000);
+    }
 }
 
-//¹èÈ¸ ³ì»ö, ÃßÀû ÁÖÈ², Å½»ö ÆÄ¶û, °ø°Ý »¡°­, »ç¸Á °ËÁ¤

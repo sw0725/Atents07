@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
@@ -15,10 +16,14 @@ public class MazeGenerator : MonoBehaviour
     }
     public MazeAlgorithm mazeAlgorithm = MazeAlgorithm.Wilson;
     public int seed = -1;
+    public Action onMazeGenerated;
 
     MazeVisualizer visualizer;
     NavMeshSurface surface;              //네브메쉬 생성은 오래걸리니까 비동기방식이 굿
     AsyncOperation async;
+
+    public Maze Maze => maze;
+    Maze maze = null;
 
     private void Awake()
     {
@@ -28,7 +33,6 @@ public class MazeGenerator : MonoBehaviour
 
     public void Generate(int width, int height, MazeAlgorithm algorithm = MazeAlgorithm.Wilson) 
     {
-        Maze maze = null;
         switch (algorithm) 
         {
             case MazeAlgorithm.RecursiveBackTracking:
@@ -55,5 +59,7 @@ public class MazeGenerator : MonoBehaviour
         {
             yield return null;
         }
+        //오클루젼 컬링베이크
+        onMazeGenerated?.Invoke();
     }
 }

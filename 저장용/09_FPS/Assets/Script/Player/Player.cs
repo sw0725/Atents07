@@ -4,10 +4,29 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public float MaxHP = 100.0f;
+    public float HP 
+    {
+        get => hp;
+        set 
+        {
+            hp = value;
+            if (hp < 0.1f) 
+            {
+                Die();
+            }
+            hp = Mathf.Clamp(hp, 0, MaxHP);
+            onHPChange?.Invoke(hp);
+        }
+    }
+    float hp;
+
     public Transform FireTransform => transform.GetChild(0);
 
     public Action<GunBase> onGunChange;
     public Action onDie;
+    public Action<float> onHPChange;       //현재 hp
+    public Action<float> onAttacked;       //공격받은 각도(정면 0, 후면 180)
 
     StarterAssetsInputs starterAssets;
     FirstPersonController controller;
@@ -47,6 +66,8 @@ public class Player : MonoBehaviour
         activeGun = guns[0];
         activeGun.Equip();
         onGunChange?.Invoke(activeGun);
+
+        HP = MaxHP;
     }
 
     void DisableGunCamera(bool disable = true) 
@@ -88,8 +109,18 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void onAttacked(Enemy enemy) 
+    public void OnAttacked(Enemy enemy) 
     {
-        
+        Vector3 dir = enemy.transform.position - transform.position;
+                                                                                  //Vector3.up월드의 업방향 // transform.up 로컬의 업방향
+        float angle = Vector3.SignedAngle(transform.forward, dir, Vector3.up);    //angle = 0-180사이의 각도만 반환, 오른쪽 왼쪽 구분 불가 //SignedAngle = 0-360 반환 축기준 으로 회전각 나옴
+        onAttacked?.Invoke(-angle);
+        HP -= enemy.attackPower;
+    }
+
+    void Die() 
+    {
+        onDie?.Invoke();
+        gameObject.SetActive(false);
     }
 }

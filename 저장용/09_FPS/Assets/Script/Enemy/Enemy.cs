@@ -288,7 +288,7 @@ public class Enemy : MonoBehaviour
     void Attack() 
     {
         Debug.Log("attack to player");
-        attackTarget.onAttacked(this);
+        attackTarget.OnAttacked(this);
     }
 
     public void OnAttacked(HitLocation hit, float damege) 
