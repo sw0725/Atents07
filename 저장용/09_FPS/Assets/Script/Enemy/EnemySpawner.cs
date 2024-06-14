@@ -26,6 +26,7 @@ public class EnemySpawner : MonoBehaviour
             Enemy enemy = obj.GetComponent<Enemy>();
             enemy.onDie += (target) =>
             {
+                GameManager.Instance.IncreaseKillCount();
                 StartCoroutine(Respawn(target));
             };
             enemy.Respawn(GetRandomSpawnPosition(true));
@@ -46,13 +47,18 @@ public class EnemySpawner : MonoBehaviour
 
         int x;
         int y;
-
+        int limit = 100;
         do
         {
             int index = Random.Range(0, mazeHeight * mazeWidth);
             x = index / mazeWidth;
             y = index % mazeHeight;
-        } while (x < playerPos.x + 5 && x > playerPos.x - 5 && y < playerPos.y + 5 && y > playerPos.y - 5);
+            limit--;
+            if (limit < 1) 
+            {
+                break;
+            }
+        } while (!(x < playerPos.x + 5 && x > playerPos.x - 5 && y < playerPos.y + 5 && y > playerPos.y - 5));
 
         Vector3 world = MazeVisualizer.GridToWorld(x, y);
 

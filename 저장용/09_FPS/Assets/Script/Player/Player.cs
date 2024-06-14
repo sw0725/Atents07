@@ -123,4 +123,9 @@ public class Player : MonoBehaviour
         onDie?.Invoke();
         gameObject.SetActive(false);
     }
+
+    public void InputDisable() 
+    {
+        starterAssets.enabled = false;     //컴포넌트 비활성화
+    }
 }

@@ -18,12 +18,12 @@ public class MazeGenerator : MonoBehaviour
     public int seed = -1;
     public Action onMazeGenerated;
 
+    public Maze Maze => maze;
+    Maze maze = null;
+
     MazeVisualizer visualizer;
     NavMeshSurface surface;              //네브메쉬 생성은 오래걸리니까 비동기방식이 굿
     AsyncOperation async;
-
-    public Maze Maze => maze;
-    Maze maze = null;
 
     private void Awake()
     {
@@ -49,6 +49,7 @@ public class MazeGenerator : MonoBehaviour
 
         visualizer.Clear();
         visualizer.Draw(maze);
+
         StartCoroutine(UpdateSurface());
     }
 
