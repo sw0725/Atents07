@@ -5,8 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(SphereCollider))]
 public class Goal : MonoBehaviour
 {
-    public System.Action onGameClear;
-
     public void SetRandomPos(int width, int height) 
     {
         Vector2Int result = new Vector2Int();
@@ -38,7 +36,7 @@ public class Goal : MonoBehaviour
     {
         if (other.CompareTag("Player")) 
         {
-            onGameClear?.Invoke();
+            GameManager.Instance.GameClear();
         }
     }
 

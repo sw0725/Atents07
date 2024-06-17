@@ -37,11 +37,12 @@ public class Enemy : MonoBehaviour
     
     public enum BehaviorState : byte 
     {
-        Wander = 0,
+        Idle = 0,
+        Wander,
         Chase,
         Find,   //추적도중 플레이어가 시야에서 벗어나면 탐색한다
         Attack, //추적도중 범위한에 들어오면 일정주기로 공격
-        Dead    //일정사간 후에 재생성
+        Dead,   //일정시간 후에 재생성
     }
 
     BehaviorState State 
@@ -90,6 +91,8 @@ public class Enemy : MonoBehaviour
 
     Player attackTarget = null;
 
+    AttackSensor attackSensor;
+
     //탐색=======================================
 
     public float findTime = 5.0f;
@@ -118,7 +121,7 @@ public class Enemy : MonoBehaviour
         sphere.radius = sightRange;
 
         Transform c = transform.GetChild(1);
-        AttackSensor attackSensor = c.GetComponent<AttackSensor>();
+        attackSensor = c.GetComponent<AttackSensor>();
         attackSensor.onSensorTriggered += (target) => 
         {
             if(attackTarget == null)
@@ -132,9 +135,12 @@ public class Enemy : MonoBehaviour
         c =transform.GetChild(0);
         c = c.GetChild(0);
         c = c.GetChild(0);
+
         Renderer rand = c.GetComponent<Renderer>();
         eyeColor = rand.material;
         eyeColor.SetColor(EyeColorID, stateEyeColors[(int)BehaviorState.Wander]);
+
+        onUpdate = Update_Idle;
     }
 
     private void OnEnable()
@@ -162,7 +168,10 @@ public class Enemy : MonoBehaviour
     {
         onUpdate();
     }
+    private void Update_Idle()
+    {
 
+    }
     private void Update_Wander()
     {
         if (FindPlayer()) 
@@ -203,6 +212,10 @@ public class Enemy : MonoBehaviour
     private void Update_Attack()
     {
         agent.SetDestination(attackTarget.transform.position);
+
+        Quaternion target = Quaternion.LookRotation(attackTarget.transform.position - transform.position);
+        transform.rotation = Quaternion.Lerp(transform.rotation, target, Time.deltaTime);
+
         attackElapsed += Time.deltaTime;
         if(attackElapsed > attackInterval) 
         {
@@ -221,6 +234,11 @@ public class Enemy : MonoBehaviour
         eyeColor.SetColor(EyeColorID, stateEyeColors[(int)state]);
         switch (state)
         {
+            case BehaviorState.Idle:
+                onUpdate = Update_Idle;
+                agent.speed = 0.0f;
+                attackSensor.gameObject.SetActive(false);
+                break;
             case BehaviorState.Wander:
                 onUpdate = Update_Wander;
                 agent.speed = walkSpeed * (1 - speedPenalty);
@@ -253,8 +271,12 @@ public class Enemy : MonoBehaviour
 
     void OnStateExit(BehaviorState state)
     {
-        switch (state) 
+        switch (state)
         {
+            case BehaviorState.Idle:
+                agent.speed = walkSpeed;
+                attackSensor.gameObject.SetActive(true);
+                break;
             case BehaviorState.Find:
                 agent.angularSpeed = 120.0f;
                 StopAllCoroutines();
@@ -388,10 +410,17 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void Respawn(Vector3 spawnPos) 
+    public void Respawn(Vector3 spawnPos, bool init = false) 
     {
         agent.Warp(spawnPos);
-        State = BehaviorState.Wander;
+        if (init)
+        {
+            State = BehaviorState.Idle;
+        }
+        else 
+        {
+            State = BehaviorState.Wander;
+        }
     }
 
     void DropItem(ItemTable table = ItemTable.Random) 
@@ -414,6 +443,16 @@ public class Enemy : MonoBehaviour
             }
         }
         Factory.Instance.GetDropItem(select, transform.position);
+    }
+
+    public void Play()
+    {
+        State = BehaviorState.Wander;
+    }
+
+    public void Stop() 
+    {
+        State = BehaviorState.Idle;
     }
 
 #if UNITY_EDITOR

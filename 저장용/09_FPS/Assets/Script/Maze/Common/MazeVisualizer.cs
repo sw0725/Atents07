@@ -5,6 +5,7 @@ using UnityEngine;
 public class MazeVisualizer : MonoBehaviour
 {
     public GameObject cellPrefab;
+    public GameObject goalPrefab;
 
     public void Draw(Maze maze) 
     {
@@ -18,6 +19,10 @@ public class MazeVisualizer : MonoBehaviour
             CellVisualizer cellVisualizer = obj.GetComponent<CellVisualizer>();
             cellVisualizer.RefreshWall(cell.Path);
         }
+
+        GameObject goalObj = Instantiate(goalPrefab, transform);
+        Goal goal = goalObj.GetComponent<Goal>();
+        goal.SetRandomPos(maze.Width, maze.Height);
     }
 
     public void Clear() 

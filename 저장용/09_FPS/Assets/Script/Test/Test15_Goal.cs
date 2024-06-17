@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class Test15_Goal : TestBase
 {
+
     protected override void OnTest1(InputAction.CallbackContext context)
     {
         Enemy enemy = FindAnyObjectByType<Enemy>();
@@ -39,8 +40,11 @@ public class Test15_Goal : TestBase
 
     protected override void OnTest4(InputAction.CallbackContext context)
     {
-        Goal goal = FindAnyObjectByType<Goal>();
+        GameManager.Instance.onGameClear += (_) => Debug.Log("Goal");
+    }
 
-        goal.onGameClear += () => Debug.Log("Clear");
+    protected override void OnTest5(InputAction.CallbackContext context)
+    {
+        GameManager.Instance.GameStart();
     }
 }

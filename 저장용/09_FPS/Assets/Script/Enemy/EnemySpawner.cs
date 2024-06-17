@@ -11,26 +11,23 @@ public class EnemySpawner : MonoBehaviour
     int mazeHeight;
 
     Player player;
+    Enemy[] enemies;
+
+    private void Awake()
+    {
+        enemies = new Enemy[enemyCount];
+    }
 
     void Start() 
     {
         mazeWidth = GameManager.Instance.MazeWidth;
         mazeHeight = GameManager.Instance.MazeHeight;
-
         player = GameManager.Instance.Player;
 
-        for (int i = 0; i < enemyCount; i++) 
-        {
-            GameObject obj = Instantiate(enemyPrefab, transform);
-            obj.name = $"Enemy_{i}";
-            Enemy enemy = obj.GetComponent<Enemy>();
-            enemy.onDie += (target) =>
-            {
-                GameManager.Instance.IncreaseKillCount();
-                StartCoroutine(Respawn(target));
-            };
-            enemy.Respawn(GetRandomSpawnPosition(true));
-        }
+        EnemyAllSpawn();
+
+        GameManager.Instance.onGameStart += EnemyAllPlay;
+        GameManager.Instance.onGameClear += (_) => EnemyAllStop();
     }
 
     Vector3 GetRandomSpawnPosition(bool init = false) //플레이어 주변의 랜덤 위치 반환 // init = 플레이어가 존재하지 않음
@@ -69,5 +66,38 @@ public class EnemySpawner : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
         target.Respawn(GetRandomSpawnPosition());
+    }
+
+    public void EnemyAllSpawn() 
+    {
+        for (int i = 0; i < enemyCount; i++)
+        {
+            GameObject obj = Instantiate(enemyPrefab, transform);
+            obj.name = $"Enemy_{i}";
+            Enemy enemy = obj.GetComponent<Enemy>();
+            enemies[i] = enemy;
+            enemy.onDie += (target) =>
+            {
+                GameManager.Instance.IncreaseKillCount();
+                StartCoroutine(Respawn(target));
+            };
+            enemy.Respawn(GetRandomSpawnPosition(true), true);
+        }
+    }
+
+    void EnemyAllStop() 
+    {
+        foreach (var enemy in enemies) 
+        {
+           enemy.Stop();   
+        }
+    }
+
+    void EnemyAllPlay() 
+    {
+        foreach (var enemy in enemies)
+        {
+            enemy.Play();
+        }
     }
 }

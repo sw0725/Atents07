@@ -1,6 +1,7 @@
 using StarterAssets;
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -34,11 +35,14 @@ public class Player : MonoBehaviour
     GunBase[] guns;
 
     GunBase activeGun;
+    PlayerInput playerInput;
 
     private void Awake()
     {
         starterAssets = GetComponent<StarterAssetsInputs>();
         controller = GetComponent<FirstPersonController>();
+        playerInput = GetComponent<PlayerInput>();
+
         GunCamera = transform.GetChild(2).gameObject;
 
         Transform c = transform.GetChild(3);
@@ -68,6 +72,8 @@ public class Player : MonoBehaviour
         onGunChange?.Invoke(activeGun);
 
         HP = MaxHP;
+
+        GameManager.Instance.onGameClear += (_) => InputDisable();
     }
 
     void DisableGunCamera(bool disable = true) 
@@ -124,8 +130,8 @@ public class Player : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void InputDisable() 
+    void InputDisable() 
     {
-        starterAssets.enabled = false;     //컴포넌트 비활성화
+        playerInput.actions.actionMaps[0].Disable();        //액션맵이 하나만 있으므로 그냥 처리
     }
 }
