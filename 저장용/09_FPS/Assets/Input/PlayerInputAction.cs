@@ -302,6 +302,54 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UI"",
+            ""id"": ""3e03b129-12f5-4711-84d0-32b1baf72e41"",
+            ""actions"": [
+                {
+                    ""name"": ""MiniMapZoomIn"",
+                    ""type"": ""Button"",
+                    ""id"": ""c82fb3d9-31aa-4d8e-8f85-c68f95e182df"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MiniMapZoomOut"",
+                    ""type"": ""Button"",
+                    ""id"": ""6308ff0f-e726-4b5e-9435-12856db0e7a5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""f46568a8-0982-45f4-b234-5b2f33861f7c"",
+                    ""path"": ""<Keyboard>/numpadPlus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MiniMapZoomIn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1fbab325-3603-4624-930b-aa26fe272cdd"",
+                    ""path"": ""<Keyboard>/numpadMinus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MiniMapZoomOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -363,6 +411,10 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_Player_Zoom = m_Player.FindAction("Zoom", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
+        // UI
+        m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
+        m_UI_MiniMapZoomIn = m_UI.FindAction("MiniMapZoomIn", throwIfNotFound: true);
+        m_UI_MiniMapZoomOut = m_UI.FindAction("MiniMapZoomOut", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -514,6 +566,60 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // UI
+    private readonly InputActionMap m_UI;
+    private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
+    private readonly InputAction m_UI_MiniMapZoomIn;
+    private readonly InputAction m_UI_MiniMapZoomOut;
+    public struct UIActions
+    {
+        private @PlayerInputAction m_Wrapper;
+        public UIActions(@PlayerInputAction wrapper) { m_Wrapper = wrapper; }
+        public InputAction @MiniMapZoomIn => m_Wrapper.m_UI_MiniMapZoomIn;
+        public InputAction @MiniMapZoomOut => m_Wrapper.m_UI_MiniMapZoomOut;
+        public InputActionMap Get() { return m_Wrapper.m_UI; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
+        public void AddCallbacks(IUIActions instance)
+        {
+            if (instance == null || m_Wrapper.m_UIActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_UIActionsCallbackInterfaces.Add(instance);
+            @MiniMapZoomIn.started += instance.OnMiniMapZoomIn;
+            @MiniMapZoomIn.performed += instance.OnMiniMapZoomIn;
+            @MiniMapZoomIn.canceled += instance.OnMiniMapZoomIn;
+            @MiniMapZoomOut.started += instance.OnMiniMapZoomOut;
+            @MiniMapZoomOut.performed += instance.OnMiniMapZoomOut;
+            @MiniMapZoomOut.canceled += instance.OnMiniMapZoomOut;
+        }
+
+        private void UnregisterCallbacks(IUIActions instance)
+        {
+            @MiniMapZoomIn.started -= instance.OnMiniMapZoomIn;
+            @MiniMapZoomIn.performed -= instance.OnMiniMapZoomIn;
+            @MiniMapZoomIn.canceled -= instance.OnMiniMapZoomIn;
+            @MiniMapZoomOut.started -= instance.OnMiniMapZoomOut;
+            @MiniMapZoomOut.performed -= instance.OnMiniMapZoomOut;
+            @MiniMapZoomOut.canceled -= instance.OnMiniMapZoomOut;
+        }
+
+        public void RemoveCallbacks(IUIActions instance)
+        {
+            if (m_Wrapper.m_UIActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IUIActions instance)
+        {
+            foreach (var item in m_Wrapper.m_UIActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_UIActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public UIActions @UI => new UIActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -559,5 +665,10 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         void OnZoom(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);
+    }
+    public interface IUIActions
+    {
+        void OnMiniMapZoomIn(InputAction.CallbackContext context);
+        void OnMiniMapZoomOut(InputAction.CallbackContext context);
     }
 }

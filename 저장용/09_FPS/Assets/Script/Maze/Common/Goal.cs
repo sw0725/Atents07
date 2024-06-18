@@ -29,7 +29,7 @@ public class Goal : MonoBehaviour
                 result.y = Random.Range(0, height);
                 break;
         }
-        transform.position = MazeVisualizer.GridToWorld(result.x, result.y);
+        transform.position = MazeVisualizer.GridToWorld(result.x, result.y) + Vector3.up;
     }
 
     private void OnTriggerEnter(Collider other)

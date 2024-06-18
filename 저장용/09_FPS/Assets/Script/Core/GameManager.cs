@@ -32,8 +32,7 @@ public class GameManager : Singltrun<GameManager>
     protected override void OnInitialize()
     {
         player = FindAnyObjectByType<Player>();
-        Vector3 centerPos = MazeVisualizer.GridToWorld(mazeWidth / 2, mazeHeight / 2);
-        player.transform.position = centerPos;
+        player.Spawn();
         player.onDie += GameOver;
 
         GameObject obj = GameObject.FindWithTag("FollowCamera");

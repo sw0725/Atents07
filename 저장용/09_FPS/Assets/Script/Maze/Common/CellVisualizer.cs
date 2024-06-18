@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CellVisualizer : MonoBehaviour
 {
     public const float CellSize = 10.0f;
 
     GameObject[] walls;
+    
+    GameObject[] coners;    //
 
     private void Awake()
     {
@@ -16,6 +19,13 @@ public class CellVisualizer : MonoBehaviour
         {
             walls[i] = c.GetChild(i).gameObject;
         }
+
+        c = transform.GetChild(2);                  //
+        coners = new GameObject[c.childCount];
+        for (int i = 0; i < walls.Length; i++)
+        {
+            coners[i] = c.GetChild(i).gameObject;
+        }
     }
 
     public void RefreshWall(byte data)          //북동남서 순서로 1이 세팅됫으면 길, 0이 세팅됫으면 벽
@@ -24,6 +34,24 @@ public class CellVisualizer : MonoBehaviour
         {
             int mask = 1 << i;
             walls[i].SetActive(!((data & mask) != 0));
+        }
+    }
+
+    public void RefreshConer(Cell[] neghbor)                 //북서, 북동, 남동, 남서        북동남서    //
+    {
+        int index = 0;
+        foreach(Cell cell in neghbor) 
+        {
+            if (cell.IsPath((Direction)(3 + index)))
+            {
+
+            }
+            else
+            {
+
+                coners[index].SetActive(false);
+            }
+            index++;
         }
     }
 

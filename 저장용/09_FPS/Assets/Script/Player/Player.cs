@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
     public Action onDie;
     public Action<float> onHPChange;       //현재 hp
     public Action<float> onAttacked;       //공격받은 각도(정면 0, 후면 180)
+    public Action onSpawn;
 
     StarterAssetsInputs starterAssets;
     FirstPersonController controller;
@@ -128,6 +129,14 @@ public class Player : MonoBehaviour
     {
         onDie?.Invoke();
         gameObject.SetActive(false);
+    }
+
+    public void Spawn() 
+    {
+        GameManager gameManager = GameManager.Instance;
+        Vector3 centerPos = MazeVisualizer.GridToWorld(gameManager.MazeWidth / 2, gameManager.MazeHeight / 2);
+        transform.position = centerPos;
+        onSpawn?.Invoke();
     }
 
     void InputDisable() 

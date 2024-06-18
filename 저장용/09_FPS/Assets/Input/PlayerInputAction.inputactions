@@ -280,6 +280,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "UI",
+            "id": "3e03b129-12f5-4711-84d0-32b1baf72e41",
+            "actions": [
+                {
+                    "name": "MiniMapZoomIn",
+                    "type": "Button",
+                    "id": "c82fb3d9-31aa-4d8e-8f85-c68f95e182df",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MiniMapZoomOut",
+                    "type": "Button",
+                    "id": "6308ff0f-e726-4b5e-9435-12856db0e7a5",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f46568a8-0982-45f4-b234-5b2f33861f7c",
+                    "path": "<Keyboard>/numpadPlus",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MiniMapZoomIn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1fbab325-3603-4624-930b-aa26fe272cdd",
+                    "path": "<Keyboard>/numpadMinus",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MiniMapZoomOut",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

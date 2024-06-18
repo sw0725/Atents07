@@ -18,8 +18,14 @@ public class MazeVisualizer : MonoBehaviour
 
             CellVisualizer cellVisualizer = obj.GetComponent<CellVisualizer>();
             cellVisualizer.RefreshWall(cell.Path);
-        }
 
+            Cell[] cc = new Cell[4];                                    //
+            cc[0] = maze.Cells[maze.GridToIndex(cell.X, cell.Y + 1)];
+            cc[1] = maze.Cells[maze.GridToIndex(cell.X + 1, cell.Y)];
+            cc[2] = maze.Cells[maze.GridToIndex(cell.X, cell.Y - 1)];
+            cc[3] = maze.Cells[maze.GridToIndex(cell.X - 1, cell.Y)];
+            cellVisualizer.RefreshConer(cc);             
+        }
         GameObject goalObj = Instantiate(goalPrefab, transform);
         Goal goal = goalObj.GetComponent<Goal>();
         goal.SetRandomPos(maze.Width, maze.Height);

@@ -72,7 +72,7 @@ public class Maze
     {
         return new(index % width, index/width);
     }
-    protected int GridToIndex(int x, int y)
+    public int GridToIndex(int x, int y)        //
     {
         return x + y * width;
     }
