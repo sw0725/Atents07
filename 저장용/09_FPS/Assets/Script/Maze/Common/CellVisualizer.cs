@@ -8,8 +8,7 @@ public class CellVisualizer : MonoBehaviour
     public const float CellSize = 10.0f;
 
     GameObject[] walls;
-    
-    GameObject[] coners;    //
+    GameObject[] coners;
 
     private void Awake()
     {
@@ -20,9 +19,9 @@ public class CellVisualizer : MonoBehaviour
             walls[i] = c.GetChild(i).gameObject;
         }
 
-        c = transform.GetChild(2);                  //
+        c = transform.GetChild(2);
         coners = new GameObject[c.childCount];
-        for (int i = 0; i < walls.Length; i++)
+        for (int i = 0; i < coners.Length; i++)
         {
             coners[i] = c.GetChild(i).gameObject;
         }
@@ -37,21 +36,12 @@ public class CellVisualizer : MonoBehaviour
         }
     }
 
-    public void RefreshConer(Cell[] neghbor)                 //북서, 북동, 남동, 남서        북동남서    //
+    public void RefreshConer(int data)          //북동남서 순서로 1이 세팅됫으면 길, 0이 세팅됫으면 벽
     {
-        int index = 0;
-        foreach(Cell cell in neghbor) 
+        for (int i = 0; i < coners.Length; i++)
         {
-            if (cell.IsPath((Direction)(3 + index)))
-            {
-
-            }
-            else
-            {
-
-                coners[index].SetActive(false);
-            }
-            index++;
+            int mask = 1 << i;
+            coners[i].SetActive(!((data & mask) != 0));
         }
     }
 

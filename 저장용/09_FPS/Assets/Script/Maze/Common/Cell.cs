@@ -46,4 +46,15 @@ public class Cell
     {
         return (path & (byte)direction) == 0;
     }
+
+    public bool ConerCheck(Direction dir1, Direction dir2) 
+    {
+        bool result = false;
+        Direction coner = dir1 | dir2;
+        if (coner == (Direction.North | Direction.East) || coner == (Direction.North | Direction.West) || coner == (Direction.South | Direction.East) || coner == (Direction.South | Direction.West)) 
+        {
+            result = IsPath(dir1) && IsPath(dir2);
+        }
+        return result;
+    }
 }

@@ -7,9 +7,33 @@ public class MazeVisualizer : MonoBehaviour
     public GameObject cellPrefab;
     public GameObject goalPrefab;
 
+    Maze maze = null;
+
+    Dictionary<Direction, Vector2Int> neighborDir;
+    (Direction, Direction)[] coners = null;
+
+    private void Awake()
+    {
+        neighborDir = new Dictionary<Direction, Vector2Int>(4);
+        neighborDir[Direction.North] = new Vector2Int(0, -1);
+        neighborDir[Direction.East] = new Vector2Int(1, 0);
+        neighborDir[Direction.South] = new Vector2Int(0, 1);
+        neighborDir[Direction.West] = new Vector2Int(-1, 0);
+
+        coners = new (Direction, Direction)[]
+        {
+            (Direction.North, Direction.West),
+            (Direction.North, Direction.East),
+            (Direction.South, Direction.East),
+            (Direction.South, Direction.West),
+        };
+    }
+
     public void Draw(Maze maze) 
     {
+        this.maze = maze;
         float size = CellVisualizer.CellSize;
+
         foreach(var cell in maze.Cells) 
         {
             GameObject obj = Instantiate(cellPrefab, transform);
@@ -19,12 +43,15 @@ public class MazeVisualizer : MonoBehaviour
             CellVisualizer cellVisualizer = obj.GetComponent<CellVisualizer>();
             cellVisualizer.RefreshWall(cell.Path);
 
-            Cell[] cc = new Cell[4];                                    //
-            cc[0] = maze.Cells[maze.GridToIndex(cell.X, cell.Y + 1)];
-            cc[1] = maze.Cells[maze.GridToIndex(cell.X + 1, cell.Y)];
-            cc[2] = maze.Cells[maze.GridToIndex(cell.X, cell.Y - 1)];
-            cc[3] = maze.Cells[maze.GridToIndex(cell.X - 1, cell.Y)];
-            cellVisualizer.RefreshConer(cc);             
+            int conerMask = 0;
+            for (int i = 0; i < coners.Length; i++) 
+            {
+                if (IsConerVisible(cell, coners[i].Item1, coners[i].Item2)) 
+                {
+                    conerMask |= 1 << i;
+                }
+            }
+            cellVisualizer.RefreshConer(conerMask);
         }
         GameObject goalObj = Instantiate(goalPrefab, transform);
         Goal goal = goalObj.GetComponent<Goal>();
@@ -53,6 +80,19 @@ public class MazeVisualizer : MonoBehaviour
     {
         float size = CellVisualizer.CellSize;
         Vector2Int result = new((int)(world.x / size), (int)(-world.z / size));
+        return result;
+    }
+
+    bool IsConerVisible(Cell cell, Direction dir1, Direction dir2) 
+    {
+        bool result = false;
+        if(cell.ConerCheck(dir1, dir2)) 
+        {
+            Cell neighborCell1 = maze.GetCell(cell.X + neighborDir[dir1].x, cell.Y + neighborDir[dir1].y);
+            Cell neighborCell2 = maze.GetCell(cell.X + neighborDir[dir2].x, cell.Y + neighborDir[dir2].y);
+
+            result = neighborCell1.IsWall(dir2) && neighborCell2.IsWall(dir1);
+        }
         return result;
     }
 }

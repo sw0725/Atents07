@@ -32,8 +32,10 @@ public class GameManager : Singltrun<GameManager>
     protected override void OnInitialize()
     {
         player = FindAnyObjectByType<Player>();
-        player.Spawn();
         player.onDie += GameOver;
+
+        LoadingScreen loadingScreen = FindAnyObjectByType<LoadingScreen>();
+        loadingScreen.Initialize();
 
         GameObject obj = GameObject.FindWithTag("FollowCamera");
         if (obj != null) 
@@ -42,6 +44,7 @@ public class GameManager : Singltrun<GameManager>
         }
 
         enemySpawner = FindAnyObjectByType<EnemySpawner>();
+        enemySpawner.onSpawnCompleted += () => loadingScreen.OnLoadingProgress(1.0f);
 
         generator = FindAnyObjectByType<MazeGenerator>();
         if(generator != null)
@@ -49,6 +52,8 @@ public class GameManager : Singltrun<GameManager>
             generator.Generate(MazeWidth, MazeHeight);
             generator.onMazeGenerated += () =>
             {
+                loadingScreen.OnLoadingProgress(0.7f);
+
                 enemySpawner?.EnemyAllSpawn();
 
                 playTime = 0.0f;

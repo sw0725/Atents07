@@ -72,12 +72,18 @@ public class Maze
     {
         return new(index % width, index/width);
     }
-    public int GridToIndex(int x, int y)        //
+    protected int GridToIndex(int x, int y)
     {
         return x + y * width;
     }
     protected int GridToIndex(Vector2Int grid)
     {
         return grid.x + grid.y * width;
+    }
+
+    public Cell GetCell(int x, int y) 
+    {
+        int index = GridToIndex(x, y);
+        return cells[index];
     }
 }

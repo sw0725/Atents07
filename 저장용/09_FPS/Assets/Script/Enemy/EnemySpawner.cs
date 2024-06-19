@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,8 @@ public class EnemySpawner : MonoBehaviour
 {
     public int enemyCount = 50;
     public GameObject enemyPrefab;
+
+    public Action onSpawnCompleted;
 
     int mazeWidth;
     int mazeHeight;
@@ -45,9 +48,10 @@ public class EnemySpawner : MonoBehaviour
         int x;
         int y;
         int limit = 100;
+        float halfSize = Mathf.Min(mazeWidth, mazeHeight) * 0.5f;
         do
         {
-            int index = Random.Range(0, mazeHeight * mazeWidth);
+            int index = UnityEngine.Random.Range(0, mazeHeight * mazeWidth);
             x = index / mazeWidth;
             y = index % mazeHeight;
             limit--;
@@ -55,7 +59,7 @@ public class EnemySpawner : MonoBehaviour
             {
                 break;
             }
-        } while (!(x < playerPos.x + 5 && x > playerPos.x - 5 && y < playerPos.y + 5 && y > playerPos.y - 5));
+        } while (!(x < playerPos.x + halfSize && x > playerPos.x - halfSize && y < playerPos.y + halfSize && y > playerPos.y - halfSize));
 
         Vector3 world = MazeVisualizer.GridToWorld(x, y);
 
@@ -68,7 +72,7 @@ public class EnemySpawner : MonoBehaviour
         target.Respawn(GetRandomSpawnPosition());
     }
 
-    public void EnemyAllSpawn() 
+    public void EnemyAllSpawn() //적을 모두 스폰
     {
         for (int i = 0; i < enemyCount; i++)
         {
@@ -83,6 +87,7 @@ public class EnemySpawner : MonoBehaviour
             };
             enemy.Respawn(GetRandomSpawnPosition(true), true);
         }
+        onSpawnCompleted?.Invoke();
     }
 
     void EnemyAllStop() 
