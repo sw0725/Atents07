@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ResultPanel : MonoBehaviour
@@ -23,6 +24,7 @@ public class ResultPanel : MonoBehaviour
         c = transform.GetChild(5);
 
         Button restart = c.GetComponent<Button>();
+        restart.onClick.AddListener(() => SceneManager.LoadScene(0));
     }
 
     public void Open(bool isClear, int killCount, float playTime) 

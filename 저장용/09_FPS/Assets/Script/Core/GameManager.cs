@@ -34,6 +34,9 @@ public class GameManager : Singltrun<GameManager>
         player = FindAnyObjectByType<Player>();
         player.onDie += GameOver;
 
+        MiniMapCamera miniMap = FindAnyObjectByType<MiniMapCamera>();
+        miniMap.Initialize(player);
+
         LoadingScreen loadingScreen = FindAnyObjectByType<LoadingScreen>();
         loadingScreen.Initialize();
 
@@ -44,7 +47,11 @@ public class GameManager : Singltrun<GameManager>
         }
 
         enemySpawner = FindAnyObjectByType<EnemySpawner>();
-        enemySpawner.onSpawnCompleted += () => loadingScreen.OnLoadingProgress(1.0f);
+        enemySpawner.onSpawnCompleted += () =>
+        {
+            loadingScreen.OnLoadingProgress(1.0f);
+            player.Spawn();
+        };
 
         generator = FindAnyObjectByType<MazeGenerator>();
         if(generator != null)
@@ -63,6 +70,9 @@ public class GameManager : Singltrun<GameManager>
 
         ResultPanel resultPanel = FindAnyObjectByType<ResultPanel>();
         resultPanel.gameObject.SetActive(false);
+
+        onGameStart = null;     //델리게이트 초기화 삭제되지 않는 오브제라 자연 초기화가 안됨
+        onGameClear = null;
 
         onGameClear += (isClear) =>
         {

@@ -324,6 +324,15 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AnyKey"",
+                    ""type"": ""Button"",
+                    ""id"": ""e1f75c69-7f96-4dcf-870d-f437a6a304a2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -346,6 +355,39 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MiniMapZoomOut"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ef41b68d-c7a8-4232-83cc-e3082a717242"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AnyKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4f0c65e9-a82c-4021-b305-c493706e28bb"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AnyKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""250573af-5e4a-475e-b640-b55b35802590"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AnyKey"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -415,6 +457,7 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_MiniMapZoomIn = m_UI.FindAction("MiniMapZoomIn", throwIfNotFound: true);
         m_UI_MiniMapZoomOut = m_UI.FindAction("MiniMapZoomOut", throwIfNotFound: true);
+        m_UI_AnyKey = m_UI.FindAction("AnyKey", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -572,12 +615,14 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
     private readonly InputAction m_UI_MiniMapZoomIn;
     private readonly InputAction m_UI_MiniMapZoomOut;
+    private readonly InputAction m_UI_AnyKey;
     public struct UIActions
     {
         private @PlayerInputAction m_Wrapper;
         public UIActions(@PlayerInputAction wrapper) { m_Wrapper = wrapper; }
         public InputAction @MiniMapZoomIn => m_Wrapper.m_UI_MiniMapZoomIn;
         public InputAction @MiniMapZoomOut => m_Wrapper.m_UI_MiniMapZoomOut;
+        public InputAction @AnyKey => m_Wrapper.m_UI_AnyKey;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -593,6 +638,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @MiniMapZoomOut.started += instance.OnMiniMapZoomOut;
             @MiniMapZoomOut.performed += instance.OnMiniMapZoomOut;
             @MiniMapZoomOut.canceled += instance.OnMiniMapZoomOut;
+            @AnyKey.started += instance.OnAnyKey;
+            @AnyKey.performed += instance.OnAnyKey;
+            @AnyKey.canceled += instance.OnAnyKey;
         }
 
         private void UnregisterCallbacks(IUIActions instance)
@@ -603,6 +651,9 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
             @MiniMapZoomOut.started -= instance.OnMiniMapZoomOut;
             @MiniMapZoomOut.performed -= instance.OnMiniMapZoomOut;
             @MiniMapZoomOut.canceled -= instance.OnMiniMapZoomOut;
+            @AnyKey.started -= instance.OnAnyKey;
+            @AnyKey.performed -= instance.OnAnyKey;
+            @AnyKey.canceled -= instance.OnAnyKey;
         }
 
         public void RemoveCallbacks(IUIActions instance)
@@ -670,5 +721,6 @@ public partial class @PlayerInputAction: IInputActionCollection2, IDisposable
     {
         void OnMiniMapZoomIn(InputAction.CallbackContext context);
         void OnMiniMapZoomOut(InputAction.CallbackContext context);
+        void OnAnyKey(InputAction.CallbackContext context);
     }
 }

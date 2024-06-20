@@ -75,8 +75,6 @@ public class Player : MonoBehaviour
         HP = MaxHP;
 
         GameManager.Instance.onGameClear += (_) => InputDisable();
-
-        Spawn();
     }
 
     void DisableGunCamera(bool disable = true) 

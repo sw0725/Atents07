@@ -41,10 +41,13 @@ public class MiniMapCamera : MonoBehaviour
     private void Start()
     {
         zoomTarget = zoomMin;
+    }
 
-        Player player = GameManager.Instance.Player;
+    public void Initialize(Player player)
+    {
         offset = transform.position;
         target = player.transform;
+        transform.position = target.position + offset;
         player.onSpawn += () =>
         {
             transform.position = target.position;

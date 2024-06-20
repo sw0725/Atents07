@@ -25,6 +25,8 @@ namespace StarterAssets
 
 		public Action<bool> onZoom;
 
+		bool isGameEnd = false;
+
 		Player player;
 		CinemachineVirtualCamera followCamera;
 
@@ -36,6 +38,7 @@ namespace StarterAssets
         private void Start()
         {
 			followCamera = GameManager.Instance.FollowCamera;
+			GameManager.Instance.onGameClear += (_) => isGameEnd = true;
         }
 
 #if ENABLE_INPUT_SYSTEM
@@ -146,7 +149,10 @@ namespace StarterAssets
 		
 		private void OnApplicationFocus(bool hasFocus)
 		{
-			SetCursorState(cursorLocked);
+			if (!isGameEnd) 
+			{
+				SetCursorState(cursorLocked);
+			}
 		}
 
 		private void SetCursorState(bool newState)

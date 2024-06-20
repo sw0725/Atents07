@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class LoadingScreen : MonoBehaviour
@@ -31,8 +33,12 @@ public class LoadingScreen : MonoBehaviour
     TextMeshProUGUI completeText;
     TextMeshProUGUI pressText;
 
+    PlayerInputAction action;
+
     private void Awake()
     {
+        action = new PlayerInputAction();
+
         Transform c = transform.GetChild(0);
         loadingText = c.GetComponent<TextMeshProUGUI>();
         c = transform.GetChild(1);
@@ -43,6 +49,17 @@ public class LoadingScreen : MonoBehaviour
         c = transform.GetChild(3);
         slider = c.GetComponent<Slider>();
         slider.value = 0;
+    }
+
+    private void OnEnable()
+    {
+        action.UI.AnyKey.performed += OnAnyKey;
+    }
+
+    private void OnDisable()
+    {
+        action.UI.AnyKey.performed -= OnAnyKey;
+        action.UI.Disable();
     }
 
     private void Update()
@@ -82,5 +99,13 @@ public class LoadingScreen : MonoBehaviour
         slider.value = 1;
 
         StopAllCoroutines();
+
+        action.UI.Enable();
+    }
+
+    private void OnAnyKey(InputAction.CallbackContext context)
+    {
+        gameObject.SetActive(false);
+        GameManager.Instance.GameStart();
     }
 }
