@@ -19,13 +19,13 @@ public class Ball : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (Life.Expired(Runner))                           //5초가 지낫는가
+        if (Life.Expired(Runner))                           //life만료시
         {
             Runner.Despawn(Object);
         }
         else 
         {
-            transform.position += Runner.DeltaTime * moveSpeed * transform.forward;
+            transform.position += Runner.DeltaTime * moveSpeed * transform.forward;     //앞으로 이동
         }
     }
 }

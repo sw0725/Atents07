@@ -6,6 +6,7 @@ using Fusion.Sockets;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using Fusion.Addons.Physics;
 
 public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -18,7 +19,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     Vector3 inputDir = Vector3.zero;
 
-    bool isShootPress = false;    
+    bool isShootPress = false;      //왼
+    bool isPhyscShootPress = false; //오
     
     PlayerInputAction inputActions;
 
@@ -30,6 +32,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     async void StartGame(GameMode gameMode)     //async = 비동기 실행 함수, 이 함수가 시작되면 끝날때까지 대기한다.(await)
     {                                           //세션을 열거나 게임에 접속한다 gameMode = 호스트?클라이언트?싱글?
         myRunner = this.gameObject.AddComponent<NetworkRunner>();
+        this.gameObject.AddComponent<RunnerSimulatePhysics3D>();    //물리 시뮬레이션 처리용 컴포넌트
         myRunner.ProvideInput = true;             //유저 입력을 제공할 것이라 설정 => onInput 작동 가능
 
         SceneRef scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);  //현재씬을 기반으로 씬 래퍼런스 가져옴
@@ -57,6 +60,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         inputActions.Player.Move.canceled += OnMove;
         inputActions.Player.Shoot.performed += OnShootPress;
         inputActions.Player.Shoot.canceled += OnShootRelease;
+        inputActions.Player.PhyscShoot.performed += OnPhyscShootPress;
+        inputActions.Player.PhyscShoot.canceled += OnPhyscShootRelease;
     }
 
 
@@ -66,6 +71,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         inputActions.Player.Move.canceled -= OnMove;
         inputActions.Player.Shoot.performed -= OnShootPress;
         inputActions.Player.Shoot.canceled -= OnShootRelease;
+        inputActions.Player.PhyscShoot.performed -= OnPhyscShootPress;
+        inputActions.Player.PhyscShoot.canceled -= OnPhyscShootRelease;
         inputActions.Player.Disable();
     }
 
@@ -83,6 +90,16 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     private void OnShootRelease(InputAction.CallbackContext context)
     {
         isShootPress = false;
+    }
+
+    private void OnPhyscShootPress(InputAction.CallbackContext context)
+    {
+        isPhyscShootPress = true;
+    }
+
+    private void OnPhyscShootRelease(InputAction.CallbackContext context)
+    {
+        isPhyscShootPress = false;
     }
 
     void OnGUI()        //유니티제공, GUI그리는 이벤트 함수 코드대로 UI생성
@@ -124,6 +141,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         data.direction = inputDir;                                      //if (Keyboard.current.wKey.isPressed) 이걸로 입력캐치가 되나 함수호출시마다 하드웨어에 접근해야함
 
         data.buttons.Set(NetworkInputData.MouseButtonLeft, isShootPress);
+        data.buttons.Set(NetworkInputData.MouseButtonRight, isPhyscShootPress);
 
         input.Set(data);    //결정된 입력을 서버에 전달
     }
